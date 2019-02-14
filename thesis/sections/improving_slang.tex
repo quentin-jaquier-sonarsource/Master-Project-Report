@@ -1,4 +1,112 @@
 \section{Improving SLang: Null pointer consistency}
 \label{sec:improving_slang}
 
+SLang has already demonstrated his power to add 4 new language, some of them in less than a month, and to implements more than 40 common rules. 
+However, the language is still young and the current rules involve mainly syntactic element. 
+In this section, we are going to attend to push \slang further, to implements more complex checks.
+To estimates the quality of the results of a checker implemented on \slang, we will use a variation null pointer consistency rule. 
+We choose this rules because this is a well-known bug and well-studied in static analysis, a lot of different implementations exists with different complexity.
+
 \subsection{What is null pointer consistency}
+\label{subsec:null_pointer_consistency}
+
+Null pointer consistency is the verification that a pointer that is dereferenced is valid and not equals to null. Dereferencing a null pointer will results at best to an abrupt program termination, and at worst could be used by an attacker, by revealing debugging information or bypassing security logic for example.
+
+\subsection{Belief style Null Pointer Checker}
+\label{subsec:belief_style}
+
+The goal is to implement a checker that implements a variation of the current check “null pointers should not be dereferenced” \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
+The current implementation of the checker of SonarSource, SonarJava, use a complex symbolic execution engine to track the potential values of variables and report when a null pointer can happen.
+[TODO: eventually discuss S.E. with difference and limits].
+Our initial goal is not to find all the issues of this checker, but to show that it is still possible to find interesting issues, even if we implement the check on an incomplete intermediate representation such as \slang.
+The idea of this first checker is to use facts implied by the code, that we call belief \cite{Engler:2001:BDB:502059.502041}.
+It assumes that the programmer’s goal is not to make his code crash. If two contradicting believes are detected, we report an issue.
+Concretely, we are going to try to detect the use of a pointer P, followed by a check for null. The check for null can be equals or not equals to null, both statements implying that the programmer believes that the pointer p can be null.
+
+\lstinputlisting[label={lst:typical-issue},
+caption=Typical example that the checker reports]{code/typical-issue.scala}
+
+Listing \ref{lst:typical-issue} demonstrate a typical example that the checker is able to report. 
+From line 1, p is dereferenced without having been checked for null, we can imply that the programmer believes that, at this point, the pointer is not null, otherwise the program will crash. 
+If later, at line $\#4$, p is checked for null, it implies that the programmer thinks that p can in fact be null, contradicting the previous belief: we report an issue from this contradiction.
+To implement this check, we need to have a representation of the control flow of the program, that is typically represented by a control flow graph.
+
+\subsubsection{Control Flow Graph}
+\label{subsubsec:control_flow_graph}
+
+A control flow graph is a directed graph that represents the execution flow of a program, the nodes of the graph are individuals instructions, and the edges represents the control flow. More precisely, there is an edge from a node \emph{N1} to a node \emph{N2}, if and only if the instruction of the node \emph{N2} can be directly executed after the node \emph{N1}.
+
+
+\subparagraph{Basic Block}
+We initially described the nodes as individual instructions, however, we can easily see that many instruction are always executed unconditionally in the same sequence.
+We can regroup these instructions in the same node that we are going to call basic block, representing the maximum sequence of instruction that are executed unconditionally in sequence. 
+This greatly reduce the number of nodes present in the graph, reducing therefore the complexity of future computation on top of the graph.
+
+\subsection{Formal definition of the checker}
+\label{subsec:checker_formal_definition}
+More formally, the idea is to check that a use of a pointer \emph{p} post dominates the check of \emph{p} for null, intuitively, we can say that all path arriving to the check of \emph{p} goes through a use of \emph{p}, without having been reassigned between the two. 
+To do this, we are going to use a data-flow analysis using the control flow graph previously described.
+
+\subsubsection{Data-flow Analysis}
+\label{subsubsec:data_flow_analysis}
+
+[TODO: ev. More high level description of dataflow analysis]
+The analysis tracks the pointer uses (set of pointer believed to be non-null) and flag when the same pointer is checked afterwards. 
+The control flow graph will only be build for the current function being analyzed (intra procedural), and will not have any access to other functions or others files (inter procedural).
+
+Formally:
+
+\begin{equation}\label{eqn:dataflow1}
+i_{n} = o_{p1}  \cap   o_{p2}  \cap  ... \cap   o_{pk}
+\end{equation}
+
+Where $p1, ..., pk$ are all the predecessors of n, $i_{n}$ the input set of node \emph{n}, and  $o_{n}$ the output set.
+
+\begin{equation}\label{eqn:dataflow2}
+o_{n} = gen(n)  \cup   (i_{p2} \setminus kill(n))
+\end{equation}
+
+Where
+
+\begin{equation}\label{eqn:dataflow3}
+gen(n) =\text{pointer that is used in node n}
+\end{equation}
+\begin{equation}\label{eqn:dataflow4}
+kill(n) = \text{assignment of pointer in node n}
+\end{equation}
+
+Intuitively, we can see the analysis as follows:
+\begin{enumerate}
+	\item The set of believed to be non-null pointer split at fork. \newline 
+	\item On join, we take the intersection of incoming path, this means that we will remove the ones kill on at least one path. Also called \emph{MUST} analysis. \newline 
+\end{enumerate}
+
+\subsection{Variation of the rule}
+\label{subsec:rule_variation}
+
+\begin{table}[h]
+	\centering
+	\caption{Number of issues per type of analysis}
+	\label{table:issue_per_analysis_type}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\bf Analysis type &  \bf Number of issues &  \bf False Positive $[\%]$ \\ \hline
+		Forward - MUST &  32 &  0 \\ 
+		Forward - MAY &  2500 & $> 90$  \\ 
+		Backward - MUST &  65 & 80 \\ \hline
+	\end{tabular}
+\end{table}
+
+The version described before shows one way of doing the analysis, there is multiple small variation that we can do on the analysis that will greatly influence the results.
+
+\subsubsection{May vs Must analysis}
+\label{subsubsec:may_vs_must}
+With a MAY analysis, the computation of the input set from equation \ref{eqn:dataflow1} becomes:
+\begin{equation}\label{eqn:mayvsmust}
+i_{n} = o_{p1}  \cup   o_{p2}  \cup  ... \cup   o_{pk}
+\end{equation}
+
+If a \emph{MUST} analysis takes the intersection of all incoming path, the \emph{MAY} analysis takes the union of the paths. It means that a pointer will be removed from the set only if all path re-assign this variable.
+The choice of \emph{MUST} over \emph{MAY} goes in the sense of the idea to have as little false positives as possible described in Precision and Recall trade off.
+Table \ref{table:issue_per_analysis_type} shows the differences between a May and a Must analysis of the checker ran on the same sets of sources.
+

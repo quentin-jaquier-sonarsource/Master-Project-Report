@@ -39,6 +39,8 @@
 \usepackage{csvsimple}
 
 \usepackage{highlighter}
+\usepackage{qtree} 				% For AST
+
 
 
 \theoremstyle{definition}
@@ -52,8 +54,7 @@
 
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
-\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
-\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommand{\slang}{SLang }
 
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3} } }
@@ -62,12 +63,6 @@
 
 \addbibresource{thesis.bib}
 \renewcommand{\baselinestretch}{1.1}
-
-% Single spacing after dots and colons
-\frenchspacing
-\hyphenation{Scala}
-\hyphenation{Dotty}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                        Setup

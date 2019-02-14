@@ -1,2 +1,148 @@
 \section{Adding a new language to SLang}
 \label{sec:new_language}
+
+In this part, we are going to discuss the challenge to add a new language to \slang, with a general procedure and a concrete example with Scala.
+
+\subsection{General Procedure}
+\label{subsec:general_procedure}
+
+The addition of a new language follow a general procedure that we can be described in a high level way. 
+The first step is to choose a front end that we are going to use to perform the parsing of the language. 
+
+\subsubsection{Front end}
+\label{subsubsec:front_end}
+
+To choose a front-end, we have to take into consideration multiples points:
+\begin{enumerate}
+	\item \textit{License} \newline The tool developed will be open source, we have to use an existing front end that that have a compatible license.
+	\item \textit{Features} \newline Static analysis requires specifics need, that is not necessarily provided by any front-end. 	For example, we need precise location of tokens to be able to report the issues to the user as precisely as possible. Another example is the comments, that is required for some of the common rules [add ref], but is typically removed early in a compiler front-end. 
+	\item \textit{Maintenance} \newline 
+	The last criteria is the completeness and maintenance. We want a tool that is regularly maintained and that support the eventual new feature of the language that will arise. 
+\end{enumerate}
+
+\subsubsection{Incrementally add new mapping and enable rules}
+\label{subsubsec:new_mapping_and_enables_rules}
+
+With the front-end, we now have access to the intermediate representation of the original language. 
+We can now start to work on enabling more and more rules. 
+The work usually start by looking at which rule we want to implements. 
+Depending on the rules, we have to add the support for more nodes. 
+If the prerequisite for the front-end are respected, the initial effort to add the mapping for a new node is an easy task. 
+Once we have added the nodes needed by the rule, and enabled it, we can then look at the results. 
+This is the critical step, we have to make sure that the rule make sense on this new language, and that the issues reported are relevant. 
+
+There is multiple way to improve the results. 
+The first one is to setup the parameters of the rule. 
+For example, all the rules of naming convention have to be setup with the convention of the language. 
+Sometimes, the rules simply does not apply for the language. 
+For example, if a language does not have a \emph{switch} statement, all the rules related to \emph{switch} will not apply to this language.
+The most challenging situation arise when the situation is not clear. 
+The imprecision induce from the approximate translation lead to situations where the rules could apply, but the language specific feature change the behavior of the checks. 
+These problematic situations have to be taken care on case by case.
+
+The problem of reporting relevant issues without too much noise is common in static analysis, and is often referred as the precision and recall trade-off.
+
+\subsubsection{Precision and Recall trade-off}
+\label{subsubsec:precision_recall}
+
+In static analysis, a common challenge is to deal with the precision and recall trade-off. When reporting an issue, we can be in two situation:
+
+\begin{enumerate}
+	\item \textit{False Positive} \newline The tool is reporting a non existing bug.
+	\item \textit{True Positive} \newline The tool is reporting real bug reported. 
+\end{enumerate}
+Similarly, we can have false and true negative, for real issue not reported and non existing bug not reported, respectively. 
+
+\emph{Precision} is the number of true positive, over the total number of issues reported by the tool ($ \emph{true positive} + \emph{false positive} $). \emph{Recall} is the number of true positive over the number of issues present in the code. Finding good balance is a challenging task, in the first case, the programmer don’t want to be surrounded with issues that he does not consider as relevant, it will hide the real issues and discredit the tool. In the other extreme, a checker that never report any issue will never report false positive, but obviously not be useful, and will contain a lot of false negative. There is no clear solution to this trade-off, it mainly depends on the context in which the tool is used. An analysis of the software of an aircraft might want to have a high recall while a user working on a small project would like precise tool. For our check, we will focus on having as little false positive as possible, accepting therefore more false negative, but still report real issues. This is an important choice since it will greatly influence our design and implementation choices.
+
+An important note is that we are not in the context of proving the absence of bugs, that our checker is sound, but we want to reduce at best their occurrences by reporting real problems, to be as complete as possible.
+
+\subsection{A concrete example: Scala}
+\label{subsec:concrete_example}
+
+Scala is particularly interesting as it is the first functional language that is going to be added to \slang.
+Scalameta \cite{Scalameta:2019:Online} provide all the features that we need, is widely used by the community and is intended to be used by static analysis tool. 
+It seems to suit perfectly to the requirements for a good front end.
+
+\subsubsection{Incrementally mapping Scala to SLang}
+\label{subsubsec:scala_to_slang}
+Now that we have chosen a front end, we can use it to obtain a Scala AST from a Scala file. At this point, we already have enough information to activate a first rule: file should parse.
+The first step from this AST is to extract comments, and translate the Scalameta token into \slang token.
+With this simple step, we are already able to enable the 4 new rules related to comments(S4663, S1134, S1135, S1451).
+The second step is to start the translation. As in any compiler phase that perform translation, the base will be a pattern matching on the current node. 
+We will traverse the tree using a top-down approach. 
+The initial step is to map all nodes to native tree, that will represents nodes that we do not know anything about. 
+We still have access to the token of the native nodes, we can therefore already activate the copy paste detection and the different metrics. 
+In addition, all the rules related to the structure of a file can already be enabled: length of line, tabulations, length of file. (S103, S105, S104).
+With only little effort, we manage to enable 8 rules, and provide a copy/paste detection and metrics. 
+We will continue the effort by adding more and more nodes translations, and activating more and more rules.
+
+Most of the nodes from the Scala AST have a direct equivalent in \slang, the translation effort is just to make sure that the meaning of this node in the original language is the one intended in \slang and that the metadata is correctly handled. This is the case for package/import declaration, literal, block for example. Surprisingly, more complex nodes such as loop, if tree, pattern match also fall into this category.
+In fact,all nodes in \slang have an equivalent in Scalameta and they all follow the same process: we recursively build the children and eventually make sure they exists, but no additional effort than building the children and grouping the metadata is required to build the node in \slang.
+
+\subsubsection{Reducing the false positives}
+\label{subsubsec:reducing_false_positives}
+
+\slang is driven by the rules, when we add a new node and enable a new rule, we have to make sure that the current rules make sense. 
+In the case of Scala, some of the features greatly reduce the quality of rules.
+One quick but naive solution when facing false positive is to map the problematic node to native, to remove the problematic case.
+
+\lstinputlisting[label={lst:pattern-match-fp},
+caption=Pattern matching that can cause false positives]{code/pattern-match-fp.scala}
+
+For example, listing \ref{lst:pattern-match-fp} shows a correct pattern matching, but with the current mapping, we only add the pattern \emph{”a”} to the condition of the \emph{match} case, and not the guard (\emph{if(variable)}). 
+This will incorrectly trigger the rule that report identical pattern in a conditional structure. 
+If we map the match case to native, this solve the problem, but introduce false negative for the rules that report identical branch implementation, or other rules related to match tree.
+
+Identifying which node can lead to false positive can be done during the mapping, but sometimes it is hard to have a feeling of where the problems can happen. 
+To identify the potential problematic cases, we can store in all nodes, the original node from which it was created. 
+After the translation, we can compute a mapping, from every original node to the node(s) in \slang. 
+This gives us a huge list with all nodes present in Scalameta, that is not yet useful to do identify potential problems. 
+The first observation is that the majority of the nodes are mapped 100\% to native nodes. This is not a problem, we know that we do not need all the nodes from the original language to perform our checks. 
+The more interesting cases are the original nodes that are mapped to a \slang node and a native node. 
+All the rules that use the nodes that are conditionally translated are subject to false negatives.
+
+\begin{table}[h]
+	\centering
+	\caption{Mapping from a node in Scalameta to the translated node in SLang, with the percentage}
+	\label{table:interesting_mapping}
+	\begin{tabular}{|c|c|}
+		\hline
+		DefnDefImpl (1) &  FunctionDeclarationTree(90\%); NativeTree(10\%) \\ \hline
+		TermMatch (2) &  MatchTreeImpl(70\%); BlockTree (21\%); NativeTreeImpl(9\%) \\ \hline
+		DefnValImpl (3) &  VariableDeclarationTreeImpl(64\%); NativeTreeImpl(36\%) \\ \hline
+		DefnVarImpl (3) & NativeTreeImpl(65\%); VariableDeclarationTreeImpl(35\%) \\ \hline
+		TermParam (4) & NativeTreeImpl(61\%); ParameterTreeImpl(39\%); \\ \hline
+	\end{tabular}
+\end{table}
+
+Table \ref{table:interesting_mapping} shows the resulting table for Scala if we filter further to only keep the nodes where the partition is relevant. From this table, we can directly identify 4 problematic situation that lead to false positives.
+
+\begin{enumerate}
+	\item \textit{Function with many parameter clauses} \newline 
+	\lstinputlisting[label={lst:many-parameters},
+	caption=Example of Scala function with many parameter clauses]{code/many-parameters.scala}
+	
+	Listing \ref{lst:many-parameters} shows an example of a Scala function with multiple parameters, that is common in Scala, but not in other languages. 
+	Treating all the parameters as belonging to a single list is not entirely correct, however simply mapping the whole function as native is a bit too strong, as all the rules using function declaration will not report any issue.
+	[TODO...]
+	
+	\item \textit{Match statement with at least one conditional case} \newline 
+	Listing \ref{lst:pattern-match-fp}, seen previously, also appear in the list. The solution chosen is 
+	[TODO...].
+	
+	\item \textit{Variable and constant definition if there is some templating} \newline 
+	\lstinputlisting[label={lst:scala-template},
+	caption=Example of Scala templating]{code/scala-template.scala}
+	
+	In listing \ref{lst:scala-template} we are going to have false negative for both naming convention of variable, and unused local variable. 
+	[TODO...].
+	
+	\item \textit{Function parameters with default value or modifier.} \newline 
+	\lstinputlisting[label={lst:scala-default-modifier},
+	caption=Example of Scala function with default value or with a modifier]{code/scala-default-modifier.scala}
+	
+	In listing \ref{lst:scala-default-modifier}
+	[TODO...].
+\end{enumerate}
+
