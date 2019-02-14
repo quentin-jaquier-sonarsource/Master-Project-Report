@@ -1,0 +1,128 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+%\usepackage{fourier}
+\usepackage[english]{babel}
+\usepackage{xargs}
+\usepackage[pdftex,dvipsnames]{xcolor}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{tablefootnote}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{epstopdf}
+\usepackage{floatrow}
+\usepackage{float}
+\usepackage[colorlinks=true,breaklinks=false]{hyperref}
+\usepackage{listings}
+\usepackage[norelsize,ruled,vlined]{algorithm2e}
+\usepackage{csquotes}
+\usepackage{url}
+\usepackage{ifthen}
+\usepackage{etoolbox}
+\usepackage{datetime}
+\usepackage{eurosym}
+\usepackage{tikz}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage{caption}
+
+\usepackage{blindtext}
+\usepackage{paralist}             % in-paragraph lists
+\usepackage{stmaryrd}             % llbracket / rrbracket
+\usepackage[nounderscore]{syntax} % grammars
+\usepackage{mathtools}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage{chngcntr}
+
+\usepackage{datatool}
+\usepackage{tabularx}
+\usepackage{csvsimple}
+
+\usepackage{highlighter}
+
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\counterwithin*{equation}{section}
+\counterwithin*{equation}{subsection}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3} } }
+\captionsetup[lstlisting]{format=listing, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
+
+
+\addbibresource{thesis.bib}
+\renewcommand{\baselinestretch}{1.1}
+
+% Single spacing after dots and colons
+\frenchspacing
+\hyphenation{Scala}
+\hyphenation{Dotty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                        Setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\normalfont
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstdefinestyle{scala}{
+  language=Scala,
+  aboveskip=3mm,
+  basicstyle=\small\ttfamily,
+  belowskip=3mm,
+  breakatwhitespace=false,
+  showspaces=false,
+  showlines=true,
+  columns=flexible,
+  keepspaces=true,
+  commentstyle=\color{dkgreen},
+  keywordstyle=\color{blue},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  stepnumber=1,
+  extendedchars=true,
+  literate={Ⲕ}{{$\kappa$}}1 {⊢}{{$\vdash$}}1,
+}
+
+
+\include{sections/settings}
+\include{sections/cover}
+\include{sections/abstract}
+\tableofcontents
+\lstlistoflistings
+%\listofalgorithms
+\listoffigures
+\listoftables
+
+\setlength{\parskip}{1em}
+\include{sections/introduction}
+\include{sections/null_pointer_consistency}
+\include{sections/implementation_java}
+\include{sections/implementation_slang}
+\include{sections/native_nodes_cfg}
+\include{sections/related_work}
+\include{sections/future_work}
+\include{sections/conclusion}
+
+\pagebreak
+\printbibliography{}
+
+\end{document}
+
+
