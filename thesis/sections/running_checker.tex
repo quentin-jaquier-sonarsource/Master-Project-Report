@@ -1,2 +1,171 @@
 \section{Running the checker on open source Java projects}
 \label{sec:running_checker}
+
+Open source Java project is a good source of data to test our checker. 
+The checker has been run on more than one hundred of project of various size, containing for instance OpenJDK, SonarJava and the \slang project itself. 
+The idea is to run the implementation done on SonarJava and \slang, and compare the results.
+
+\begin{table}[h]
+	\centering
+	\caption{Early number of Issues reported by the two implementation, before improvement}
+	\label{table:early-sonarjava-vs-slang}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\bf SonarJava issues & \bf Slang issues & \bf \% \\ \hline
+		37 &  29 &  78 \\ \hline
+	\end{tabular}
+\end{table}
+
+[TODO: sources] \newline
+
+Table \ref{table:early-sonarjava-vs-slang} shows the number of issues reported by the implementation on SonarJava, and the issues reported by the implementation on \slang. 
+Despite all our effort to prevent problematic situation done in the previous parts,  the implementation is having more than 20\% of false negative compared to the implementation on SonarJava. This is already a good start, but it is not enough for our objective set in section \ref{subsubsec:precision_recall}.
+We can wonder what are the reasons of this differences.
+We will discuss some of them in the following part, to see if this comes from a misbehavior of the implementation, or a real limitation of \slang.
+
+\subsection{Reducing the false negative from SonarJava}
+\label{subsec:reducing_false_positive_sonarjava}
+
+The difference between the two implementations is mainly due to the way ternary expression and loop header is currently handled in \slang.
+
+\subsection{Ternary expression}
+\label{subsec:reducing_false_positive_ternary}
+Ternary expression have been used as example previously, and they actually appear to be causing false positive in real project.
+
+\lstinputlisting[label={lst:reduce-fp-ternary},
+caption=Typical code structure with ternary expression]{code/reduce-fp-ternary.scala}
+
+The situation is not as obvious as the one presented before, listing \ref{lst:reduce-fp-ternary} show a possible situation were no issues will be reported. To solve this problem, one solution is to map ternary expression to if/else tree.This solution is already used for other checks and seems to solve our problem nicely.
+
+\subsection{Loop Header}
+\label{subsec:loop_header}
+
+Currently, no rules uses the details of the for loop header, it is therefore mapped to a native tree. 
+
+\lstinputlisting[label={lst:loop-header},
+caption=Loop header with pointer used]{code/loop-header.scala}
+
+Listing \ref{lst:loop-header} shows the problematic situation. The pointer \emph{p} is used, not re-assigned, and check for null later. 
+It is exactly the kind of situation that we would like to report. 
+However, the different parts of the header are in a native node, as described before, it will therefore not be added to the set of used pointer. 
+This makes sense, from a language agnostic point of view, we can not know anything from the execution order of the different block of the loop header, as it can depends on the original language for example. 
+This is in fact the kind of behavior that we want to achieve, the language specific features does not produce false positive, we only have false positive. 
+One way to solve this problem is to simply add a node in \slang that will better support this situation. 
+If it makes sense for loop header as it is probably a feature that is present in different situation, we have to keep in mind that this is not a solution that we should use in all situation, where the feature is really specific to a language.
+
+\subsection{Improved results}
+\label{subsec:improved_results}
+
+\begin{table}[h]
+	\centering
+	\caption{Final issues found by the two implementations for Java}
+	\label{table:final-sonarjava-vs-slang}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\bf SonarJava issues & \bf Slang issues & \bf \% \\ \hline
+		37 &  37 &  100 \\ \hline
+	\end{tabular}
+\end{table}
+
+[TODO: sources] \newline
+
+With the two modification done on the implementation on \slang. We manage to report the same issues that the implementation of SonarJava was reporting!
+
+\begin{table}[h]
+	\centering
+	\caption{Final issues found by the two implementations for Java}
+	\label{table:issues-per-project}
+	\begin{tabular}{|c|c|}
+		\hline
+		\bf Project & \bf Number of issues\\ \hline
+		OpenJDK 9 & 12 \\
+		ElasticSearch & 7 \\
+		Apache Abdera & 5 \\
+		Apache Tika & 	4 \\
+		Ops4j Pax Logging & 3 \\
+		Apache Jackrabbit & 2 \\
+		RestComm Sip Servlets & 1 \\
+		Wildfly Application Server & 1 \\
+		Apache pluto & 1 \\
+		Fabric8 Maven Plugin & 1 \\\hline
+		Total &  37 \\ \hline
+	\end{tabular}
+\end{table}
+
+[TODO: sources] \newline
+
+Table \ref{table:issues-per-project} shows the projects that contains one or more issues and number of true positive reported, for both forward and backward analysis. All these issues have been reported by both the SonarJava implementation, and Slang with the modification done in Reducing the false negative from sonarJava.
+
+
+\subsubsection{Other languages}
+\label{subsubsec:other_languages}
+
+The mapping to \slang has been implemented for 5 languages: Java Scala, Kotlin, Ruby, and Apex. Once we have an implementation of a checker that works for one language, the checker can be run out of the box on other languages if we make sure that all node described in subsection \ref{subsec:nodes} are present.
+
+[TODO: run on 1000s] \newline
+
+[[ The checker seems to work on some sample example, but does not manage to find any real issues on the project that we tested. For Apex, this can be explained by the fact that we have only little open source code available out here. For Scala and Kotlin, the two languages provide a special construct to deal with null. Therefore, we can expect less issues on these two language. Comparing the performance of the checker for Scala and Kotlin with other tool is not really possible, since the only check that exists and make sense in these language is simply that you should never use Null.]]
+
+\subsection{Are the issues found really relevant?}
+\label{subsec:are_the_issues_relevant}
+
+Table \ref{table:issues-per-project} shows the number of issues found per project. 
+This includes all the true positives of the forward and backward analysis. 
+A first observation is that the issues found are coming from various project and in various situations, it is not one anti-pattern that is repeated multiple times in the same project. Additionally, all the issues seems to be relevant from a high level view and without any specific knowledge of the project, you can not easily justify any of the issues reported. 
+To estimate more reliably this interest, we can also look at the fix rate of the issues.
+
+\subsubsection{Fix-rate}
+\label{subsubsec:fix_rate}
+
+Fix-rate is the rate of issues that are reported by a tool, and really fixed by the user. 
+As discussed in Precision and Recall tradeoff, static analysis tools have to deal with the fact that if we report too much issues, we take the risk of reporting irrelevant ones and the user will not pay attention to them. 
+This is where fix-rate may be useful, it shows that the user did really care about the issue, and took some time to fix it. \newline
+The problem is obviously that we can not define at a given instant this rate, we can only retroactively look at this number, depending therefore on the time we gives to the user to fix the issues.
+The goal is not to reach a precise number, but to find examples of issues that are fixed, to improve our confidence in the quality of the results.\newline
+The first way we will estimate the fix rate is by using some of our test project that are not updated for every version. 
+In practice, there is only a few, the main one that we will use is the OpenJDK. 
+The issues reported comes from version 9, that we will compare with the version 11.
+
+\begin{table}[h]
+	\centering
+	\caption{OpenJDK 9 issues fixed in version 11}
+	\label{table:openJDK_issues}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\bf OpenJDK V.9  issues & \bf Issues fixed in V.11 & \bf \% \\ \hline
+		12 &  3 &  25 \\ \hline
+	\end{tabular}
+\end{table}
+
+Table above shows that 25\% of the issues found on OpenJDK 9 have been fixed in the version 11. This may seems like a low number, but it seems to be the kind of results we can expect from this kind of estimation. For example, a research from Jetbrains \cite{Bryksin:2018:DAK:3236454.3236457} report that 32\% of the issues reported by their tool were considered as useful (rated with high value) by the person that were confronted to the issues. 
+We can explain this by the fact that developer have priorities, especially in such big open-source project, fixing a bug that is already here and is apparently not causing any trouble have low priorities, even if this is a legitimate issue. 
+SonarSource often refers to this idea as the “Fix the leak” approach: it does not make sense to spend considerable effort to fix every bug already present in the code if you keep introducing new one on new code, the same way you would not start to mop the floor during a flooding without having fixed the origin. \newline
+
+One other way to estimate the fix-rate is to look into the issues reported by the tool, understand them, eventually write a unit test that raise an exception, and report this issues to let the owner of the project decide if this issue is worth the attention.
+One of the problem is that sometimes, it is indeed possible to write a unit test that target a specific function and throw a null pointer exception, but it will never happen in real execution due to the fact that the programmer have an implicit knowledge about his code, reducing his interest in fixing the code. 
+For example, if a user only calls a function only when he finds a specific element in a list, he will assume that the list will never be null. 
+These kind of issues should however not directly be classified as false positive, as it can also report dead code.
+
+\subsubsection{Potential Null Pointer Exception or Dead code ?}
+\label{subsubsec:dead_code}
+
+\lstinputlisting[label={lst:contradiction-code},
+caption=Example of contradicting code that lead to dead code]{code/contradiction-code.scala}
+
+Despite the fact that we try to find null pointer exception, some of the issues found can be considered as dead code, as they can never raise an exception in practice. 
+For example, in listing \ref{lst:contradiction-code}, we can see that this code will never raise an exception. 
+It comes from the fact that we implies beliefs from the code that a programmer writes, if he writes himself contradicting statement, we will still report an issue. 
+In the situation of listing above, the checker does not take in consideration the check for null as a path-sensitive tool would do. \newline
+One similar situation is that sometimes, it is indeed possible to write a unit test that target a specific function and throw an exception, but it will never happen in real execution due to the fact that the programmer have an implicit knowledge about his code. 
+For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be null in this function, and therefore the check is simply dead code. 
+This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
+
+
+
+
+
+
+
+
+
+
