@@ -1,4 +1,4 @@
-\section{Anticipating other potential problems}
+\section{Limitation of the approach: Anticipating other potential problems}
 \label{sec:anticipating_problems}
 
 In the previous parts, we have shown that we were able, with some assumptions, to find with \slang all the issues found by the implementation on SonarJava. 
@@ -17,7 +17,7 @@ Normally, the type system of Kotlin prevent this kind of issue if the variable i
 However this code will not raise a null pointer exception since in fact the function \emph{isBooleanOrInt} is called, without dereferencing the pointer \emph{a}! 
 Our checker is only checking the content of one function, from his point of view this code can raise an exception. 
 This is clearly a false positive that is reported in for Kotlin. 
-In fact, in Kotlin, we do not expect to find any situations where an exception is possible, but only issues that are dead code, as described in [TODO: Add ref].
+In fact, in Kotlin, we do not expect to find any situations where an exception is possible, but only issues that are dead code, as described in section \ref{subsubsec:dead_code}.
 
 \subsection{Other languages features}
 \label{subsec:other_language_features}

@@ -34,7 +34,7 @@ For example, when a function is called without a member selection, the tree will
 This way, we are able to detect not only function invocation, but also field selection or anything that we consider as a member selection in the original language.
 
 The nodes needed for the control flow graph are the one that we can expect for identifying the control flow of a program, that are common in all language and already implemented in \slang. 
-The way we handle them will be described in [TODO: add ref to build a cfg].
+The way we handle them will be described in subsection \ref{subsec:cfg_on_slang}.
 The last column describes others nodes that are needed indirectly by the checker.
 
 \subsubsection{Variable declaration}
@@ -43,7 +43,7 @@ The last column describes others nodes that are needed indirectly by the checker
 \lstinputlisting[label={lst:local-scope-in-while},
 caption=Example of local scope inside a loop that can shadow field]{code/local-scope-in-while.scala}
 
-In [TODO: add ref to naive semantics], we are going to describe how we perform a naive semantics, that is assumed inside the rule.
+In section \ref{subsubsec:identifying_local_variable}, we are going to describe how we perform a naive semantics, that is assumed inside the rule.
 In this semantics, we are not going ot be able to differentiate if two pointer that have the same name refer to the same declaration. 
 The idea to better support this limitation is that we will kill the pointer in the analysis when we see a declaration, the same way we are killing it when we see an assignment.
 This will enable us to remove the kind of false positive of listing \ref{lst:local-scope-in-while}.
@@ -55,7 +55,7 @@ This will enable us to remove the kind of false positive of listing \ref{lst:loc
 caption=Pointer p is used as a parameter of a function call]{code/function-invocation-support.scala}
 
 As discussed before, we do not need explicitly function invocation, only member selection. 
-Due to a specific way we handle nodes that are not translated that we will explain in [TODO: add ref to how to deal with...], we will add function invocation to be able to report pointer use that happens inside a function call, as illustrated in listing \ref{lst:function-invocation-support}.
+Due to a specific way we handle nodes that are not translated that we will explain in section \ref{subsec:how_to_deal_with_native}, we will add function invocation to be able to report pointer use that happens inside a function call, as illustrated in listing \ref{lst:function-invocation-support}.
 
 \subsubsection{Function and Class declaration}
 \label{subsubsec:function_class_declaration}
@@ -168,7 +168,7 @@ Figure \ref{figure:pat-mat-cfg} shows the resulting control flow graph of the co
 \label{subsubsec:jump_tree_cfg}
 
 Jump tree are not supposed to appear when we do not expect them, if we have an unexpected jump tree, we can not do anything and we will simply add it to the current block. 
-We will discuss in [TODO: How to deal with native nodes in a CFG based checker?] a solution to better support this situation.
+We will discuss in section \ref{subsec:how_to_deal_with_native} a solution to better support this situation.
 In the usual case, we will expect them and create an edge from the current block to the head of the stack that is filled as described in \ref{subsubsec:loops_cfg} and \ref{subsubsec:match_tree_cfg} sections.
 
 \subsubsection{Return}
@@ -205,7 +205,7 @@ They can be introduced in multiple situations, when we create a temporary forwar
 During the creation of the graph, we only knew the successors of the nodes, we still have to compute the predecessor set. 
 Since we have all successors, computing the predecessor of all the block is straightforward. Finally, we can create a \emph{START} node, that implements the same behavior as the \emph{END} node, to indicate the beginning of the flow. \newline
 The hard work is done, we now have a complete control flow graph. 
-There is still part of it that can be imprecise due to the fact that the different statements of the original language can behave differently, but we are going to discuss it later in [TODO: add ref].
+There is still part of it that can be imprecise due to the fact that the different statements of the original language can behave differently, but we are going to discuss it later in section \ref{subsec:how_to_deal_with_native}.
 
 \subsection{Data flow analysis}
 \label{subsec:data_flow_analysis}
@@ -331,7 +331,7 @@ This is the opposite of the previous point: in the case where the checker need t
 	\end{tabular}
 \end{table}
 
-[TODO: add sources ref]
+[TODO: add sources ref]\newline
 Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang after translating open-source project to \slang. The percentage of completely native nodes refers to the nodes that have all their children that are native. If more than $40\%$ of nodes are not translated, this does not mean that our language lack of information, because we do not mapped some kind of nodes on purpose.
 This table shows us that natives nodes are not rare, using the above approach will greatly reduce our chance to find any relevant issue as we will in the majority of the case, be in the presence of natives nodes in the body of a function.
 
@@ -341,7 +341,7 @@ The two approach described before seems not well-suited for our checker, we may 
 We can use the fact that we know if an element comes from a native node or not to define a finer grain implementation of our checker. 
 It consist mainly in one modification of the data flow analysis described previously: we do not add a pointer that is used in an unreliable block to believed to be non-null set.
 
-\begin{equation}\label{eqn:dataflow4}
+\begin{equation}\label{eqn:new_dataflow4}
 newGen(n) = \text{use of pointer in the node n except if the node is marked as unreliable}
 \end{equation}
 

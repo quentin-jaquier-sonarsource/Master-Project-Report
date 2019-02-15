@@ -28,7 +28,7 @@ The next parts will discuss what this technology good for, and if we can impleme
 Our current checker is only supporting intra procedural analysis, going further is obviously a way to find more issue, since it would enables us to learn belief from arguments not only inside the function, but also outside. 
 The main difficulty is to define which function is called at run time, if it is possible to do it for one language, having a consistent way to do it in a language agnostic way is impossible. One of the way is to compute the summary of every function, and to use this information during the intra procedural analysis. 
 For example, we can store for every function if it can return null, then when the result of this function call is assign to a variable, we can consider it the same way as if it was null. 
-This idea is used by SpotBugs and will be described later[TODO: ref]. 
+This idea is used by SpotBugs and will be described in subsection \ref{subsec:spotbugs_specific}. 
 There is multiples others way to perform inter-procedural analysis, that represents more precisely the execution flow, however the idea are complex and will not be described in this work.
 
 \subsubsection{Requires the build}

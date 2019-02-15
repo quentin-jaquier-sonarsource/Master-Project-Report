@@ -97,7 +97,7 @@ Intuitively, we can see the analysis as follows:
 	\end{tabular}
 \end{table}
 
-[TODO: add dataset + reproducibility ?]
+[TODO: add dataset + reproducibility ?] \newline
 The version described before shows one way of doing the analysis, there is multiple small variation that we can do on the analysis that will greatly influence the results.
 
 \subsubsection{May vs Must analysis}
@@ -122,7 +122,7 @@ caption=Example of false positive of MAY anaylsis]{code/may-analysis-fp.scala}
 
 Listing \ref{lst:may-analysis-issue} shows an example of a false positive that is reported by the \emph{MAY} analysis. 
 This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not null, the check for null later does not mean that there is a potential exception.
-We will discuss possible amelioration to this situation in [TODO: cite path sensibility].
+We will discuss possible amelioration to this situation in subsection \ref{subsubsec:path_sensitivity}.
 
 \subsubsection{Used then check, check then used}
 \label{subsubsec:used_then_check_check_then_used}
