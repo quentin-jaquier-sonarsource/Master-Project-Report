@@ -27,7 +27,7 @@ Concretely, we are going to try to detect the use of a pointer P, followed by a 
 caption=Typical example that the checker reports]{code/typical-issue.scala}
 
 Listing \ref{lst:typical-issue} demonstrate a typical example that the checker is able to report. 
-From line 1, p is dereferenced without having been checked for null, we can imply that the programmer believes that, at this point, the pointer is not null, otherwise the program will crash. 
+From line $\#1$, p is dereferenced without having been checked for null, we can imply that the programmer believes that, at this point, the pointer is not null, otherwise the program will crash. 
 If later, at line $\#4$, p is checked for null, it implies that the programmer thinks that p can in fact be null, contradicting the previous belief: we report an issue from this contradiction.
 To implement this check, we need to have a representation of the control flow of the program, that is typically represented by a control flow graph.
 
@@ -63,7 +63,7 @@ i_{n} = o_{p1}  \cap   o_{p2}  \cap  ... \cap   o_{pk}
 Where $p1, ..., pk$ are all the predecessors of n, $i_{n}$ the input set of node \emph{n}, and  $o_{n}$ the output set.
 
 \begin{equation}\label{eqn:dataflow2}
-o_{n} = gen(n)  \cup   (i_{p2} \setminus kill(n))
+o_{n} = gen(n)  \cup   (i_{n} \setminus kill(n))
 \end{equation}
 
 Where
@@ -97,10 +97,12 @@ Intuitively, we can see the analysis as follows:
 	\end{tabular}
 \end{table}
 
+[TODO: add dataset + reproducibility ?]
 The version described before shows one way of doing the analysis, there is multiple small variation that we can do on the analysis that will greatly influence the results.
 
 \subsubsection{May vs Must analysis}
 \label{subsubsec:may_vs_must}
+
 With a MAY analysis, the computation of the input set from equation \ref{eqn:dataflow1} becomes:
 \begin{equation}\label{eqn:mayvsmust}
 i_{n} = o_{p1}  \cup   o_{p2}  \cup  ... \cup   o_{pk}
@@ -109,4 +111,55 @@ i_{n} = o_{p1}  \cup   o_{p2}  \cup  ... \cup   o_{pk}
 If a \emph{MUST} analysis takes the intersection of all incoming path, the \emph{MAY} analysis takes the union of the paths. It means that a pointer will be removed from the set only if all path re-assign this variable.
 The choice of \emph{MUST} over \emph{MAY} goes in the sense of the idea to have as little false positives as possible described in Precision and Recall trade off.
 Table \ref{table:issue_per_analysis_type} shows the differences between a May and a Must analysis of the checker ran on the same sets of sources.
+We can see that we have significantly more issues, but the rates of false positive is significantly higher, finding interesting issues is too hard with so much noise. 
+In addition, another downside of \emph{MAY} analysis is that identifying true positive can be tricky, involving specific path executed that will raise an exception, while discovering false positive can be within a few seconds. 
+In practice, to help the user to better understand the issue, we could report multiple location, for example the line where the pointer is used, and the one where it is dereferenced. 
+
+Intuitively, this is not surprising, a \emph{MAY} analysis means that it requires only one path that uses the pointer that is then checked to report an issues. 
+
+\lstinputlisting[label={lst:may-analysis-issue},
+caption=Example of false positive of MAY anaylsis]{code/may-analysis-fp.scala}
+
+Listing \ref{lst:may-analysis-issue} shows an example of a false positive that is reported by the \emph{MAY} analysis. 
+This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not null, the check for null later does not mean that there is a potential exception.
+We will discuss possible amelioration to this situation in [TODO: cite path sensibility].
+
+\subsubsection{Used then check, check then used}
+\label{subsubsec:used_then_check_check_then_used}
+
+\lstinputlisting[label={lst:used-then-check},
+caption=Pointer that is used then checked]{code/used-then-check.scala}
+\lstinputlisting[label={lst:checked-then-used},
+caption=Pointer that is checked then used]{code/checked-then-used.scala}
+
+Listing \ref{lst:used-then-check} and \ref{lst:checked-then-used} shows the differences between the two version of a checker.
+The work presented before implements the former, however, the latter makes as much sense, if all path that follow the check for null uses the pointer p, without re-assigning it, it probably means that an error is possible.
+In the implementation, this would be implemented using a backward analysis. 
+As the name suggest, a backward analysis means that we take the intersection of all successor’s input set to determine the output set of the current node. 
+
+For a backward analysis, equation \ref{eqn:dataflow1} becomes:
+
+\begin{equation}\label{eqn:checkthenused1}
+o_{n} = i_{s1}  \cap   i_{s2}  \cap  ... \cap   i_{sk}
+\end{equation}
+
+Where $s1, ..., sk$ are all the successors of n.
+
+And the computation \ref{eqn:dataflow2} becomes:
+
+\begin{equation}\label{eqn:checkthenused2}
+i_{n} = gen(n)  \cup   (o_{n} \setminus kill(n))
+\end{equation}
+
+Surprisingly, the rate of FP is greatly increased, the number of false positive is greater than our goal of $<5\%$, but the issues are more interesting than the \emph{MAY} analysis, we can still find interesting issues, mainly due to the fact that identifying true positive is as easy as false positives.
+
+\lstinputlisting[label={lst:user-define-function},
+caption=User define function that changes the control flow]{code/user-define-function.scala} 
+
+Listing \ref{lst:user-define-function} shows the typical example that generate the false positive, we can see that a function is called when \emph{p} is null, that will throw an exception, therefore changing the execution flow order.
+
+Custom function that changes the control flow is a weak point for flow based checker that does not perform inter procedural analysis, and we will probably face this problem both in an original language and in \slang. From now, we are only going to work with the used then checked version.
+
+
+
 
