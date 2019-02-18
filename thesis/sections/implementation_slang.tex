@@ -331,8 +331,7 @@ This is the opposite of the previous point: in the case where the checker need t
 	\end{tabular}
 \end{table}
 
-[TODO: add sources ref]\newline
-Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang after translating open-source project to \slang. The percentage of completely native nodes refers to the nodes that have all their children that are native. If more than $40\%$ of nodes are not translated, this does not mean that our language lack of information, because we do not mapped some kind of nodes on purpose.
+Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang after translating open-source projects \cite{SlangSources:2019:Online} to \slang. The percentage of completely native nodes refers to the nodes that have all their children that are native. If more than $40\%$ of nodes are not translated, this does not mean that our language lack of information, because we do not mapped some kind of nodes on purpose.
 This table shows us that natives nodes are not rare, using the above approach will greatly reduce our chance to find any relevant issue as we will in the majority of the case, be in the presence of natives nodes in the body of a function.
 
 The two approach described before seems not well-suited for our checker, we may want something between the two extremes.
@@ -380,7 +379,7 @@ Since the evaluation order is not correct, it makes sense to treat them the same
 We will hence keep all the content of these nodes, to be able to use them in the checkers, but mark them as unreliable. 
 
 \lstinputlisting[label={lst:boolean-short-circuit},
-caption=Boolean short circuit problematic situation]{code/boolean-short-circuit.scala}
+caption=Problematic situation due to Boolean short circuit]{code/boolean-short-circuit.scala}
 
 With this addition, we are now able to avoid the false negative that were reported in the well-known example of listing \ref{lst:boolean-short-circuit}.
 

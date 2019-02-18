@@ -48,21 +48,7 @@ The language is designed to implements the common rules introduced before, it is
 The language therefore contain all the metadata and abstract syntax tree nodes that we need to support these rules, and only the one needed.
 The language is therefore a balance between complexity (number of different feature that we support) and accuracy to be able to still report issues. 
 
-TODO
-
-\setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
-\setlength{\grammarindent}{12em} % increase separation between LHS/RHS 
-\begin{figure}[h]
-	\caption{Current grammar of SLang}
-	\label{figure:slang_grammar}
-	\begin{grammar}
-		<StatementOrExpression> a ::=	<Block> [<StatementOrExpression> a] a
-		\alt  <Break> a
-	\end{grammar}
-\end{figure}
-
-
-Figure \ref{figure:slang_grammar} shows the grammar of the current version of the language.
+Appendix \ref{app:slang grammar} shows the grammar of the current version of the language.
 An important note is that this grammar is not fixed, it is made to change and adapt to suits the needs. 
 We can see that it contains all the typical nodes of any programming language.
 The different nodes approximates the different programming concepts, to be able to support multiple input. 

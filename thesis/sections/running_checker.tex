@@ -1,7 +1,16 @@
 \section{Running the checker on open source Java projects}
 \label{sec:running_checker}
 
-Open source Java project is a good source of data to test our checker. 
+In this section, we are going to compare the implementation of the checker on \slang (\ref{sec:implementation_slang}) with the implementation on SonarJava (\ref{sec:implementation_java}), on a set of open source Java projects. It is a good source of data since it enables us to test the result on real situation.
+
+\subsection{Experimental Setup}
+\label{subsec:experimental_setup}
+
+To test the checker, we are going to create a SonarQube instance \cite{SonarQube:2019:Online}, with the version of the checker that we want to test. We are going to run the analysis with the plugin containing the implementation of our checker on more than 100 open source projects and publish the results on the SonarQube instance. Table \ref{table:issues-per-project} shows a sample of the projects list, and the complete list can be found in Appendix \ref{app:open_source_projects}.
+
+\subsection{Early results}
+\label{subsec:early_results}
+
 The checker has been run on more than one hundred of project of various size, containing for instance OpenJDK, SonarJava and the \slang project itself. 
 The idea is to run the implementation done on SonarJava and \slang, and compare the results.
 
@@ -16,9 +25,9 @@ The idea is to run the implementation done on SonarJava and \slang, and compare 
 	\end{tabular}
 \end{table}
 
-[TODO: sources] \newline
 
-Table \ref{table:early-sonarjava-vs-slang} shows the number of issues reported by the implementation on SonarJava, and the issues reported by the implementation on \slang. 
+
+Table \ref{table:early-sonarjava-vs-slang} shows the number of issues reported by the implementation on SonarJava, and the issues reported by the implementation on \slang, with the source, setup described in section \ref{subsec:experimental_setup}. 
 Despite all our effort to prevent problematic situation done in the previous parts,  the implementation is having more than 20\% of false negative compared to the implementation on SonarJava. This is already a good start, but it is not enough for our objective set in section \ref{subsubsec:precision_recall}.
 We can wonder what are the reasons of this differences.
 We will discuss some of them in the following part, to see if this comes from a misbehavior of the implementation, or a real limitation of \slang.
@@ -43,7 +52,7 @@ The situation is not as obvious as the one presented before, listing \ref{lst:re
 Currently, no rules uses the details of the for loop header, it is therefore mapped to a native tree. 
 
 \lstinputlisting[label={lst:loop-header},
-caption=Loop header with pointer used]{code/loop-header.scala}
+caption=Pointer used inside loop header]{code/loop-header.scala}
 
 Listing \ref{lst:loop-header} shows the problematic situation. The pointer \emph{p} is used, not re-assigned, and check for null later. 
 It is exactly the kind of situation that we would like to report. 
@@ -67,13 +76,11 @@ If it makes sense for loop header as it is probably a feature that is present in
 	\end{tabular}
 \end{table}
 
-[TODO: sources] \newline
-
-With the two modification done on the implementation on \slang. We manage to report the same issues that the implementation of SonarJava was reporting!
+With the two modification done on the implementation on \slang, , with the same source and setup described in section \ref{subsec:experimental_setup}, we manage to report the same issues that the implementation of SonarJava was reporting!
 
 \begin{table}[h]
 	\centering
-	\caption{Final issues found by the two implementations for Java}
+	\caption{Final issues found by the two implementations for Java, with the source and setup described in section \ref{subsec:experimental_setup}}
 	\label{table:issues-per-project}
 	\begin{tabular}{|c|c|}
 		\hline
@@ -92,7 +99,6 @@ With the two modification done on the implementation on \slang. We manage to rep
 	\end{tabular}
 \end{table}
 
-[TODO: sources] \newline
 
 Table \ref{table:issues-per-project} shows the projects that contains one or more issues and number of true positive reported, for both forward and backward analysis. All these issues have been reported by both the SonarJava implementation, and Slang with the modification done in Reducing the false negative from sonarJava.
 
@@ -100,7 +106,7 @@ Table \ref{table:issues-per-project} shows the projects that contains one or mor
 \subsubsection{Other languages}
 \label{subsubsec:other_languages}
 
-The mapping to \slang has been implemented for 5 languages: Java Scala, Kotlin, Ruby, and Apex. Once we have an implementation of a checker that works for one language, the checker can be run out of the box on other languages if we make sure that all node described in subsection \ref{subsec:nodes} are present.
+The mapping to \slang has been implemented for 5 languages: Java, Scala, Kotlin, Ruby, and Apex. Once we have an implementation of a checker that works for one language, the checker can be run out of the box on other languages if we make sure that all node described in subsection \ref{subsec:nodes} are present.
 
 [TODO: run on 1000s] \newline
 

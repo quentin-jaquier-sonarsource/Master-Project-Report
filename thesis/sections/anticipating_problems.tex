@@ -25,10 +25,9 @@ In fact, in Kotlin, we do not expect to find any situations where an exception i
 \begin{enumerate}
 	\item \textit{Call by name or by value} \newline
 	\lstinputlisting[label={lst:call-by-name-or-value},
-	caption=Code to demonstrate the difference between call by name and by value]{code/call-by-name-or-value.scala}
+	caption=Difference between call by name and by value]{code/call-by-name-or-value.scala}
 	
-	Listing \ref{lst:call-by-name-or-value} shows pseudo code that demonstrate the potential problematic question. If the language uses call by value, the code will raise a null pointer exception, however, if we use a call by name, p2 will not be evaluated and therefore nothing wrong happen.
-	Nodes that may be executed \textbf{before} the current block.\newline
+	Listing \ref{lst:call-by-name-or-value} shows pseudo code that demonstrate the potential problematic question. If the language uses call by value, the code will raise a null pointer exception, however, if we use a call by name, p2 will not be evaluated and therefore nothing wrong happen. \newline
 	\item \textit{Functional language} \newline
 	\item \textit{closure/high order function} \newline
 	\item \textit{Static vs dynamic scoping} \newline
