@@ -15,9 +15,12 @@ We choose this rules because this is a well-known bug and well-studied in static
 \subsection{Belief style Null Pointer Checker}
 \label{subsec:belief_style}
 
-The goal is to implement a checker that implements a variation of the current check “null pointers should not be dereferenced” \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
-The current implementation of the checker of SonarSource, SonarJava, use a complex symbolic execution engine to track the potential values of variables and report when a \emph{null} pointer can happen.
-[TODO: eventually discuss S.E. with difference and limits].
+The goal is to build a checker that implements a variation of the current check \emph{null pointers should not be dereferenced} \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
+The current implementation of the checker of SonarSource, SonarJava, use a complex symbolic execution engine to report potential \emph{null} pointer exception.
+Symbolic execution try to estimates all possibles executions path, track the value of variables, and report when a pointer is dereferenced while it can be \emph{null} on one path.
+One important limitation is that it uses a lot of assumptions to deal with the fact that the possible execution flow quickly explode. 
+If it is possible to come up with good assumptions to report interesting bug, the complexity of the implementation also increase, preventing improvement and therefore to find more bugs \cite{Brown:2016:BSC:2954679.2872364}. 
+This is one of our motivation, we want to see if it is possible to still find interesting issues with an implementation that is less complex, and based on an incomplete language.
 Our initial goal is not to find all the issues of this checker, but to show that it is still possible to find interesting issues, even if we implement the check on an incomplete intermediate representation such as \slang{}.
 The idea of this first checker is to use facts implied by the code, that we call belief \cite{Engler:2001:BDB:502059.502041}.
 It assumes that the programmer’s goal is not to make his code crash. If two contradicting believes are detected, we report an issue.

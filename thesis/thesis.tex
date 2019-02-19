@@ -23,7 +23,7 @@
 \usepackage{datetime}
 \usepackage{eurosym}
 \usepackage{tikz}
-\usepackage[backend=bibtex]{biblatex}
+\usepackage[backend=bibtex, backref=true]{biblatex}
 \usepackage{caption}
 
 \usepackage{blindtext}
@@ -76,6 +76,7 @@
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
 
 \lstdefinestyle{scala}{
   language=Scala,
@@ -95,6 +96,7 @@
   stepnumber=1,
   extendedchars=true,
   literate={Ⲕ}{{$\kappa$}}1 {⊢}{{$\vdash$}}1,
+  moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%}
 }
 
 

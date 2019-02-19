@@ -1,4 +1,4 @@
-\section{Running the checker on open source Java projects}
+\section{Experimental evaluation: \newline Running the checker on open source Java projects}
 \label{sec:running_checker}
 
 In this section, we are going to compare the implementation of the checker on \slang{}(\ref{sec:implementation_slang}) with the implementation on SonarJava (\ref{sec:implementation_java}), on a set of open source Java projects. It is a good source of data since it enables us to test the result on real situation.
@@ -37,8 +37,8 @@ We will discuss some of them in the following part, to see if this comes from a 
 
 The difference between the two implementations is mainly due to the way ternary expression and loop header is currently handled in \slang.
 
-\subsection{Ternary expression}
-\label{subsec:reducing_false_positive_ternary}
+\subsubsection{Ternary expression}
+\label{subsubsec:reducing_false_positive_ternary}
 Ternary expression have been used as example previously, and they actually appear to be causing false positive in real project.
 
 \lstinputlisting[label={lst:reduce-fp-ternary},
@@ -46,8 +46,8 @@ caption=Typical code structure with ternary expression]{code/reduce-fp-ternary.s
 
 The situation is not as obvious as the one presented before, listing \ref{lst:reduce-fp-ternary} show a possible situation were no issues will be reported. To solve this problem, one solution is to map ternary expression to if/else tree.This solution is already used for other checks and seems to solve our problem nicely.
 
-\subsection{Loop Header}
-\label{subsec:loop_header}
+\subsubsection{Loop Header}
+\label{subsubsec:loop_header}
 
 Currently, no rules uses the details of the for loop header, it is therefore mapped to a native tree. 
 

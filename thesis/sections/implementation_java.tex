@@ -11,7 +11,9 @@ With this, a pointer that is used and assigned in the same basic block will be i
 caption=Problematic situation with naive basic block creation]{code/native-block-creation.scala} 
 
 Listing \ref{lst:native-block-creation} shows a potential problem of this method, all the different parts of the code will be added to the same basic block, we will therefore have a situation that we would want to report, but is not detected since the pointer is not in the gen set of this block. 
-One naive solution would be to not aggregate statements in basic block, but we will have to compute the input and output set for every statements! [TODO: ev explain performance diff]
+One naive solution would be to not aggregate statements in basic block, but we will have to compute the input and output set for every statements! 
+\newline
+[TODO: ev explain performance diff]
 The alternative that we use in this work is done during the control flow graph creation: we break the basic block when we have a binary expression with an equals (or not equals). 
 In order to support the backward and forward analysis, we should break before and after the check for \emph{null}. 
 We can now safely consider that a pointer that is checked will never be in the same basic block as where it is used or killed.

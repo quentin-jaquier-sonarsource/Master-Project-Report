@@ -46,9 +46,7 @@ This adds a new challenge that \slang{} will probably face in the future, but it
 \subsubsection{Guided by annotation}
 \label{subsubsec:guided_by_annotation}
 
-We have seen previously that inter procedural analysis is a costly operation.
-[TODO: precise ?? Where ??] 
-To help to keep the analysis as simple as possible, we use annotation to help the tool report possible problem. Annotation are typically used to declare that a function can return a \emph{null} value, or that a function should never be called with \emph{null} as argument.
+We have seen in section \ref{subsubsec:inter_procedrual} that interprocedural analysis is difficult operation, to help to reduce the complexity of the analysis, we can use annotation to help the tool report possible problem. Annotation are typically used to declare that a function can return a \emph{null} value, or that a function should never be called with \emph{null} as argument.
 
 \lstinputlisting[label={lst:annotated-code},
 caption=Example of annotated code]{code/annotated-code.scala}
@@ -129,10 +127,12 @@ SpotBugs \cite{Spotbugs:2019:Online} is the successor of Findbugs \cite{FindBugs
 	\centering
 	\caption{Slang and Spotbugs comparison on open-source projects}
 	\label{table:slang_vs_spotbugs}
-	\begin{tabular}{|c|c|c|c|c|}
+	\begin{tabular}{|c|c|c|}
 		\hline
-		\bf SLang & \bf $\text{SLang} \cap \text{SpotBugs}$ & \bf SpotBugs: annotations & \bf SpotBugs: others & SpotBugs: correctness \\ \hline
-		21 & 21 & 263 & 161 & 424 \\ \hline
+		\bf SLang & \bf $\text{SLang} \cap \text{SpotBugs}$ & \bf SpotBugs: annotations \\
+		21 & 21 & 263 \\ \hline
+		\bf SpotBugs: others & \bf SpotBugs: correctness & \\ 
+		161 & 424 &  \\ \hline
 	\end{tabular}
 \end{table}
 
@@ -207,13 +207,6 @@ In addition, we will look more in-depth into one additional feature that is impl
 	In listing \ref{lst:spotbugs-true-false-positive}, we have an example of a true positive and a false negative from SpotBugs. At line $\#2$, the issues is correctly reported, the tools manage to identify statically that the pointer \emph{b} is called with type \emph{B}. At line $\#4$ however, the tools is not reporting any issues. This is due to the fact that the type of \emph{a} is \emph{B}, the tools do not identify the potential run-time type of the variable.\newline
 	This method does not require complex features, there is not strong push-back to implement it on \slang{}, and can already greatly increase the number of issues reported by \slang{}!
 \end{enumerate}
-
-\subsection{Benchmarks}
-\label{subsec:benchmarks}
-
-Testing the tools on real-life project is a good step to understand the quality of the results on a set of real life situation. 
-However, the list of potential issues present in the real life project is not at all exhaustive. To complement this work, it makes sense to test it against benchmarks, that aims to test as much situations as possible. 
-In our situation, it would make sense to test with benchmark that uses languages specific features, like callback, high-order function, or all issues described in Anticipating other potential problems. [TODO...]
 
 
 
