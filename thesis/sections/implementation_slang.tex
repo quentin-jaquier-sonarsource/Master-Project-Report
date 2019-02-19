@@ -2,23 +2,22 @@
 \label{sec:implementation_slang}
 
 In the implementation on SonarJava, we had access to the front end of the checker, with complete language, a control flow graph and the symbol resolution already present.
-The first step to implement it on SLang is to identify what nodes and structure we need in order to implement everything that is required for this check.
+The first step to implement it on \slang{} is to identify what nodes and structure we need in order to implement everything that is required for this check.
 
 \subsection{Nodes}
 \label{subsec:nodes}
 
-The particularity of \slang is that it is incomplete. 
+The particularity of \slang{}  is that it is incomplete. 
 The IR does not need to includes all node types in order to work, only the one needed for the rules are mapped. 
-We therefore have to make sure that we have all the nodes that we need in \slang for the implementation of the checker.
+We therefore have to make sure that we have all the nodes that we need in \slang{} for the implementation of the checker.
 
 \begin{table}[h]
-	\centering
 	\caption{All nodes needed for the null pointer dereference check}
 	\label{table:nodes-needed}
 	\begin{tabular}{|c|c|c|}
 		\hline
 		\bf Checker specific & \bf Needed for CFG & \bf Others  \\ \hline
-	    Binary operation: Equals to / Not equals to & If/else & Variable declaration \\
+	    Binary operation & If/else & Variable declaration \\
 		Identifier & Switch & Function invocation \\
 		Assignment & Exception handling, throw  & Function declaration \\
 		Litteral : Null & Loops & Class declaration \\
@@ -33,7 +32,7 @@ The interesting node is the member select, in fact, to identify when a pointer i
 For example, when a function is called without a member selection, the tree will simply be a identifier (name of the function) and a list of argument, but in the case of a pointer use, the tree will be a member selection, that we will use in the checker. 
 This way, we are able to detect not only function invocation, but also field selection or anything that we consider as a member selection in the original language.
 
-The nodes needed for the control flow graph are the one that we can expect for identifying the control flow of a program, that are common in all language and already implemented in \slang. 
+The nodes needed for the control flow graph are the one that we can expect for identifying the control flow of a program, that are common in all language and already implemented in \slang{}. 
 The way we handle them will be described in subsection \ref{subsec:cfg_on_slang}.
 The last column describes others nodes that are needed indirectly by the checker.
 
@@ -72,12 +71,12 @@ Class declaration is used for the same idea as the function declaration, we use 
 In \ref{subsec:other_way_to_add_belief}, we saw multiple way to add the belief that a null pointer can be raised. 
 Slang do not have arrays, so we could expect to not find all issues coming from them. 
 The first is the length of the array. In Slang, this is simply represented as a field access/member select, and can therefore be supported. 
-Accessing or modifying the slots of \emph{null} as if it were an array is however not supported. This will lead to false negative in \slang that we will not have in the implementation of SonarJava.
+Accessing or modifying the slots of \emph{null} as if it were an array is however not supported. This will lead to false negative in \slang{} that we will not have in the implementation of SonarJava.
 
 \subsection{Building a Control Flow Graph on SLang}
 \label{subsec:cfg_on_slang}
 
-\slang already have every control flow statements represented in the language, we can already start to build it the same way we would do it for any other language. 
+\slang{} already have every control flow statements represented in the language, we can already start to build it the same way we would do it for any other language. 
 In fact, the current implementation is greatly inspired by the implementation of the graph builder of SonarPHP \cite{SonarPHP:2019:Online}, also developed at SonarSource. 
 To build the control flow graph, we are going to use two main kind of basic blocks:
 
@@ -217,7 +216,7 @@ The former will be described in \ref{subsec:how_to_deal_with_native} and the lat
 \subsubsection{Identifying local variable}
 \label{subsubsec:identifying_local_variable}
 
-In SonarJava, we have access to symbols of identifier, information that we do not have in \slang. The current computation of local variable is quite simple: all variable declaration inside the function and all arguments are considered as local variables. 
+In SonarJava, we have access to symbols of identifier, information that we do not have in \slang{}. The current computation of local variable is quite simple: all variable declaration inside the function and all arguments are considered as local variables. 
 This is a naive version, used to show that with a proper semantics (name definitions and scoping rules) we could expect results that are as good as the current naive version. \newline
 When we have this set of local variable, we can now check if the variable is in this set before reporting the issues. In practice, we could still report the issues that are not coming from local variable, this would add some false positive.
 
@@ -238,7 +237,7 @@ For our concern, we will see the natives nodes as a nodes that we do not know an
 caption=Pseudo code with a ternary expression]{code/ternary-expression-belief.scala}
 
 \begin{figure}[h]
-	\caption{\slang AST from the code of listing \ref{lst:ternary-expression-belief}}
+	\caption{\slang{} AST from the code of listing \ref{lst:ternary-expression-belief}}
 	\label{figure:ternary-ast}
 			\Tree[.... 
 				[.\color{red}Native
@@ -252,8 +251,8 @@ caption=Pseudo code with a ternary expression]{code/ternary-expression-belief.sc
 				]
 \end{figure}
 
-Figure \ref{figure:ternary-ast} shows the results of the \slang tree created from the code from listing \ref{lst:ternary-expression-belief}. 
-In this example, we assume that we do not have ternary expression in \slang, and that they are not mapped to \emph{if then else} statement. 
+Figure \ref{figure:ternary-ast} shows the results of the \slang{} tree created from the code from listing \ref{lst:ternary-expression-belief}. 
+In this example, we assume that we do not have ternary expression in \slang{}, and that they are not mapped to \emph{if then else} statement. 
 We will use ternary expression of Java to represents the problem, but the construction can be any native nodes coming from any original language. \newline
 The problem here is that we have to represents the control flow of a node that we do not know anything about. 
 We can not trust the evaluation order of the children of the natives nodes, as it can be arbitrary. 
@@ -271,8 +270,8 @@ So, at this point, we know that we need to keep the content of the native nodes.
 The next step is to define what to do with them. 
 A naive solution would be to add the content of the graph in the elements of the basic block, with the assumption that the evaluation order is not important. 
 This is in fact correct for a native node with only one children, where the evaluation order can obviously not change. 
-Here, we make the assumption that all the statements that change the flow of a program are represented in \slang. 
-This is a reasonable assumption since programming language hardly ever provides exceptional statement that are break the control flow, and if it does, we can add it to \slang grammar.
+Here, we make the assumption that all the statements that change the flow of a program are represented in \slang{}. 
+This is a reasonable assumption since programming language hardly ever provides exceptional statement that are break the control flow, and if it does, we can add it to \slang{} grammar.
 
 \lstinputlisting[label={lst:ternary-expression-example},
 caption=Pseudo code with a ternary expression]{code/ternary-expression-example.scala}
@@ -285,7 +284,7 @@ caption=Pseudo code with a ternary expression]{code/ternary-expression-example.s
 
 
 Listing \ref{lst:ternary-expression-example} shows the pseudo code of a Java program with the control flow graph of the naive implementation in figure \ref{figure:basic-block-content}.
-Since the ternary expression will be mapped to a native node in \slang, if we take the children of the native node in order, we will obtain the execution order of of the nodes in figure \ref{figure:basic-block-content}, that is obviously not correct, as the pointer will be seen as used then checked in this order, but not in the real execution order.
+Since the ternary expression will be mapped to a native node in \slang{}, if we take the children of the native node in order, we will obtain the execution order of of the nodes in figure \ref{figure:basic-block-content}, that is obviously not correct, as the pointer will be seen as used then checked in this order, but not in the real execution order.
 
 \begin{figure}[h]
 	\caption{CFG with elements coming from natives nodes}
@@ -331,7 +330,7 @@ This is the opposite of the previous point: in the case where the checker need t
 	\end{tabular}
 \end{table}
 
-Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang after translating open-source projects \cite{SlangSources:2019:Online} to \slang. The percentage of completely native nodes refers to the nodes that have all their children that are native. If more than $40\%$ of nodes are not translated, this does not mean that our language lack of information, because we do not mapped some kind of nodes on purpose.
+Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang{} after translating open-source projects \cite{SlangSources:2019:Online} to \slang{}. The percentage of completely native nodes refers to the nodes that have all their children that are native. If more than $40\%$ of nodes are not translated, this does not mean that our language lack of information, because we do not mapped some kind of nodes on purpose.
 This table shows us that natives nodes are not rare, using the above approach will greatly reduce our chance to find any relevant issue as we will in the majority of the case, be in the presence of natives nodes in the body of a function.
 
 The two approach described before seems not well-suited for our checker, we may want something between the two extremes.
@@ -388,8 +387,8 @@ With this addition, we are now able to avoid the false negative that were report
 
 In section \ref{how_to_deal_with_native}, we have seen that the order of evaluation of the nodes are critical for our checker.
 When coming from different languages, even known nodes can have different evaluation order, as we have seen an example in section \ref{match_tree_cfg}. 
-The same situation can in fact arise for any statement, hopefully, the solution is often to add the support for the new behavior in \slang.
-This trick should be used with caution, the initial goal is to be language agnostic, we should ideally not have to modify \slang for every new language we add. The good news is that there is only a limited number of possible variations that are possible, since the number of known nodes is fixed (and only a faction of it in practice). 
+The same situation can in fact arise for any statement, hopefully, the solution is often to add the support for the new behavior in \slang{}.
+This trick should be used with caution, the initial goal is to be language agnostic, we should ideally not have to modify \slang{} for every new language we add. The good news is that there is only a limited number of possible variations that are possible, since the number of known nodes is fixed (and only a faction of it in practice). 
 This kind of problem is a difficulty that are hard to anticipate and will arise during the implementation of a new checker, but it is not in itself a strong limitation.
 
 \subsubsection{Lost Jump Statements}

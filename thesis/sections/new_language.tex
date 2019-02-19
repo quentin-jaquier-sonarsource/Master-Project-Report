@@ -1,7 +1,7 @@
 \section{Adding a new language to SLang}
 \label{sec:new_language}
 
-In this part, we are going to discuss the challenge to add a new language to \slang, with a general procedure and a concrete example with Scala.
+In this part, we are going to discuss the challenge to add a new language to \slang{}, with a general procedure and a concrete example with Scala.
 
 \subsection{General Procedure}
 \label{subsec:general_procedure}
@@ -60,14 +60,14 @@ An important note is that we are not in the context of proving the absence of bu
 \subsection{A concrete example: Scala}
 \label{subsec:concrete_example}
 
-Scala is particularly interesting as it is the first functional language that is going to be added to \slang.
+Scala is particularly interesting as it is the first functional language that is going to be added to \slang{}.
 Scalameta \cite{Scalameta:2019:Online} provide all the features that we need, is widely used by the community and is intended to be used by static analysis tool. 
 It seems to suit perfectly to the requirements for a good front end.
 
 \subsubsection{Incrementally mapping Scala to SLang}
 \label{subsubsec:scala_to_slang}
 Now that we have chosen a front end, we can use it to obtain a Scala AST from a Scala file. At this point, we already have enough information to activate a first rule: file should parse.
-The first step from this AST is to extract comments, and translate the Scalameta token into \slang token.
+The first step from this AST is to extract comments, and translate the Scalameta token into \slang{} token.
 With this simple step, we are already able to enable the 4 new rules related to comments(S4663, S1134, S1135, S1451).
 The second step is to start the translation. As in any compiler phase that perform translation, the base will be a pattern matching on the current node. 
 We will traverse the tree using a top-down approach. 
@@ -77,13 +77,13 @@ In addition, all the rules related to the structure of a file can already be ena
 With only little effort, we manage to enable 8 rules, and provide a copy/paste detection and metrics. 
 We will continue the effort by adding more and more nodes translations, and activating more and more rules.
 
-Most of the nodes from the Scala AST have a direct equivalent in \slang, the translation effort is just to make sure that the meaning of this node in the original language is the one intended in \slang and that the metadata is correctly handled. This is the case for package/import declaration, literal, block for example. Surprisingly, more complex nodes such as loop, if tree, pattern match also fall into this category.
-In fact,all nodes in \slang have an equivalent in Scalameta and they all follow the same process: we recursively build the children and eventually make sure they exists, but no additional effort than building the children and grouping the metadata is required to build the node in \slang.
+Most of the nodes from the Scala AST have a direct equivalent in \slang{}, the translation effort is just to make \slang{} that the meaning of this node in the original language is the one intended in \slang{} and that the metadata is correctly handled. This is the case for package/import declaration, literal, block for example. Surprisingly, more complex nodes such as loop, if tree, pattern match also fall into this category.
+In fact,all nodes in \slang{} have an equivalent in Scalameta and they all follow the same process: we recursively build the children and eventually make \slang{} they exists, but no additional effort than building the children and grouping the metadata is required to build the node in \slang{}.
 
 \subsubsection{Reducing the false positives}
 \label{subsubsec:reducing_false_positives}
 
-\slang is driven by the rules, when we add a new node and enable a new rule, we have to make sure that the current rules make sense. 
+\slang{} is driven by the rules, when we add a new node and enable a new rule, we have to make \slang{} that the current rules make sense. 
 In the case of Scala, some of the features greatly reduce the quality of rules.
 One quick but naive solution when facing false positive is to map the problematic node to native, to remove the problematic case.
 

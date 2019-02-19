@@ -3,8 +3,8 @@
 
 SLang has already demonstrated his power to add 4 new language, some of them in less than a month, and to implements more than 40 common rules. 
 However, the language is still young and the current rules involve mainly syntactic element. 
-In this section, we are going to attend to push \slang further, to implements more complex checks.
-To estimates the quality of the results of a checker implemented on \slang, we will use a variation null pointer consistency rule. 
+In this section, we are going to attend to push \slang{} further, to implements more complex checks.
+To estimates the quality of the results of a checker implemented on \slang{}, we will use a variation null pointer consistency rule. 
 We choose this rules because this is a well-known bug and well-studied in static analysis, a lot of different implementations exists with different complexity.
 
 \subsection{What is null pointer consistency}
@@ -18,7 +18,7 @@ Null pointer consistency is the verification that a pointer that is dereferenced
 The goal is to implement a checker that implements a variation of the current check “null pointers should not be dereferenced” \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
 The current implementation of the checker of SonarSource, SonarJava, use a complex symbolic execution engine to track the potential values of variables and report when a null pointer can happen.
 [TODO: eventually discuss S.E. with difference and limits].
-Our initial goal is not to find all the issues of this checker, but to show that it is still possible to find interesting issues, even if we implement the check on an incomplete intermediate representation such as \slang.
+Our initial goal is not to find all the issues of this checker, but to show that it is still possible to find interesting issues, even if we implement the check on an incomplete intermediate representation such as \slang{}.
 The idea of this first checker is to use facts implied by the code, that we call belief \cite{Engler:2001:BDB:502059.502041}.
 It assumes that the programmer’s goal is not to make his code crash. If two contradicting believes are detected, we report an issue.
 Concretely, we are going to try to detect the use of a pointer P, followed by a check for null. The check for null can be equals or not equals to null, both statements implying that the programmer believes that the pointer p can be null.
@@ -156,7 +156,7 @@ caption=User define function that changes the control flow]{code/user-define-fun
 
 Listing \ref{lst:user-define-function} shows the typical example that generate the false positive, we can see that a function is called when \emph{p} is null, that will throw an exception, therefore changing the execution flow order.
 
-Custom function that changes the control flow is a weak point for flow based checker that does not perform inter procedural analysis, and we will probably face this problem both in an original language and in \slang. From now, we are only going to work with the used then checked version.
+Custom function that changes the control flow is a weak point for flow based checker that does not perform inter procedural analysis, and we will probably face this problem both in an original language and in \slang{}. From now, we are only going to work with the used then checked version.
 
 
 
