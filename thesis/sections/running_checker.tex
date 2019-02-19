@@ -1,7 +1,7 @@
 \section{Running the checker on open source Java projects}
 \label{sec:running_checker}
 
-In this section, we are going to compare the implementation of the checker on \slang (\ref{sec:implementation_slang}) with the implementation on SonarJava (\ref{sec:implementation_java}), on a set of open source Java projects. It is a good source of data since it enables us to test the result on real situation.
+In this section, we are going to compare the implementation of the checker on \slang{}(\ref{sec:implementation_slang}) with the implementation on SonarJava (\ref{sec:implementation_java}), on a set of open source Java projects. It is a good source of data since it enables us to test the result on real situation.
 
 \subsection{Experimental Setup}
 \label{subsec:experimental_setup}
@@ -11,7 +11,7 @@ To test the checker, we are going to create a SonarQube instance \cite{SonarQube
 \subsection{Early results}
 \label{subsec:early_results}
 
-The checker has been run on more than one hundred of project of various size, containing for instance OpenJDK, SonarJava and the \slang project itself. 
+The checker has been run on more than one hundred of project of various size, containing for instance OpenJDK, SonarJava and the \slang{} project itself. 
 The idea is to run the implementation done on SonarJava and \slang, and compare the results.
 
 \begin{table}[h]
@@ -54,12 +54,12 @@ Currently, no rules uses the details of the for loop header, it is therefore map
 \lstinputlisting[label={lst:loop-header},
 caption=Pointer used inside loop header]{code/loop-header.scala}
 
-Listing \ref{lst:loop-header} shows the problematic situation. The pointer \emph{p} is used, not re-assigned, and check for null later. 
+Listing \ref{lst:loop-header} shows the problematic situation. The pointer \emph{p} is used, not re-assigned, and check for \emph{null} later. 
 It is exactly the kind of situation that we would like to report. 
 However, the different parts of the header are in a native node, as described before, it will therefore not be added to the set of used pointer. 
 This makes sense, from a language agnostic point of view, we can not know anything from the execution order of the different block of the loop header, as it can depends on the original language for example. 
 This is in fact the kind of behavior that we want to achieve, the language specific features does not produce false positive, we only have false positive. 
-One way to solve this problem is to simply add a node in \slang that will better support this situation. 
+One way to solve this problem is to simply add a node in \slang{} that will better support this situation. 
 If it makes sense for loop header as it is probably a feature that is present in different situation, we have to keep in mind that this is not a solution that we should use in all situation, where the feature is really specific to a language.
 
 \subsection{Improved results}
@@ -76,7 +76,7 @@ If it makes sense for loop header as it is probably a feature that is present in
 	\end{tabular}
 \end{table}
 
-With the two modification done on the implementation on \slang, , with the same source and setup described in section \ref{subsec:experimental_setup}, we manage to report the same issues that the implementation of SonarJava was reporting!
+With the two modification done on the implementation on \slang{}, with the same source and setup described in section \ref{subsec:experimental_setup}, we manage to report the same issues that the implementation of SonarJava was reporting!
 
 \begin{table}[h]
 	\centering
@@ -100,17 +100,17 @@ With the two modification done on the implementation on \slang, , with the same 
 \end{table}
 
 
-Table \ref{table:issues-per-project} shows the projects that contains one or more issues and number of true positive reported, for both forward and backward analysis. All these issues have been reported by both the SonarJava implementation, and Slang with the modification done in Reducing the false negative from sonarJava.
+Table \ref{table:issues-per-project} shows the projects that contains one or more issues and number of true positive reported, for both forward and backward analysis. All these issues have been reported by both the SonarJava implementation, and \slang{} with the modification done in Reducing the false negative from sonarJava.
 
 
 \subsubsection{Other languages}
 \label{subsubsec:other_languages}
 
-The mapping to \slang has been implemented for 5 languages: Java, Scala, Kotlin, Ruby, and Apex. Once we have an implementation of a checker that works for one language, the checker can be run out of the box on other languages if we make sure that all node described in subsection \ref{subsec:nodes} are present.
+The mapping to \slang{} has been implemented for 5 languages: Java, Scala, Kotlin, Ruby, and Apex. Once we have an implementation of a checker that works for one language, the checker can be run out of the box on other languages if we make sure that all node described in subsection \ref{subsec:nodes} are present.
 
 [TODO: run on 1000s] \newline
 
-[[ The checker seems to work on some sample example, but does not manage to find any real issues on the project that we tested. For Apex, this can be explained by the fact that we have only little open source code available out here. For Scala and Kotlin, the two languages provide a special construct to deal with null. Therefore, we can expect less issues on these two language. Comparing the performance of the checker for Scala and Kotlin with other tool is not really possible, since the only check that exists and make sense in these language is simply that you should never use Null.]]
+[[ The checker seems to work on some sample example, but does not manage to find any real issues on the project that we tested. For Apex, this can be explained by the fact that we have only little open source code available out here. For Scala and Kotlin, the two languages provide a special construct to deal with \emph{null}. Therefore, we can expect less issues on these two language. Comparing the performance of the checker for Scala and Kotlin with other tool is not really possible, since the only check that exists and make sense in these language is simply that you should never use \emph{null}.]]
 
 \subsection{Are the issues found really relevant?}
 \label{subsec:are_the_issues_relevant}
@@ -148,8 +148,8 @@ We can explain this by the fact that developer have priorities, especially in su
 SonarSource often refers to this idea as the “Fix the leak” approach: it does not make sense to spend considerable effort to fix every bug already present in the code if you keep introducing new one on new code, the same way you would not start to mop the floor during a flooding without having fixed the origin. \newline
 
 One other way to estimate the fix-rate is to look into the issues reported by the tool, understand them, eventually write a unit test that raise an exception, and report this issues to let the owner of the project decide if this issue is worth the attention.
-One of the problem is that sometimes, it is indeed possible to write a unit test that target a specific function and throw a null pointer exception, but it will never happen in real execution due to the fact that the programmer have an implicit knowledge about his code, reducing his interest in fixing the code. 
-For example, if a user only calls a function only when he finds a specific element in a list, he will assume that the list will never be null. 
+One of the problem is that sometimes, it is indeed possible to write a unit test that target a specific function and throw a \emph{null} pointer exception, but it will never happen in real execution due to the fact that the programmer have an implicit knowledge about his code, reducing his interest in fixing the code. 
+For example, if a user only calls a function only when he finds a specific element in a list, he will assume that the list will never be \emph{null}. 
 These kind of issues should however not directly be classified as false positive, as it can also report dead code.
 
 \subsubsection{Potential Null Pointer Exception or Dead code ?}
@@ -158,12 +158,12 @@ These kind of issues should however not directly be classified as false positive
 \lstinputlisting[label={lst:contradiction-code},
 caption=Example of contradicting code that lead to dead code]{code/contradiction-code.scala}
 
-Despite the fact that we try to find null pointer exception, some of the issues found can be considered as dead code, as they can never raise an exception in practice. 
+Despite the fact that we try to find \emph{null} pointer exception, some of the issues found can be considered as dead code, as they can never raise an exception in practice. 
 For example, in listing \ref{lst:contradiction-code}, we can see that this code will never raise an exception. 
 It comes from the fact that we implies beliefs from the code that a programmer writes, if he writes himself contradicting statement, we will still report an issue. 
-In the situation of listing above, the checker does not take in consideration the check for null as a path-sensitive tool would do. \newline
+In the situation of listing above, the checker does not take in consideration the check for \emph{null} as a path-sensitive tool would do. \newline
 One similar situation is that sometimes, it is indeed possible to write a unit test that target a specific function and throw an exception, but it will never happen in real execution due to the fact that the programmer have an implicit knowledge about his code. 
-For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be null in this function, and therefore the check is simply dead code. 
+For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be \emph{null} in this function, and therefore the check is simply dead code. 
 This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
 
 

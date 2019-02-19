@@ -1,7 +1,7 @@
 \section{Comparison with other tools}
 \label{sec:comparison}
 
-If the initial goal is not to find as many issues as an other tools, looking at the features they provide is a good way to look how to improve the current checker and to anticipate if it is possible to implement them on top of \slang.
+If the initial goal is not to find as many issues as an other tools, looking at the features they provide is a good way to look how to improve the current checker and to anticipate if it is possible to implement them on top of \slang{}.
 
 
 \subsection{General features features}
@@ -9,7 +9,7 @@ If the initial goal is not to find as many issues as an other tools, looking at 
 
 \begin{table}[h]
 	\centering
-	\caption{Technology used by different tools to detect null pointer dereference}
+	\caption{Technology used by different tools to detect \emph{null} pointer dereference}
 	\label{table:tools_features}
 	\begin{tabular}{|c|c|}
 		\hline
@@ -19,17 +19,17 @@ If the initial goal is not to find as many issues as an other tools, looking at 
 Table \ref{table:tools_features} shows the different technology that the different tool uses. 
 This is a high level description of the feature, they all implement them in their own way and with different level of efficiency. 
 We can see that our tool is not using a lot of these technology, mainly due to the fact that we did not target them in the first place. 
-The next parts will discuss what this technology good for, and if we can implement it on \slang.
+The next parts will discuss what this technology good for, and if we can implement it on \slang{}.
 
 
-\subsubsection{Inter-procedural}
+\subsubsection{Interprocedural}
 \label{subsubsec:inter_procedrual}
 
-Our current checker is only supporting intra procedural analysis, going further is obviously a way to find more issue, since it would enables us to learn belief from arguments not only inside the function, but also outside. 
-The main difficulty is to define which function is called at run time, if it is possible to do it for one language, having a consistent way to do it in a language agnostic way is impossible. One of the way is to compute the summary of every function, and to use this information during the intra procedural analysis. 
-For example, we can store for every function if it can return null, then when the result of this function call is assign to a variable, we can consider it the same way as if it was null. 
+Our current checker is only supporting intraprocedural analysis, going further is obviously a way to find more issue, since it would enables us to learn belief from arguments not only inside the function, but also outside. 
+The main difficulty is to define which function is called at run time, if it is possible to do it for one language, having a consistent way to do it in a language agnostic way is impossible. One of the way is to compute the summary of every function, and to use this information during the intraprocedural analysis. 
+For example, we can store for every function if it can return \emph{null}, then when the result of this function call is assign to a variable, we can consider it the same way as if it was \emph{null}. 
 This idea is used by SpotBugs and will be described in subsection \ref{subsec:spotbugs_specific}. 
-There is multiples others way to perform inter-procedural analysis, that represents more precisely the execution flow, however the idea are complex and will not be described in this work.
+There is multiples others way to perform interprocedural analysis, that represents more precisely the execution flow, however the idea are complex and will not be described in this work.
 
 \subsubsection{Requires the build}
 \label{subsubsec:require_build}
@@ -39,34 +39,34 @@ Using the build provides however so much information that the popular tools seem
 This can make sense when the checking for error is integrated to the build process, but this is a real handicap when we want to have interactive feedback in an IDE or a pull request analysis, and is simply not possible in a cloud computing scenario, when you do not have access to the binaries. 
 The recent trend however is to avoid using the build due to the disadvantage stated before.
 
-In the situation of \slang, we will obviously not have access to the binary of the original language. 
-In addition, the goal of \slang is not to be a complete language, it is therefore far from being possible to compile this new code. 
-This adds a new challenge that \slang will probably face in the future, but it brings enough benefits to make the effort worth it.
+In the situation of \slang{}, we will obviously not have access to the binary of the original language. 
+In addition, the goal of \slang{} is not to be a complete language, it is therefore far from being possible to compile this new code. 
+This adds a new challenge that \slang{} will probably face in the future, but it brings enough benefits to make the effort worth it.
 
 \subsubsection{Guided by annotation}
 \label{subsubsec:guided_by_annotation}
 
 We have seen previously that inter procedural analysis is a costly operation.
 [TODO: precise ?? Where ??] 
-To help to keep the analysis as simple as possible, we use annotation to help the tool report possible problem. Annotation are typically used to declare that a function can return a null value, or that a function should never be called with null as argument.
+To help to keep the analysis as simple as possible, we use annotation to help the tool report possible problem. Annotation are typically used to declare that a function can return a \emph{null} value, or that a function should never be called with \emph{null} as argument.
 
 \lstinputlisting[label={lst:annotated-code},
 caption=Example of annotated code]{code/annotated-code.scala}
 
-In listing \ref{lst:annotated-code} for example, the function \emph{f} is guaranteed to never return null, and the callee can directly dereference the result of this function without checking it for null. 
-For the parameters, it enforce that \emph{f} can gives null as a first parameter, but not for the second one.\newline
-They are multiple way to do it depending on if we want, for example, Error Prone is using a trusting analysis, meaning that method parameters, field, and method return are assumed \emph{@Nullable} only if annotated so. 
-If we see the problem the other way, we could alternatively ask to explicitly mark as non-null an argument that should never be null.\newline
-Annotations seems to be the most popular way to detect null pointer exception currently especially for interactive tools, it enables to detect most of the exception with a small effort on the programmer side. 
+In listing \ref{lst:annotated-code} for example, the function \emph{f} is guaranteed to never return \emph{null}, and the callee can directly dereference the result of this function without checking it for \emph{null}. 
+For the parameters, it enforce that \emph{f} can gives \emph{null} as a first parameter, but not for the second one.\newline
+They are multiple way to do it depending on if we want, for example, Error Prone is using a trusting analysis, meaning that method parameters, field, and method return are assumed \nullable{} only if annotated so. 
+If we see the problem the other way, we could alternatively ask to explicitly mark as \emph{non-null} an argument that should never be \emph{null}.\newline
+Annotations seems to be the most popular way to detect \emph{null} pointer exception currently especially for interactive tools, it enables to detect most of the exception with a small effort on the programmer side. 
 It is often worth to make this effort, it is useful not only for the checker, but also helps during the development of the program. 
 The downside of this method is that it requires a consistent and coordinate use of annotation in a whole project, consistency that is hard to achieve, even more when we want to introduce it in a new project.
 
-Annotation could be added on top of \slang, finding annotation that are relevant for any language is possible if they share the same concepts. 
-For example, a non-null annotation makes sense in any language that has the concept of null. 
-In other cases, this can be more tricky; for example, the annotation initializer, used in the context of null pointer exception, can not be used in an language agnostic way, since the initialization is not the same in any language.\newline
+Annotation could be added on top of \slang{}, finding annotation that are relevant for any language is possible if they share the same concepts. 
+For example, a \emph{non-null} annotation makes sense in any language that has the concept of \emph{null}. 
+In other cases, this can be more tricky; for example, the annotation initializer, used in the context of \emph{null} pointer exception, can not be used in an language agnostic way, since the initialization is not the same in any language.\newline
 One solution to this is to provide a way to configure the tool. 
-Using configurable rule is always a danger for the user experience. For example, NullAway is providing more than 10 configuration flags, some of them being mandatory, all of them related to null dereference. 
-In the context of \slang, having so much configuration to do for every rules and every language simply does not scale at all.\newline
+Using configurable rule is always a danger for the user experience. For example, NullAway is providing more than 10 configuration flags, some of them being mandatory, all of them related to \emph{null} dereference. 
+In the context of \slang{}, having so much configuration to do for every rules and every language simply does not scale at all.\newline
 An interesting note is that annotation are principally used is to help to reduce the complexity of the analysis, however no annotation is required to detect all pointer if we have a perfect inter procedural analysis.
 
 
@@ -77,7 +77,7 @@ One tempting solution to solve all potential problem is to add language specific
 We can always add meta-data, to add information that reflect the different parts of the language. 
 This is a step that can be useful if the concept is well known and shared between multiple language. 
 This is an important element: the language is not designed to be perfect and to satisfy everyone, but to support at best the rules implemented on it. 
-Therefore, if we see that 4 out of 5 languages define a feature (like ternary expression for example), and that we need it to provide precise issues, it makes sense to add it to \slang.
+Therefore, if we see that 4 out of 5 languages define a feature (like ternary expression for example), and that we need it to provide precise issues, it makes sense to add it to \slang{}.
 
 
 \subsubsection{Path sensitivity}
@@ -85,7 +85,7 @@ Therefore, if we see that 4 out of 5 languages define a feature (like ternary ex
 
 Currently, our tool is using flow sensitive analysis, namely we are only interested in the order in which the statements are executed. 
 In addition, path-sensitivity computes and keeps additional information, based statements seen along the path and avoid infeasible path. 
-For example, if a pointer is checked for null, the tool will know that the pointer is equals to null inside the true branch, it will therefore report if the pointer is used or given to a function that expect a non-null value. 
+For example, if a pointer is checked for \emph{null}, the tool will know that the pointer is equals to \emph{null} inside the true branch, it will therefore report if the pointer is used or given to a function that expect a \emph{non-null} value. 
 In addition, we could also use the path sensitivity to improve the \emph{MAY} analysis introduce in subsection \ref{subsubsec:may_vs_must}, to at least remove the obvious false positives. 
 The main challenge of this kind of analysis is to deal with the fact that the number of path grow exponentially, making it hard to scale. 
 In the current situation, we do not have path sensitivity in our checker, but we already have all the features required, implementing it with the same constraints as an implementation over a original language seems to be possible.
@@ -93,37 +93,37 @@ In the current situation, we do not have path sensitivity in our checker, but we
 \subsection{Other tools features}
 \label{subsec:other_tools_features}
 
-The idea here is not to describe in depth the exact functioning of a particular tool, but to describe some of the features implemented by other tools that can be interesting for our purpose of anticipating the potential problems of an eventual implementation on \slang.
+The idea here is not to describe in depth the exact functioning of a particular tool, but to describe some of the features implemented by other tools that can be interesting for our purpose of anticipating the potential problems of an eventual implementation on \slang{}.
 
 \subsubsection{IntellJ IDEA}
 \label{subsubsec:intellj_idea}
 
 IntellJ is an IDEA, this is a particularly interesting since it requires interactivity, a user wants to see the issues being raised while he writes code, without having to rebuild the whole project. 
-This tool is also performing a null pointer analysis using annotation. 
-It warns when the user use a pointer that is nullable, without checking it for null. 
-To detect that a pointer is checked for null, it uses a pattern that is customizable. 
+This tool is also performing a \emph{null} pointer analysis using annotation. 
+It warns when the user use a pointer that is \nullable{}, without checking it for \emph{null}. 
+To detect that a pointer is checked for \emph{null}, it uses a pattern that is customizable. 
 This will not work if the user is using custom methods to perform the null-check. 
-In this case, the user can use a contract, that would for example say that this method fail if the argument is null, or more simply configure “not-null” check methods.\newline
-Having configurable setting for a rule in \slang is far from being ideal, even if the effort to configure one check seems to be minimal, if we have a configuration to do for every rule, this can quickly becomes a nightmare for the user. 
+In this case, the user can use a contract, that would for example say that this method fail if the argument is \emph{null}, or more simply configure “not-null” check methods.\newline
+Having configurable setting for a rule in \slang{} is far from being ideal, even if the effort to configure one check seems to be minimal, if we have a configuration to do for every rule, this can quickly becomes a nightmare for the user. 
 All our work that try to reduce the overall complexity would be pointless if we have a configuration for every rules.
 
 
 \subsubsection{Error prone : Null away}
 \label{subsubsec:error_prone}
 
-Null away is a tool built on top of error prone. 
-The process first checks if the value dereferenced is obviously non-null (annotated @Non-null). If it is not the case, it performs a dataflow analysis to try to show the non-nullness of a value. 
-The dataflow analysis is using existing null check into the code. 
-Therefore, if a field is annotated as Nullable and is dereferenced, an error will be reported only if the value is not checked for null. 
+\emph{Null} away is a tool built on top of error prone. 
+The process first checks if the value dereferenced is obviously \emph{non-null} (annotated @Non-null). If it is not the case, it performs a data-flow analysis to try to show the that the value is \emph{non-null}. 
+The data-flow analysis is using existing \emph{null} check into the code. 
+Therefore, if a field is annotated as \nullable{} and is dereferenced, an error will be reported only if the value is not checked for \emph{null}. 
 The key idea here is to perform the analysis in multiple steps of potentially increasing complexity. 
-If the value is obviously null, we do not have to go through the creation of the control flow graph and the computation of the data flow analysis. 
-Having multiple steps is a particularly good idea for \slang, not only for performance, but also for the quality of the results. 
-If we can report an issue, or prevent a complex computation before facing the uncertainties due to \slang, it may prevents us to make bad decisions.
+If the value is obviously \emph{null}, we do not have to go through the creation of the control flow graph and the computation of the data flow analysis. 
+Having multiple steps is a particularly good idea for \slang{}, not only for performance, but also for the quality of the results. 
+If we can report an issue, or prevent a complex computation before facing the uncertainties due to \slang{}, it may prevents us to make bad decisions.
 
 \subsection{In-depth comparison: SpotBugs}
 \label{subsec:indpeth_comparison_spotbugs}
 
-SpotBugs \cite{Spotbugs:2019:Online} is the successor of Findbugs \cite{FindBugs:2019:Online}, an open-source static analysis tool, it implements multiples checks related to null dereference, it is therefore a good candidate to have a more complete comparison with.
+SpotBugs \cite{Spotbugs:2019:Online} is the successor of Findbugs \cite{FindBugs:2019:Online}, an open-source static analysis tool, it implements multiples checks related to \emph{null} dereference, it is therefore a good candidate to have a more complete comparison with.
 
 \begin{table}[h]
 	\centering
@@ -153,24 +153,24 @@ For SpotBugs, we used the default configuration, namely confidence level and eff
 	\end{tabular}
 \end{table}
 
-Table \ref{table:slang_vs_spotbugs} shows a subset of more than 30 rules related to null pointer dereference that are reported by SpotBugs. 
+Table \ref{table:slang_vs_spotbugs} shows a subset of more than 30 rules related to \emph{null} pointer dereference that are reported by SpotBugs. 
 For our purpose, we are only interested by the rules that are labeled as “correctness”, as they represents the bugs that we try to identify and not the code smells that are not directly of interest for us. \newline
 Note that the number is different from the previous one because SpotBugs was crashing on some of the project (OpenJDK, elastic search). 
 This leads to our first observation: our tool can be ran with no configuration directly on any of more than 100 of projects.
 This is particularly good: if we want to introduce these kind of tools on top of huge project like OpenJDK, it is extremely complex to debug if it does not work out of the box. 
-The second observation is that every issues reported by \slang, is also reported by SpotBugs. This results may seem discouraging, we are not finding anything new, but it also shows that the issues reported by our tools does matter for others tools as well. 
+The second observation is that every issues reported by \slang{}, is also reported by SpotBugs. This results may seem discouraging, we are not finding anything new, but it also shows that the issues reported by our tools does matter for others tools as well. 
 These issues are reported by SpotBugs as “NullCheck of value previously dereferenced“, who is in fact exactly the issues that we report when we use the forward version of the analysis. 
-In addition, \slang implementation is reporting all issues that are reported under this category, showing that we do not seem to be missing any obvious issues. \newline
+In addition, \slang{} implementation is reporting all issues that are reported under this category, showing that we do not seem to be missing any obvious issues. \newline
 
 While we would want to compute the intersection automatically, this number has to be computed by hand. 
 Fully automatically computing the intersection is not a trivial task \cite{Gabel:2010:OIE:1806799.1806806}. 
 First, due to the fact that Spotbugs works on byte-code, we can not rely on the positions (even the line) of the reported issue reported by the tool. 
-This problem is even worth since the tools is reporting the issues in an inconsistent way, sometimes in a check for null, then when the pointer is used. 
+This problem is even worth since the tools is reporting the issues in an inconsistent way, sometimes in a check for \emph{null}, then when the pointer is used. 
 One solution would be to look at the file level, and compare the number of issues. 
-This would be possible if the issues were reported into the same category, but Spotbugs is reporting the issues related to null pointer in multiple categories, if we include multiple categories into the comparison, we greatly increase the chance to have other issues that are not related reported in the file. \newline
+This would be possible if the issues were reported into the same category, but Spotbugs is reporting the issues related to \emph{null} pointer in multiple categories, if we include multiple categories into the comparison, we greatly increase the chance to have other issues that are not related reported in the file. \newline
 The most important information is the number of issues, SpotBugs is reporting more than 20x more issues! 
 We can split this number into two category: the first one is the issues related to annotation. It is interesting to do the differentiation to understand what we can gain from adding a given feature. 
-The second is the other issues related to null. 
+The second is the other issues related to \emph{null}. 
 These issues are reported without the help of annotation. 
 It can be interesting for us since it does not require any language specific knowledge, and can serve as a goal that can be reached with our tool.
 
@@ -178,15 +178,15 @@ It can be interesting for us since it does not require any language specific kno
 \label{subsec:spotbugs_specific}
 
 The first reason of this huge difference is that we have such difference is the additional feature that we have described previously in subsection \ref{subsec:general_features}.
-In addition, we will look more in-depth into one additional feature that is implemented in SpotBugs and producing a big difference, and see that may be implemented on \slang.
+In addition, we will look more in-depth into one additional feature that is implemented in SpotBugs and producing a big difference, and see that may be implemented on \slang{}.
 
 \begin{enumerate}
 	\item \textit{Summary-based inter procedural analysis} \newline
 	This is an smart and easy first step to perform inter procedural analysis.
-	The idea is to compute a summary of every methods, and use this information during the intra procedural analysis. 
-	In our case, we would like for example to store if a method can return null, or if an parameters could be non-null to then report if null is passed as his argument. 
-	We can have this information by simply looking at annotation. If the annotation are not presents, we can still perform intra procedural analysis to find ourselves the annotation. For example, if a method ever return null, we can annotate the function as nullable, and if a function always dereference an argument without checking it for null, we can consider the argument as non-null. 
-	The good part is that we already have the tools required to build the summary. The feature currently missing in \slang is the method references. 
+	The idea is to compute a summary of every methods, and use this information during the intraprocedural analysis. 
+	In our case, we would like for example to store if a method can return \emph{null}, or if an parameters could be \emph{non-null} to then report if \emph{null} is passed as his argument. 
+	We can have this information by simply looking at annotation. If the annotation are not presents, we can still perform intraprocedural analysis to find ourselves the annotation. For example, if a method ever return \emph{null}, we can annotate the function as \nullable{}, and if a function always dereference an argument without checking it for \emph{null}, we can consider the argument as \emph{non-null}. 
+	The good part is that we already have the tools required to build the summary. The feature currently missing in \slang{} is the method references. 
 	We obviously need to be able to identify which method is called to be able to retrieve the summary.
 	This is related to the problem of the name references that we faced during in the previous parts, naive solution exist, but proper semantics have to be completed.	
 
@@ -205,7 +205,7 @@ In addition, we will look more in-depth into one additional feature that is impl
 	caption=Example of true positive and false negative of SpotBugs]{code/spotbugs-true-false-positive.scala}
 	
 	In listing \ref{lst:spotbugs-true-false-positive}, we have an example of a true positive and a false negative from SpotBugs. At line $\#2$, the issues is correctly reported, the tools manage to identify statically that the pointer \emph{b} is called with type \emph{B}. At line $\#4$ however, the tools is not reporting any issues. This is due to the fact that the type of \emph{a} is \emph{B}, the tools do not identify the potential run-time type of the variable.\newline
-	This method does not require complex features, there is not strong push-back to implement it on \slang, and can already greatly increase the number of issues reported by \slang!
+	This method does not require complex features, there is not strong push-back to implement it on \slang{}, and can already greatly increase the number of issues reported by \slang{}!
 \end{enumerate}
 
 \subsection{Benchmarks}

@@ -1,34 +1,34 @@
 \section{Improving SLang: Null pointer consistency}
 \label{sec:improving_slang}
 
-SLang has already demonstrated his power to add 4 new language, some of them in less than a month, and to implements more than 40 common rules. 
+\slang{} has already demonstrated his power to add 4 new language, some of them in less than a month, and to implements more than 40 common rules. 
 However, the language is still young and the current rules involve mainly syntactic element. 
 In this section, we are going to attend to push \slang{} further, to implements more complex checks.
-To estimates the quality of the results of a checker implemented on \slang{}, we will use a variation null pointer consistency rule. 
+To estimates the quality of the results of a checker implemented on \slang{}, we will use a variation \emph{null} pointer consistency rule. 
 We choose this rules because this is a well-known bug and well-studied in static analysis, a lot of different implementations exists with different complexity.
 
 \subsection{What is null pointer consistency}
 \label{subsec:null_pointer_consistency}
 
-Null pointer consistency is the verification that a pointer that is dereferenced is valid and not equals to null. Dereferencing a null pointer will results at best to an abrupt program termination, and at worst could be used by an attacker, by revealing debugging information or bypassing security logic for example.
+\emph{Null} pointer consistency is the verification that a pointer that is dereferenced is valid and not equals to \emph{null}. Dereferencing a \emph{null} pointer will results at best to an abrupt program termination, and at worst could be used by an attacker, by revealing debugging information or bypassing security logic for example.
 
 \subsection{Belief style Null Pointer Checker}
 \label{subsec:belief_style}
 
 The goal is to implement a checker that implements a variation of the current check “null pointers should not be dereferenced” \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
-The current implementation of the checker of SonarSource, SonarJava, use a complex symbolic execution engine to track the potential values of variables and report when a null pointer can happen.
+The current implementation of the checker of SonarSource, SonarJava, use a complex symbolic execution engine to track the potential values of variables and report when a \emph{null} pointer can happen.
 [TODO: eventually discuss S.E. with difference and limits].
 Our initial goal is not to find all the issues of this checker, but to show that it is still possible to find interesting issues, even if we implement the check on an incomplete intermediate representation such as \slang{}.
 The idea of this first checker is to use facts implied by the code, that we call belief \cite{Engler:2001:BDB:502059.502041}.
 It assumes that the programmer’s goal is not to make his code crash. If two contradicting believes are detected, we report an issue.
-Concretely, we are going to try to detect the use of a pointer P, followed by a check for null. The check for null can be equals or not equals to null, both statements implying that the programmer believes that the pointer p can be null.
+Concretely, we are going to try to detect the use of a pointer P, followed by a check for \emph{null}. The check for \emph{null} can be equals or not equals to \emph{null}, both statements implying that the programmer believes that the pointer p can be \emph{null}.
 
 \lstinputlisting[label={lst:typical-issue},
 caption=Typical example that the checker reports]{code/typical-issue.scala}
 
 Listing \ref{lst:typical-issue} demonstrate a typical example that the checker is able to report. 
-From line $\#1$, p is dereferenced without having been checked for null, we can imply that the programmer believes that, at this point, the pointer is not null, otherwise the program will crash. 
-If later, at line $\#4$, p is checked for null, it implies that the programmer thinks that p can in fact be null, contradicting the previous belief: we report an issue from this contradiction.
+From line $\#1$, p is dereferenced without having been checked for \emph{null}, we can imply that the programmer believes that, at this point, the pointer is not \emph{null}, otherwise the program will crash. 
+If later, at line $\#4$, p is checked for \emph{null}, it implies that the programmer thinks that p can in fact be \emph{null}, contradicting the previous belief: we report an issue from this contradiction.
 To implement this check, we need to have a representation of the control flow of the program, that is typically represented by a control flow graph.
 
 \subsubsection{Control Flow Graph}
@@ -44,14 +44,14 @@ This greatly reduce the number of nodes present in the graph, reducing therefore
 
 \subsection{Formal definition of the checker}
 \label{subsec:checker_formal_definition}
-More formally, the idea is to check that a use of a pointer \emph{p} post dominates the check of \emph{p} for null, intuitively, we can say that all path arriving to the check of \emph{p} goes through a use of \emph{p}, without having been reassigned between the two. 
+More formally, the idea is to check that a use of a pointer \emph{p} post dominates the check of \emph{p} for \emph{null}, intuitively, we can say that all path arriving to the check of \emph{p} goes through a use of \emph{p}, without having been reassigned between the two. 
 To do this, we are going to use a data-flow analysis using the control flow graph previously described.
 
 \subsubsection{Data-flow Analysis}
 \label{subsubsec:data_flow_analysis}
 
-The analysis tracks the pointer uses (set of pointer believed to be non-null) and flag when the same pointer is checked afterwards. 
-The control flow graph will only be build for the current function being analyzed (intra procedural), and will not have any access to other functions or others files (inter procedural).
+The analysis tracks the pointer uses (set of pointer believed to be \emph{non-null}) and flag when the same pointer is checked afterwards. 
+The control flow graph will only be build for the current function being analyzed (intraprocedural), and will not have any access to other functions or others files (inter procedural).
 
 Formally:
 
@@ -76,7 +76,7 @@ kill(n) = \text{assignment of pointer in node n}
 
 Intuitively, we can see the analysis as follows:
 \begin{enumerate}
-	\item The set of believed to be non-null pointer split at fork. \newline 
+	\item The set of believed to be \emph{non-null} pointer split at fork. \newline 
 	\item On join, we take the intersection of incoming path, this means that we will remove the ones kill on at least one path. Also called \emph{MUST} analysis. \newline 
 \end{enumerate}
 
@@ -119,7 +119,7 @@ Intuitively, this is not surprising, a \emph{MAY} analysis means that it require
 caption=Example of false positive of MAY anaylsis]{code/may-analysis-fp.scala}
 
 Listing \ref{lst:may-analysis-issue} shows an example of a false positive that is reported by the \emph{MAY} analysis. 
-This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not null, the check for null later does not mean that there is a potential exception.
+This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not \emph{null}, the check for \emph{null} later does not mean that there is a potential exception.
 We will discuss possible amelioration to this situation in subsection \ref{subsubsec:path_sensitivity}.
 
 \subsubsection{Used then check, check then used}
@@ -131,7 +131,7 @@ caption=Pointer that is used then checked]{code/used-then-check.scala}
 caption=Pointer that is checked then used]{code/checked-then-used.scala}
 
 Listing \ref{lst:used-then-check} and \ref{lst:checked-then-used} shows the differences between the two version of a checker.
-The work presented before implements the former, however, the latter makes as much sense, if all path that follow the check for null uses the pointer p, without re-assigning it, it probably means that an error is possible.
+The work presented before implements the former, however, the latter makes as much sense, if all path that follow the check for \emph{null} uses the pointer p, without re-assigning it, it probably means that an error is possible.
 In the implementation, this would be implemented using a backward analysis. 
 As the name suggest, a backward analysis means that we take the intersection of all successor’s input set to determine the output set of the current node. 
 
@@ -154,7 +154,7 @@ Surprisingly, the rate of FP is greatly increased, the number of false positive 
 \lstinputlisting[label={lst:user-define-function},
 caption=User define function that changes the control flow]{code/user-define-function.scala} 
 
-Listing \ref{lst:user-define-function} shows the typical example that generate the false positive, we can see that a function is called when \emph{p} is null, that will throw an exception, therefore changing the execution flow order.
+Listing \ref{lst:user-define-function} shows the typical example that generate the false positive, we can see that a function is called when \emph{p} is \emph{null}, that will throw an exception, therefore changing the execution flow order.
 
 Custom function that changes the control flow is a weak point for flow based checker that does not perform inter procedural analysis, and we will probably face this problem both in an original language and in \slang{}. From now, we are only going to work with the used then checked version.
 

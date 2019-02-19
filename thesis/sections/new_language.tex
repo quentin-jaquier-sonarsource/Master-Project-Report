@@ -99,7 +99,7 @@ To identify the potential problematic cases, we can store in all nodes, the orig
 After the translation, we can compute a mapping, from every original node to the node(s) in \slang. 
 This gives us a huge list with all nodes present in Scalameta, that is not yet useful to do identify potential problems. 
 The first observation is that the majority of the nodes are mapped 100\% to native nodes. This is not a problem, we know that we do not need all the nodes from the original language to perform our checks. 
-The more interesting cases are the original nodes that are mapped to a \slang node and a native node. 
+The more interesting cases are the original nodes that are mapped to a \slang{} node and a native node. 
 All the rules that use the nodes that are conditionally translated are subject to false negatives.
 
 \begin{table}[h]

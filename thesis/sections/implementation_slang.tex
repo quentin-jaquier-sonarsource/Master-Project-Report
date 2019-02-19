@@ -68,7 +68,7 @@ Class declaration is used for the same idea as the function declaration, we use 
 \subsubsection{Other nodes not supported}
 \label{subsubsec:other_nodes_not_supported}
 
-In \ref{subsec:other_way_to_add_belief}, we saw multiple way to add the belief that a null pointer can be raised. 
+In \ref{subsec:other_way_to_add_belief}, we saw multiple way to add the belief that a \emph{null} pointer can be raised. 
 Slang do not have arrays, so we could expect to not find all issues coming from them. 
 The first is the length of the array. In Slang, this is simply represented as a field access/member select, and can therefore be supported. 
 Accessing or modifying the slots of \emph{null} as if it were an array is however not supported. This will lead to false negative in \slang{} that we will not have in the implementation of SonarJava.
@@ -302,7 +302,7 @@ All control flow statement nested inside the native nodes will also lead to unre
 [Ev: show nested control flow nodes that are also unreliable]. 
 Additionally, we will also mark the whole graph as unreliable. 
 
-This information can now be used by any checker that use a control flow graph, not only for the null pointer dereference checker.
+This information can now be used by any checker that use a control flow graph, not only for the \emph{null} pointer dereference checker.
 
 \subsubsection{How to use this information?}
 \label{subsubsec:use_unreliable_information}
@@ -337,7 +337,7 @@ The two approach described before seems not well-suited for our checker, we may 
 
 \item \textit{Fine grain} \newline
 We can use the fact that we know if an element comes from a native node or not to define a finer grain implementation of our checker. 
-It consist mainly in one modification of the data flow analysis described previously: we do not add a pointer that is used in an unreliable block to believed to be non-null set.
+It consist mainly in one modification of the data flow analysis described previously: we do not add a pointer that is used in an unreliable block to believed to be \emph{non-null} set.
 
 \begin{equation}\label{eqn:new_dataflow4}
 newGen(n) = \text{use of pointer in the node n except if the node is marked as unreliable}
@@ -354,13 +354,13 @@ With this idea, we are now avoiding to report any issue for the two correct pseu
 \lstinputlisting[label={lst:fine-grain-3},
 caption=Third example of finer grain behaviour]{code/fine-grain-3.scala}
 
-In listing \ref{lst:fine-grain-3} though, the real evaluation order use \emph{p} and then check it for null. This code is not reported by our tool despite the fact that it should be. This is a false negative.\newline
+In listing \ref{lst:fine-grain-3} though, the real evaluation order use \emph{p} and then check it for \emph{null}. This code is not reported by our tool despite the fact that it should be. This is a false negative.\newline
 
 \lstinputlisting[label={lst:fine-grain-4},
 caption=Fourth example of finer grain behaviour]{code/fine-grain-4.scala}
 
 In addition, the implementation will  still report issues inside native nodes.
-For example, in listing \ref{lst:fine-grain-4}, we can see that the pointer \emph{p} is used, and then checked for null later in a un-trusted node. We do not know exactly what exactly happen in this node, but we can expect that a check for null still mean that p can be null. 
+For example, in listing \ref{lst:fine-grain-4}, we can see that the pointer \emph{p} is used, and then checked for \emph{null} later in a un-trusted node. We do not know exactly what exactly happen in this node, but we can expect that a check for \emph{null} still mean that p can be \emph{null}. 
 In this example, we report a true positive.
 \end{enumerate}
 

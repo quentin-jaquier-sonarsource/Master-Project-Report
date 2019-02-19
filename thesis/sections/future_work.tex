@@ -1,10 +1,10 @@
 \section{Future work}
 \label{sec:future_work}
 
-This work shows the potential of \slang to support the implementation of more and more checks, however, the list is limited, finding interesting rules that makes sense in a language agnostic way is difficult. 
+This work shows the potential of \slang{} to support the implementation of more and more checks, however, the list is limited, finding interesting rules that makes sense in a language agnostic way is difficult. 
 One promising continuation is to work on rule inference to detect object usage anomalies \cite{Wasylkowski:2007:DOU:1287624.1287632}. \newline
 Rules inference try to solve the problem that users uses a wide range of function for the same goal,  identifying which function does what is typically a hard process that need to be done by hand and even impossible for manual approach if the function is user defined. 
-If the basic idea is to generate rules specific to a project, it would makes sense to adapt it to generate rules specific to a language, everything in an agnostic way on top of \slang. 
+If the basic idea is to generate rules specific to a project, it would makes sense to adapt it to generate rules specific to a language, everything in an agnostic way on top of \slang{}. 
 The typical example is to look at temporal properties. 
 There is multiples way to do it, looking at the sequence of method call online \cite{Gabel:2010:OIE:1806799.1806806}, or to use a related idea of the belief style \cite{Engler:2001:BDB:502059.502041} that we used in this project. 
 The idea is to learn pattern of sequence of function call from the code, and report when this pattern is not respected. 
