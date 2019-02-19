@@ -216,7 +216,10 @@ The former will be described in \ref{subsec:how_to_deal_with_native} and the lat
 \subsubsection{Identifying local variable}
 \label{subsubsec:identifying_local_variable}
 
-In SonarJava, we have access to symbols of identifier, information that we do not have in \slang{}. The current computation of local variable is quite simple: all variable declaration inside the function and all arguments are considered as local variables. 
+In SonarJava, we have access to symbols of identifier, information that we do not have in \slang{}. 
+The current computation of local variable is quite simple: all variable declaration inside the function and all arguments are considered as local variables.
+This idea can work well for Java, but it not well suited for all language.
+In particularity for \emph{Ruby}: there is no variable declaration in the language, running the checker as it is will lead to a lot of potential false negative since we will only report issues for parameters.
 This is a naive version, used to show that with a proper semantics (name definitions and scoping rules) we could expect results that are as good as the current naive version. \newline
 When we have this set of local variable, we can now check if the variable is in this set before reporting the issues. In practice, we could still report the issues that are not coming from local variable, this would add some false positive.
 
@@ -385,8 +388,8 @@ With this addition, we are now able to avoid the false negative that were report
 \subsubsection{Order of evaluation of known nodes}
 \label{subsubsec:evaluation_known_nodes}
 
-In section \ref{how_to_deal_with_native}, we have seen that the order of evaluation of the nodes are critical for our checker.
-When coming from different languages, even known nodes can have different evaluation order, as we have seen an example in section \ref{match_tree_cfg}. 
+In section \ref{subsec:how_to_deal_with_native}, we have seen that the order of evaluation of the nodes are critical for our checker.
+When coming from different languages, even known nodes can have different evaluation order, as we have seen an example in section \ref{subsubsec:match_tree_cfg}. 
 The same situation can in fact arise for any statement, hopefully, the solution is often to add the support for the new behavior in \slang{}.
 This trick should be used with caution, the initial goal is to be language agnostic, we should ideally not have to modify \slang{} for every new language we add. The good news is that there is only a limited number of possible variations that are possible, since the number of known nodes is fixed (and only a faction of it in practice). 
 This kind of problem is a difficulty that are hard to anticipate and will arise during the implementation of a new checker, but it is not in itself a strong limitation.
