@@ -1,8 +1,10 @@
 \begin{abstract}
-Statically finding bugs that can arise in production is typically known as a complex process, that is often specific to a single programming language, leading to a non-trivial implementation with specialized data-structures.
-Powerful analysis tools already exists, but only for a subset of all existing languages.
-Supporting new language requires to re-implements the same checks again and again.
-Ideally, we would want to reduce the cost by re-using the same implementation of the checker.
-To solve this problem, SonarSource, a company performing static analysis, have introduce an incomplete universal intermediate representation, called \slang{}.
+Statically finding bugs before they can arise in production is typically known as a complex process, that is often specific to a single programming language, leading to a non-trivial implementation with specialized data-structures.
+Powerful analysis tools already exists, but only for a subset of all existing languages, supporting more of them requires to re-implements the same checks again and again.
+Ideally, static analysis companies would want to minimize this effort by re-using the same implementation of the different checkers.
+
+To solve this problem, SonarSource, a company developing static analysis tool, have introduced an incomplete universal intermediate representation called \slang{}.
 In this work, we are going to try to understand, consolidate, and improve the use of this universal representation to perform static analysis.
+We have added the support for the functional language Scala without any big limitation, and
+our experiments has shown that the implementation of a control flow based \emph{null} pointer dereference checker over the universal representation produces results that are equivalents to an implementation on the original language.
 \end{abstract}
