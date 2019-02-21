@@ -1,22 +1,22 @@
 \section{Introduction}
 \label{sec:introduction}
-SonarSource is a company that develop static analysis tool for more than 10 years, with the time, they have developed a good expertise for static analysis.
-Static code analysis is the action of automatically analysing the behaviour of a program without actually executing it.
+SonarSource is a company that develops static analysis tool for more than 10 years, with the time, the team has developed a good expertise for static analysis.
+Static code analysis is the action of automatically analyzing the behavior of a program without actually executing it.
 This kind of analysis is particularly useful to identify potential issues as early as possible, reducing the effort needed to fix them.
-SonarSource was already supporting more than 20 languages, but they realized that they were not supporting some of them that were the most used by the community, and that a frequent request from user is to know when their beloved language will be supported for analysis. 
+A year ago, SonarSource was supporting more than 20 languages, but they realized that they were not supporting some that were the most used by the community, and that a frequent request from user is to know when their beloved language will be supported for analysis. 
 In 2018, SonarSource decided to respond to this demand and add the support for 5 new languages that they were not supporting: Go, Kotlin, Ruby, Scala and Apex.
 
 \subsection{Supporting 5 new languages}
 \label{subsec:5_new_languages}
 Supporting 5 new languages was a challenging objective since adding a new language to the list used to take month of work, the team had to question their whole process to tackle this challenge.
-Historically, the typical process to develop a new static analysis tool at SonarSource was to to build a front-end, specifically a lexer and a parser.
-Then comes the core of the work: implements the different checks, the metrics, copy-paste detection and syntax highlighting. The main content of the work is done, but it still need to be regularly maintained to stay up to date.
-The complexity of the current situation is therefore a multiplication between the number of languages, and the number of rules. 
-As the objective is to increase the number of languages, the current situation does not scale.
+Historically, the typical process to develop a new static analysis tool at SonarSource was to build a front-end, specifically a lexer and a parser.
+Then comes the core of the work: implementing the different checks, the metrics, copy-paste detection and syntax highlighting. The main content of the work is done, but it still needs to be regularly maintained to stay up to date.
+The complexity of the current situation is therefore a multiplication between the number of language, and the number of rule. 
+As the objective is to increase the number of language, the current situation does not scale.
 The first observation that they made is that implementing the front-end for a language is a hard task. This is more or less implementing the front end of a compiler, doing it right and following the evolution of the language is not a trivial task.
 Hopefully, there exist open-source project that already provide complete and maintained parsing that we can use. 
 This is the first important choice: SonarSource is not going to develop their own front end anymore, but re-use existing one.
-A second observation that we can make is that many rules are implemented the same way, and that some of them are common, they make sense for every programming language.
+A second observation is that many rules are implemented the same way, and that some of them are common, they make sense for every programming language.
 
 
 \begin{table}[h]
@@ -35,25 +35,24 @@ A second observation that we can make is that many rules are implemented the sam
 Table \ref{table:common_rules} shows a sample of typical checks that can be considered as common rules \cite{JiraSonarSource:2019:Online} , that apply to any programming language.
 This was the main motivation: avoid redoing the same work again and again, by finding a way to implements these rules only once, changing the multiplication by an addition.
 At this point, the high level idea is to use an existing front-end to perform the parsing, to translate it to an universal intermediate representation and to implements the checks and metrics on it.
-This idea is promising, it would enables SonarSource to support new languages faster, avoiding duplication, and to reduce the maintainability cost, allowing them to reach their objective.
+This idea is promising, it would enable SonarSource to support new languages faster, avoiding duplication, and to reduce the maintainability cost, allowing them to reach their objective.
 After a few trial and error, the team comes up with SonarLanguage, or \slang{}, an incomplete universal intermediate representation. 
 
 
 \subsection{Incomplete Universal Intermediate Representation: \slang{}}
 \label{subsec:slang}
 
-In order to be able to implements the rules only once, SonarSource have introduced an incomplete universal intermediate representation, a domain specific language for static analysis. 
-The goal is to have an unified representation of common programming language, for easy, scalable and maintainable code smell and bug detection. 
-The language is designed to implements the common rules introduced before, it is therefore not designed for mainstream programming, and in fact, we do not even a complete transformation, that is needed for transformation of source code for example \cite{Koppel:2018:OTM:3288538.3276492}.
-The language contains all the metadata and abstract syntax tree nodes that we need to support these rules, and only the one needed.
-It is therefore a balance between complexity (number of different features that we support) and accuracy to be able to still report interesting issues. 
+In order to be able to implement the rules only once, SonarSource has introduced an incomplete universal intermediate representation, a domain specific language for static analysis. 
+The goal is to have a unified representation of common programming language, for easy, scalable and maintainable code smell and bug detection. 
+The language is designed to implement the common rules introduced before, it is therefore not designed for mainstream programming, and in fact, the goal is not even to be able to compile it.
+It contains all the metadata and abstract syntax tree nodes that we need to support these rules, and only the one needed, and is therefore a balance between complexity (number of different feature that we support) and accuracy to be able to still report interesting issues. 
 
 Appendix \ref{app:slang grammar} shows the grammar of the current version of the language.
 This grammar is not fixed, it is made to change and adapt to suits the needs that arise.
 We can see that it contains all the typical nodes of any programming language.
-The different nodes approximates the different programming concepts, to be able to support multiple input. 
+The different nodes approximates the different programming concepts, to be able to support multiple input languages, but we do not need the translation to be faithful, as a transformation of source code requires for example \cite{Koppel:2018:OTM:3288538.3276492}.
 For example, the loops are all mapped to one single node, with one child that represents the condition, and another for the body. 
-Even if we still keep the original type of the loop, this procedure can still mutilate the input, reduce the three part of a for loop header into one condition for example, and lose information, but as long as the result of the checks are not affected, it is not a problem.
+Even if we still keep the original type of the loop, this procedure can still mutilate the input, reducing the three part of a for loop header into one condition, losing information but as long as the result of the checks are not affected, it is not a problem.
 One interesting note is that there is some important nodes that are not present, for example, there is no function invocation. 
 The reason is that none of the rules use them, we eventually need to know the list of the arguments to report unused variable, but we do not need the concept of function invocation in itself.
 The specificity of this language is the native node. 
@@ -95,16 +94,16 @@ During the translation, we are going to keep all the original nodes, if one has 
 \end{figure}
 
 Figure \ref{figure:native_node_example} shows an example of native node present in a \slang{} tree. In the left tree, we understand that the equals is part of an assignment, but in the second case, we have an unknown expression, and keep it, but as a native node.
-They therefore represent nodes that are unknown, but we will still be able to compare them and have the list of their children and tokens. 
-Since we can compare two native, we are still able to find that two branches of a switch is the same, without knowing exactly what is inside. 
+Native nodes therefore represent nodes that are unknown, but we will still be able to compare them and have the list of their children and tokens. 
+Since we can compare two native nodes, we are still able to find that two branches of a switch is the same for example, without knowing exactly what is inside. 
 The other interesting point is that we now control the shape of the tree, we know what to expect, reducing the potential problematic situations.
-It is important The native nodes also enables to process incrementally: we can implements the translation only for a few nodes, letting the others as native, and already be able to run the different checks and see the first results.
+The native nodes also enables to process incrementally: we can implement the translation only for a few nodes, letting the others as native, and already be able to run some of the checks and see the first results.
 
 
 If the \emph{Why?} can be easily understood, we will discuss the \emph{How?} in this work. 
 To better understand the challenge of implementing a new language, we will start by describing the process of adding a new language to the ecosystem (Section \ref{sec:new_language}), with the challenges and choices that need to be done (Subsection \ref{subsubsec:reducing_false_positives}). 
-We will then verify whether the results of a CFG-based check on \slang{} are comparable in quality (based on number of true positives, false positive, etc.) with the same checker over the original tree (Section \ref{sec:improving_slang}, \ref{sec:implementation_java}, \ref{sec:implementation_slang} and \ref{sec:running_checker}).
-We will then investigate if we can push \slang{} further, to be able to support more complex checks, by trying to anticipate the problems that can arise in the future (Section \ref{sec:anticipating_problems}) and compare our checker with others tools (Section \ref{sec:comparison}).
+We will then verify whether the results of a CFG-based check on \slang{} are comparable in quality (based on number of true positives, false positives, etc.) with the same checker over the original tree (Section \ref{sec:improving_slang}, \ref{sec:implementation_java}, \ref{sec:implementation_slang} and \ref{sec:running_checker}).
+We will then investigate if we can push \slang{} further, to be able to support more complex checks, by trying to anticipate the problems that can arise in the future (Section \ref{sec:anticipating_problems}) and compare our checker with other tools (Section \ref{sec:comparison}).
 
 
 

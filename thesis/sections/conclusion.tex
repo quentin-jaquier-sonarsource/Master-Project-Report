@@ -4,5 +4,7 @@ We managed to run a null pointer dereference checker on top of an incomplete int
 The checker turns out to be as efficient as the implementation on more complete intermediate representation, after some effort to adapt the language. 
 The control flow graph shows some weak spot due to the presence of the native nodes, but we manage to find a solution that report a good amount of issues with no obvious false positive. 
 The algorithm contains no complex elements, and is still able to find more than 35 issues on top of existing open-source project.
+\newline
 [...]
+\newline
 Slang seems to have started in a very good way, but we have to keep in mind that the language is less than one years old, if it suits well for the situations that we have tested today, it still have many challenge to face.
