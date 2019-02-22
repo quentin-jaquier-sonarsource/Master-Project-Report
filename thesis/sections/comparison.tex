@@ -11,8 +11,16 @@ If the initial goal is not to find as many issues as an other tools, looking at 
 	\centering
 	\caption{Technology used by different tools to detect \emph{null} pointer dereference}
 	\label{table:tools_features}
-	\begin{tabular}{|c|c|}
+	\begin{tabular}{|l|llllll|}
 		\hline
+		& \bf SLang & \bf SonarJava & \bf Spotbugs & \bf Fbinfer  & \bf ErrorProne & \bf IntelliJ IDEA \\ 
+		&&&&& \bf Null-away & \\ \hline
+		Annotation & No    & Yes       & Yes              & Yes      & Yes                   & Yes           \\
+		Flow sensitive       & Yes   & Yes       & Yes              & Yes      & Yes                   & Yes           \\
+		Path sensitive       & No    & Yes       & Yes              & Yes      & Yes                   & Yes           \\
+		Interprocedural      & No    & Yes       & Yes   & Yes      & Yes                   & Yes           \\
+		Requires build       & No    & Both      & Yes              & Yes      & Yes                   & No    \\   
+		\hline    
 	\end{tabular}
 \end{table}
 
@@ -20,7 +28,6 @@ Table \ref{table:tools_features} shows the different technology that the differe
 This is a high level description of the feature, they all implement them in their own way and with different level of efficiency. 
 We can see that our tool is not using a lot of these technology, mainly due to the fact that we did not target them in the first place. 
 The next parts will discuss what this technology good for, and if we can implement it on \slang{}.
-
 
 \subsubsection{Interprocedural}
 \label{subsubsec:inter_procedrual}
@@ -81,9 +88,16 @@ Therefore, if we see that 4 out of 5 languages define a feature (like ternary ex
 \subsubsection{Path sensitivity}
 \label{subsubsec:path_sensitivity}
 
-Currently, our tool is using flow sensitive analysis, namely we are only interested in the order in which the statements are executed. 
+Currently, our tool is using flow sensitive analysis, meaning that we are only interested in the order in which the statements are executed.
 In addition, path-sensitivity computes and keeps additional information, based statements seen along the path and avoid infeasible path. 
-For example, if a pointer is checked for \emph{null}, the tool will know that the pointer is equals to \emph{null} inside the true branch, it will therefore report if the pointer is used or given to a function that expect a \emph{non-null} value. 
+For example, if a pointer is checked for \emph{null}, the tool will know that the pointer is equals to \emph{null} inside the true branch, it will therefore report if the pointer is used or given to a function that expect a \emph{non-null} value.
+Additionally, we could also learn the value of a given pointer with assignment.
+
+\lstinputlisting[label={lst:simple-np},
+caption=Simple example of null pointer exception]{code/simple-np.scala}
+
+Listing \ref{lst:simple-np} shows a simple code that obviously raise an exception. Our checker is currently not able to detect it, since it does not try to know the current value of a pointer.
+Path sensitivity would obviously be able to find this kind of issues.
 In addition, we could also use the path sensitivity to improve the \emph{MAY} analysis introduce in subsection \ref{subsubsec:may_vs_must}, to at least remove the obvious false positives. 
 The main challenge of this kind of analysis is to deal with the fact that the number of path grow exponentially, making it hard to scale. 
 In the current situation, we do not have path sensitivity in our checker, but we already have all the features required, implementing it with the same constraints as an implementation over a original language seems to be possible.
@@ -197,7 +211,7 @@ In addition, we will look more in-depth into one additional feature that is impl
 	\label{figure:class-extends-abtract}
 	\setlength{\tabcolsep}{24pt}
 	\begin{tabular}{cc}
-		\multicolumn{1}{c}{\lstinputlisting[numbers=none]{code/abstract-class-1.scala}} & \multicolumn{1}{c}{\lstinputlisting[numbers=none]{code/abstract-class-2.scala}} \\
+		\multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-1.scala}} & \multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-2.scala}} \\
 	\end{tabular}
 \end{figure}
 	

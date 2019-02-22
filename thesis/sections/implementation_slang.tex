@@ -151,15 +151,13 @@ We create one branching block per match cases, with the body of the case as true
 At the same time, we build the sequence of the body of cases, starting from a break.
 
 \lstinputlisting[label={lst:pattern-match},
-caption=Example of pattern matching in Scala]{code/pattern-match.scala}
+caption=Example of fallthrough pattern matching]{code/pattern-match.scala}
 
 \begin{figure}[h]
 	\caption{Corresponding CFG of the code of listing \ref{lst:pattern-match}}
 	\label{figure:pat-mat-cfg}
 	\includegraphics[]{figure/pat-mat-cfg.pdf}
 \end{figure}
-
-
 
 Figure \ref{figure:pat-mat-cfg} shows the resulting control flow graph of the code of listing \ref{lst:pattern-match}. We can see that the fallthrough behavior is represented as expected, \emph{a = 1} is executed both when \emph{pat1} and \emph{pat2} is true.
 
@@ -326,7 +324,7 @@ This is the opposite of the previous point: in the case where the checker need t
 	\label{table:slang-native-percentage}
 	\begin{tabular}{|c|c|c|c|}
 		\hline
-		\bf Language & \bf \% & \bf \% of completely native & \bf Number of files \\ \hline
+		\bf Language & \bf \% & \bf \% of completely native & \bf $\bf N^{\circ}$  of files \\ \hline
 		Scala &  41 &  6.25 & 6126 \\ 
 		Kotlin &  47 &  6.5 & 26758 \\ 
 		Ruby &  39 &  5.2 &  7811 \\ \hline

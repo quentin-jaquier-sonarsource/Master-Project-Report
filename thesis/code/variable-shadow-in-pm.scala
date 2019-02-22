@@ -1,0 +1,1 @@
+p.map(p => (p == null))

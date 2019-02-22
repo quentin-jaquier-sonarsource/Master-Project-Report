@@ -1,28 +1,14 @@
 \section{Limitation of the approach: Anticipating other potential problems}
 \label{sec:anticipating_problems}
-
+[TODO: This part still need a rework...] \newline
 In the previous parts, we have shown that we were able, with some assumptions, to find with \slang{} all the issues found by the implementation on SonarJava. 
 This is encouraging, but it does not implies that nothing is lost during with this approach.
-In this part, we will try to briefly anticipate problems that were not central to this checker, but might come later, by first focusing on Kotlin example, then well known language features.
+In this part, we will try to briefly anticipate problems that were not central to this checker, but might come later.
 
-\subsection{Kotlin}
-\label{subsec:kotlin}
-
-\lstinputlisting[label={lst:false-positive-kotlin},
-caption=Kotlin code that raise a false positive]{code/false-positive-kotlin.scala}
-
-Listing \ref{lst:false-positive-kotlin} shows Kotlin code with an interesting situation. 
-At line $\#3$, we can see that the function \emph{isBooleanOrInt} from the pointer \emph{a} is called without a safe call with \emph{.?}. 
-Normally, the type system of Kotlin prevent this kind of issue if the variable is \nullable{} (of type \emph{Any?}). 
-However this code will not raise a \emph{null} pointer exception since in fact the function \emph{isBooleanOrInt} is called, without dereferencing the pointer \emph{a}! 
-Our checker is only checking the content of one function, from his point of view this code can raise an exception. 
-This is clearly a false positive that is reported in for Kotlin. 
-In fact, in Kotlin, we do not expect to find any situations where an exception is possible, but only issues that are dead code, as described in section \ref{subsubsec:dead_code}.
-
-\subsection{Other languages features}
+\subsection{Languages features}
 \label{subsec:other_language_features}
 
-The goal of this section is to presents other potential problems that can arise due to different languages features. We are going to present a high level overview of the feature, and not precisely describe an exhaustive list the consequences and how to deal with these.
+The goal of this section is to presents other potential problems that can arise due to different languages features. We are going to present a high level overview of the feature, and not precisely describe an exhaustive list of the consequences and how to deal with these.
 This list is particularly useful when thinking about new rules that we can add to \slang, being aware of them can help to avoid bad surprises.
 
 \begin{enumerate}
@@ -30,10 +16,10 @@ This list is particularly useful when thinking about new rules that we can add t
 	\lstinputlisting[label={lst:call-by-name-or-value},
 	caption=Difference between call by name and by value]{code/call-by-name-or-value.scala}
 	
-	Listing \ref{lst:call-by-name-or-value} shows pseudo code that demonstrate the potential problematic question. If the language uses call by value, the code will raise a \emph{null} pointer exception, however, if we use a call by name, p2 will not be evaluated and therefore nothing wrong happen. \newline
+	Listing \ref{lst:call-by-name-or-value} shows pseudo code that demonstrate the potential problematic question. If the language uses call by value, the code will raise a \emph{null} pointer exception, however, if we use a call by name, \emph{p2} will not be evaluated and therefore nothing wrong happen. \newline
 	\item \textit{Functional language} \newline
-	In subsection \ref{subsec:concrete_example}, we have described the addition of a new language on top of \slang.
-	Adding a functional language does bring additional challenges, but supporting the current rules implemented on \slang has been done without blockers. \newline
+	In subsection \ref{subsec:concrete_example}, we have described the addition of a new language on top of \slang{}.
+	Adding a functional language does bring additional challenges, but supporting the current rules implemented on \slang{} has been done without blockers. \newline
 	One typical feature of functional language that we are going to face one day or an other are the high order functions.
 	\begin{enumerate}
 		\item \textit{closure/high order function} \newline

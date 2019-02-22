@@ -93,14 +93,14 @@ During the translation, we are going to keep all the original nodes, if one has 
 	\end{tabular}
 \end{figure}
 
-Figure \ref{figure:native_node_example} shows an example of native node present in a \slang{} tree. In the left tree, we understand that the equals is part of an assignment, but in the second case, we have an unknown expression, and keep it, but as a native node.
+Figure \ref{figure:native_node_example} shows an example of native node present in a \slang{} tree. In the left tree, we understand that the equals is part of an assignment, but in the second case, we have an unknown expression, that we will still keep, but as a native node.
 Native nodes therefore represent nodes that are unknown, but we will still be able to compare them and have the list of their children and tokens. 
 Since we can compare two native nodes, we are still able to find that two branches of a switch is the same for example, without knowing exactly what is inside. 
 The other interesting point is that we now control the shape of the tree, we know what to expect, reducing the potential problematic situations.
 The native nodes also enables to process incrementally: we can implement the translation only for a few nodes, letting the others as native, and already be able to run some of the checks and see the first results.
 
 
-If the \emph{Why?} can be easily understood, we will discuss the \emph{How?} in this work. 
+If the \emph{Why?} is now clear, we will discuss the \emph{How?} in this work. 
 To better understand the challenge of implementing a new language, we will start by describing the process of adding a new language to the ecosystem (Section \ref{sec:new_language}), with the challenges and choices that need to be done (Subsection \ref{subsubsec:reducing_false_positives}). 
 We will then verify whether the results of a CFG-based check on \slang{} are comparable in quality (based on number of true positives, false positives, etc.) with the same checker over the original tree (Section \ref{sec:improving_slang}, \ref{sec:implementation_java}, \ref{sec:implementation_slang} and \ref{sec:running_checker}).
 We will then investigate if we can push \slang{} further, to be able to support more complex checks, by trying to anticipate the problems that can arise in the future (Section \ref{sec:anticipating_problems}) and compare our checker with other tools (Section \ref{sec:comparison}).
