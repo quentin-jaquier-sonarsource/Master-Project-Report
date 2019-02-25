@@ -105,14 +105,13 @@ All these issues have been reported by both the SonarJava implementation, and \s
 
 \subsubsection{Other languages}
 \label{subsubsec:other_languages}
-
-The mapping to \slang{} has been implemented for 5 languages: Java, Scala, Kotlin, Ruby, and Apex. Once we have an implementation of a checker that works for one language, the checker can be run out of the box on other languages if we make sure that all node described in subsection \ref{subsec:nodes} are present. 
-The current limitation to find issues is the number of project that we can run our checker on. Recently at SonarSource, they have prepared a setup to run an analyzer on more than 170'000 projects, coming from the open-source project on Github with more than 50 stars \cite{sourced:2019:Online}. 
-This is a huge database, with billions of line of code, containing many languages, and of good overall good quality.
+The check is implemented on top of \slang{} we can therefore run the checker on other language for free, if we make sure that all node described in subsection \ref{subsec:nodes} are present. Currently, the mapping have been completed for Scala and Kotlin.
+The current limitation to find issues is the number of project that we can run our checker on. Recently SonarSource have prepared a setup to run an analyzer on more than 170'000 projects, coming from the open-source project on Github with more than 50 stars \cite{sourced:2019:Online}. 
+This is a huge database, with billions of line of code, containing many languages, and of good overall good quality, this is a perfect source to test our tool.
 
 \begin{table}[h]
 	\centering
-	\caption{Number of issues found on 170K projects}
+	\caption{Number of issues found on more than 170K projects}
 	\label{table:large_scale_issues}
 	\begin{tabular}{|c|c|c|c|}
 		\hline
@@ -124,25 +123,27 @@ This is a huge database, with billions of line of code, containing many language
 \end{table}
 
 Table \ref{table:large_scale_issues} shows the number of issues per language that we have found during the analysis of the 170K projects, with the number of projects containing the language, and the true positive rate.
-The first observation is that there is issues for Java, Scala, and Kotlin!
+The first observation is that there are issues for Java, Scala, and Kotlin!
 
 \begin{enumerate}
 	\item \textit{Java} \newline
-	We find a lot of issues for Java, but if we look at the number per projects, it is hardly ever above 30 issues, meaning that it is not generating a lot of noise.
-	The true positive rates is hard to estimate with this number of issues, but by looking randomly in the list, we did not manage to find any false positive, and the majority of them are still on the master branch of their Github repository.
+	We find a lot of issues for Java, but if we look at the number per project, it is hardly ever above 30 issues, meaning that it is not generating a lot of noise in overall.
+	The true positive rates is hard to estimate with this number of issues, but by looking randomly in the list, we did not manage to find any false positive, and the majority of them are still on the master branch of their Github repository. 
+	If we can not guarantee that the true positive rate is at 100\%, our goal to have less than 10\% of false positive set in subsection \ref{subsubsec:precision_recall} seems to be reached for Java! \newline
 	\item \textit{Scala} \newline
-	Finding issues on Scala is a good news to consolidate our confidence on the strength of the checker, it is confirmed to be working on at least two languages!
-	The number is lower than Java mainly due to the fact that there is way less Scala projects.
+	Finding issues on Scala is a good news to consolidate our confidence on the strength of the checker, it is confirmed to be working on at least two languages with two different paradigm!
+	The number is lower than Java, it is mainly due to the fact that there is way less Scala projects than Java projects.
 	A second reason is that Scala language provides the statement \emph{Option}, that can be easily used to avoid null pointer.
 	
 	\lstinputlisting[label={lst:variable-shadow-in-pm},
 	caption=Example of false positive in Scala]{code/variable-shadow-in-pm.scala}
 	
-	The true positive rate is slightly lower for Scala, this can be explained by the situation in listing \ref{lst:variable-shadow-in-pm}. 
-	In this case, our naive semantics described in \ref{subsubsec:identifying_local_variable} consider that both pointer \emph{p} refers to the same pointer, but it is not the case as the second one is the element of the list \emph{p}, and not the list itself. 
-	This is a known problem, the same idea happen for variable that are shadowed in a pattern matching, but not a limitation in itself.
+	The true positive rate is slightly lower for Scala, this can be explained by situation similar to the one in listing \ref{lst:variable-shadow-in-pm}. 
+	In this case, our naive semantics described in \ref{subsubsec:identifying_local_variable} consider that both pointer \emph{p} refers to the same pointer, but it is not the case as the second one is the element of the list \emph{p}, and not the list itself.
+	The pointer will appear as used and then checked for \emph{null} in the control flow, we will therefore have a false positive.
+	This is a expected problem, the same idea happen for variable that are shadowed in a pattern matching, but not a limitation in itself.
 	
-	\item \textit{Kotlin} \newline
+	\item \textit{Kotlin}
 	
 	The checker only reports 10 issues on Kotlin, and all of them are false positives.
 	
@@ -150,13 +151,12 @@ The first observation is that there is issues for Java, Scala, and Kotlin!
 	caption=Kotlin code that raise a false positive]{code/false-positive-kotlin.scala}
 	
 	Listing \ref{lst:false-positive-kotlin} shows Kotlin code with an interesting situation that reflect the reason of the false positives. 
-	At line $\#3$, we can see that the function \emph{isBooleanOrInt} from the pointer \emph{a} is called without a safe call with \emph{.?}. 
-	Normally, the type system of Kotlin prevent this kind of issue if the variable is \nullable{} (of type \emph{Any?}). 
-	However this code will not raise a \emph{null} pointer exception since in fact the function \emph{isBooleanOrInt} is called, without dereferencing the pointer \emph{a}! 
+	At line $\#3$, we can see that the function \emph{isBooleanOrInt} from the pointer \emph{a} is called without a safe call with \emph{.?}, it is exactly what we want to detect and might look like a true positive at first glance. 
+	However this code will not raise a \emph{null} pointer exception since the function \emph{isBooleanOrInt} is called, without dereferencing the pointer \emph{a}! 
 	The is called an extension functions \cite{kotlinExtensionFun:2019:Online} in Kotlin, it will extends the class with a new functionality, but not dereferencing the pointer on which the function is called.
 	Our checker is only checking the content of one function, from his point of view this code can raise an exception. 
-	This look exactly like a problem that we want to find, however this is clearly a false positive. 
-	In fact, in Kotlin, we do not expect to detect any situations where an exception is possible, but only issues that are dead code, as described in section \ref{subsubsec:dead_code}. As this checks does not make a lot of sense for Kotlin, we might want to remove it from the list of checks that we are going to run on the language.
+	In fact, in Kotlin, we do not expect to detect any situations where an exception is possible due to the fact that the type system is built to prevents this kind of issues.
+	As this checks does not make a lot of sense for Kotlin, we might want to remove it from the list of checks that we are going to run on the language.
 \end{enumerate}
 
 \subsection{Are the issues found really relevant?}
@@ -194,7 +194,7 @@ Table above shows that 25\% of the issues found on OpenJDK 9 have been fixed in 
 We can explain this by the fact that developer have priorities, especially in such big open-source project, fixing a bug that is already here and is apparently not causing any trouble have low priorities, even if this is a legitimate issue. 
 SonarSource often refers to this idea as the “Fix the leak” approach: it does not make sense to spend considerable effort to fix every bug already present in the code if you keep introducing new one on new code, the same way you would not start to mop the floor during a flooding without having fixed the origin.
 
-A fun story is that, during the run on thousand of project described in section \ref{subsubsec:other_languages}, the checker reported an issues on an old fork of the code of the Scala compiler! The issue has already been fixed, and the commit that fix the issue state:
+A nice story related to the fix-rate is that, during the run on thousand of project described in section \ref{subsubsec:other_languages}, the checker reported an issues on an old fork of the code of the Scala compiler! The issue has already been fixed, and the commit that fix the issue state:
 
 \begin{displayquote}
 	\centering
@@ -222,12 +222,47 @@ One similar situation is that sometimes, it is indeed possible to write a unit t
 For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be \emph{null} in this function, and therefore the check is simply dead code. 
 This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
 
+\subsection{Anticipating other potential problems}
+\label{subsec:anticipating_problems}
+
+In the previous parts, we have shown that we were able, with some assumptions, to find with \slang{} all the issues found by the implementation on SonarJava. 
+This is encouraging, but it does not imply that nothing is lost during the translation.
+A lot of different problem can arise due to other feature that may not be present is the languages that we have covered.
+
+\subsubsection{Languages features}
+\label{subsubsec:other_language_features}
+
+We are going to present a high level overview of the potential problematic features, and not precisely describe an exhaustive list of the consequences and how to deal with these.
+This list is particularly useful when thinking about new rules that we can add to \slang, being aware of them can help to avoid bad surprises.
+
+\begin{enumerate}
+	\item \textit{Call by name or by value} \newline
+	\lstinputlisting[label={lst:call-by-name-or-value},
+	caption=Difference between call by name and by value]{code/call-by-name-or-value.scala}
+	
+	Listing \ref{lst:call-by-name-or-value} shows pseudo code that demonstrate the potential problematic question. If the language uses call by value, the code will raise a \emph{null} pointer exception, however, if we use a call by name, \emph{p2} will not be evaluated and therefore nothing wrong happen. \newline
+	\item \textit{Functional language} \newline
+	In subsection \ref{subsec:concrete_example}, we have described the addition of a new language on top of \slang{}.
+	Adding a functional language does bring additional challenges, but supporting the current rules implemented on \slang{} has been done without blockers. \newline
+	One typical feature of functional language that we are going to face one day or an other are the high order functions.
+	\begin{enumerate}
+		\item \textit{closure/high order function} \newline
+		We have already discussed in subsection \ref{subsubsec:other_languages} one of the problem that we faced for our check due to high order functions. 
+		How free variable are supported in closure can be implemented in many ways, [...]
+	\end{enumerate}
+	
+	\item \textit{Static vs dynamic scoping} \newline
+	\item \textit{Static vs dynamic typing} \newline
+	\item \textit{Declarative vs imperative language} \newline
+\end{enumerate}
 
 
+\subsubsection{How can SLang cope with all these feature ?}
+\label{subsubsec:how_can_slang_cope_with_features}
 
-
-
-
+All these feature are concretely related to the same challenge: choose what we want to add in \slang{}. 
+We can always add more feature, but the language will quickly become very complex and unmaintainable. For example for the call by name/value, we can easily add the information in the node, and use this information in the checker. 
+There is not clear answer, it is all about the tradeoff discussed in section \ref{subsubsec:precision_recall}, if one feature seems to be appearing a lot and causing problems, it would make sense to include it in the grammar.
 
 
 
