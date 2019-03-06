@@ -29,7 +29,7 @@ Table \ref{table:nodes-needed} shows the nodes that we need in order to implemen
 The first column lists the nodes needed to recognize the different structures used in the checker. 
 We can see that the list is quite simple. 
 The interesting node is the member select, in fact, to identify when a pointer is used, we will only use this node: we don’t need to know anything about the context in which the pointer is used. 
-For example, when a function is called without a member selection, the tree will simply be a identifier (name of the function) and a list of argument, but in the case of a pointer use, the tree will be a member selection, that we will use in the checker. 
+For example, when a function is called without a member selection, the tree will be a identifier (name of the function) and a list of argument, but in the case of a pointer use, the tree will be a member selection, that we will use in the checker. 
 This way, we are able to detect not only function invocation, but also field selection or anything that we consider as a member selection in the original language.
 
 The nodes needed for the control flow graph are the one that we can expect for identifying the control flow of a program, that are common in all language and already implemented in \slang{}. 
@@ -70,7 +70,7 @@ Class declaration is used for the same idea as the function declaration, we use 
 
 In \ref{subsec:other_way_to_add_belief}, we saw multiple way to add the belief that a \emph{null} pointer can be raised. 
 Slang do not have arrays, so we could expect to not find all issues coming from them. 
-The first is the length of the array. In Slang, this is simply represented as a field access/member select, and can therefore be supported. 
+The first is the length of the array. In Slang, this is represented as a field access/member select, and can therefore be supported. 
 Accessing or modifying the slots of \emph{null} as if it were an array is however not supported. This will lead to false negative in \slang{} that we will not have in the implementation of SonarJava.
 
 \subsection{Building a Control Flow Graph on SLang}
@@ -96,7 +96,7 @@ To build the control flow graph, we are going to use two main kind of basic bloc
 	\end{enumerate}
 	\item \textit{CFG Branching Block} \newline 
 	This interface represents blocks that include branching instruction, where the flow depend on the result of a Boolean expression. 
-	It inherits from CFG Block and simply have a true and false successor block reference in addition to the simple block.
+	It inherits from CFG Block and have a true and false successor block reference in addition to the simple block.
 	\newline 
 \end{enumerate}
 
@@ -107,7 +107,7 @@ We start by creating an END node, that contains no element and represents the en
 \subsubsection{Block and others nodes}
 \label{subsubsec:block_and_others}
 
-The simplest tree that we will face are the blocks, they represent simply a list of statements, we can therefore directly recursively build the graph for all children. 
+The simplest tree that we will face are the blocks, they represent a list of statements, we can therefore directly recursively build the graph for all children. 
 This behavior can also be applied to other known trees that does not change the flow of execution, as a default case. 
 The only difference is that we are also going to add the current tree to the elements after having built the graph for the children, in order to not lose information. 
 For example, having a list of identifier is not useful if we do not know that they are linked together by a binary expression, we will therefore add both the binary expression and the children to the elements of the current block.
@@ -124,15 +124,17 @@ We can now recursively build the condition of the If tree from the branching blo
 
 The bottom-up approach makes the creation of the If tree straightforward, since we have already built the successor of the tree that we are currently building. 
 However in the case of loops, the flow is not going to continue at the successor, but return at the condition of the loop, a predecessor’s node that we have not built yet. 
-To solve this issue, we can introduce a \textbf{forwarding block}, a simple basic block that is used to store a reference and will not contain any element. 
+To solve this issue, we can introduce a \textbf{forwarding block}, a basic block that is used to store a reference and will not contain any element. 
 We can now start to build the loop flow by creating a forwarding block that will link to the condition, and build the body with this new block as the successor. 
 Finally, we can build the condition of the loop as a branching block, with the true successor as the body of the loop, and the false as the block that follow the loop.
 There is one details that we have not address yet: break and continue. 
-To support these two statements, we are going to use a stack, that will contain breakable objects. These objects are simply here to store the link to the condition for continue, and the end of the loop for break. 
+To support these two statements, we are going to use a stack, that will contain breakable objects. 
+These objects are here to store the link to the condition for continue, and the end of the loop for break. 
 Before starting to build the body of the loop, we will push a breakable to the top of the stack, and pop it once we are done. 
 The stack is used to support nested loop, a break/continue will refers to the first enclosing loop.
 
-The current implementation of For loops is the same as While loops, this may introduce problems that will be discussed later. We can use the same idea for Do/While loop, and simply start to build the condition before the body.
+The current implementation of For loops is the same as While loops, this may introduce problems that will be discussed later. 
+We can use the same idea for Do/While loop, and start to build the condition before the body.
 
 \subsubsection{Match Tree}
 \label{subsubsec:match_tree_cfg}
@@ -164,7 +166,7 @@ Figure \ref{figure:pat-mat-cfg} shows the resulting control flow graph of the co
 \subsubsection{Jump Tree: break and continue}
 \label{subsubsec:jump_tree_cfg}
 
-Jump tree are not supposed to appear when we do not expect them, if we have an unexpected jump tree, we can not do anything and we will simply add it to the current block. 
+Jump tree are not supposed to appear when we do not expect them, if we have an unexpected jump tree, we can not do anything and we will directly add it to the current block. 
 We will discuss in section \ref{subsec:how_to_deal_with_native} a solution to better support this situation.
 In the usual case, we will expect them and create an edge from the current block to the head of the stack that is filled as described in \ref{subsubsec:loops_cfg} and \ref{subsubsec:match_tree_cfg} sections.
 
@@ -312,11 +314,11 @@ This information can be used in different ways to help to define the multiple le
 
 \begin{enumerate}
 \item \textit{Ignore this information} \newline
-In some case, it may make sense to simply ignore this information, and to treat unreliable nodes as others. 
+In some case, it may make sense to ignore this information, and to treat unreliable nodes as others. 
 In our case, we have shown previously that this solution is not suitable, as it produces too many false positives. \newline
 
 \item \textit{Don’t run the checker on unreliable CFG} \newline
-This is the opposite of the previous point: in the case where the checker need to really trust the control flow graph, it can make sense to simply stop the checker if the graph can not be trusted.
+This is the opposite of the previous point: in the case where the checker need to really trust the control flow graph, it can make sense to directly stop the checker if the graph can not be trusted.
 
 \begin{table}[h]
 	\centering

@@ -43,7 +43,7 @@ There is multiples others way to perform interprocedural analysis, that represen
 
 Requiring the build can in fact be perceived as a disadvantage, since compiling code and calling it static analysis seems to be a contradiction. 
 Using the build provides however so much information that the popular tools seems to all have opted for it. 
-This can make sense when the checking for error is integrated to the build process, but this is a real handicap when we want to have interactive feedback in an IDE or a pull request analysis, and is simply not possible in a cloud computing scenario, when you do not have access to the binaries. 
+This can make sense when the checking for error is integrated to the build process, but this is a real handicap when we want to have interactive feedback in an IDE or a pull request analysis, and is not possible in a cloud computing scenario, when you do not have access to the binaries. 
 The recent trend however is to avoid using the build due to the disadvantage stated before.
 
 In the situation of \slang{}, we will obviously not have access to the binary of the original language. 
@@ -199,7 +199,7 @@ In addition, we will look more in-depth into one additional feature that is impl
 	This is an smart and easy first step to perform inter procedural analysis.
 	The idea is to compute a summary of every methods, and use this information during the intraprocedural analysis. 
 	In our case, we would like for example to store if a method can return \emph{null}, or if an parameters could be \emph{non-null} to then report if \emph{null} is passed as his argument. 
-	We can have this information by simply looking at annotation. If the annotation are not presents, we can still perform intraprocedural analysis to find ourselves the annotation. For example, if a method ever return \emph{null}, we can annotate the function as \nullable{}, and if a function always dereference an argument without checking it for \emph{null}, we can consider the argument as \emph{non-null}. 
+	We can have this information by looking at annotation. If the annotation are not presents, we can still perform intraprocedural analysis to find ourselves the annotation. For example, if a method ever return \emph{null}, we can annotate the function as \nullable{}, and if a function always dereference an argument without checking it for \emph{null}, we can consider the argument as \emph{non-null}. 
 	The good part is that we already have the tools required to build the summary. The feature currently missing in \slang{} is the method references. 
 	We obviously need to be able to identify which method is called to be able to retrieve the summary.
 	This is related to the problem of the name references that we faced during in the previous parts, naive solution exist, but proper semantics have to be completed.	

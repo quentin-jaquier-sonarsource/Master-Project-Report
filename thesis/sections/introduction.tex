@@ -32,7 +32,7 @@ A second observation is that many rules are implemented the same way, and that s
 	\end{tabular}
 \end{table}
 
-Table \ref{table:common_rules} shows a sample of typical checks that can be considered as common rules \cite{JiraSonarSource:2019:Online} , that apply to any programming language.
+Table \ref{table:common_rules} shows a sample of typical checks that can be considered as common rules \cite{JiraSonarSource:2019:Online}, that apply to any programming language.
 This was the main motivation: avoid redoing the same work again and again, by finding a way to implements these rules only once, changing the multiplication by an addition.
 At this point, the high level idea is to use an existing front-end to perform the parsing, to translate it to an universal intermediate representation and to implements the checks and metrics on it.
 This idea is promising, it would enable SonarSource to support new languages faster, avoiding duplication, and to reduce the maintainability cost, allowing them to reach their objective.

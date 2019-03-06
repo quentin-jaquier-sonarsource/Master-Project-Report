@@ -59,7 +59,7 @@ It is exactly the kind of situation that we would like to report.
 However, the different parts of the header are in a native node, as described before, it will therefore not be added to the set of used pointer. 
 This makes sense, from a language agnostic point of view, we can not know anything from the execution order of the different block of the loop header, as it can depends on the original language for example. 
 This is in fact the kind of behavior that we want to achieve, the language specific features does not produce false positive, we only have false positive. 
-One way to solve this problem is to simply add a node in \slang{} that will better support this situation. 
+One way to solve this problem is to adapt the loop node in \slang{} that will better support this situation. 
 If it makes sense for loop header as it is probably a feature that is present in different situation, we have to keep in mind that this is not a solution that we should use in all situation, where the feature is really specific to a language.
 
 \subsection{Improved results}
@@ -219,7 +219,7 @@ For example, in listing \ref{lst:contradiction-code}, we can see that this code 
 It comes from the fact that we implies beliefs from the code that a programmer writes, if he writes himself contradicting statement, we will still report an issue. 
 In the situation of listing above, the checker does not take in consideration the check for \emph{null} as a path-sensitive tool would do. \newline
 One similar situation is that sometimes, it is indeed possible to write a unit test that target a specific function and throw an exception, but it will never happen in real execution due to the fact that the programmer have an implicit knowledge about his code. 
-For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be \emph{null} in this function, and therefore the check is simply dead code. 
+For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be \emph{null} in this function, and therefore the check is dead code. 
 This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
 
 \subsection{Anticipating other potential problems}
