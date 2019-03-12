@@ -1,13 +1,13 @@
 \section{Adding a new language to SLang}
 \label{sec:new_language}
 
-In this part, we are going to discuss the challenge to add a new language to \slang{}, with a general procedure and a concrete example with Scala.
+In this part, we are going to discuss the challenge to add a new language to \slang{}, with a general procedure and a concrete example with \emph{Scala}.
 
 \subsection{General Procedure}
 \label{subsec:general_procedure}
 
-The addition of a new language follows a general procedure that we can be described in a high level way.
-The first step is to choose a front end that we are going to use to perform the parsing of the language. 
+The addition of a new language follows a general procedure that can be described in a high level way.
+The first step is to choose a front end that we are going to use to perform the parsing of the language.
 
 \subsubsection{Front end}
 \label{subsubsec:front_end}
@@ -15,7 +15,7 @@ The first step is to choose a front end that we are going to use to perform the 
 To choose a front-end, we have to take into consideration multiples points:
 \begin{enumerate}
 	\item \textit{License} \newline The tool developed will be open source, we have to use an existing front end that that have a compatible license.
-	\item \textit{Features} \newline Static analysis requires specifics need, that is not necessarily provided by any front-end. 	For example, we need precise location of tokens to be able to report the issues to the user as precisely as possible. Another example is the comments, that is required for some of the common rule \ref{table:common_rules}, but is typically removed early in a compiler front-end since they are not directly used.
+	\item \textit{Features} \newline Static analysis requires specific needs, that is not necessarily provided by any front-end. 	For example, we need precise location of tokens to be able to report the issues to the user as precisely as possible. Another example is the comments, that are required for some of the common rule \ref{table:common_rules}, but is typically removed early in a compiler front-end since they are not directly used.
 	\item \textit{Maintenance} \newline 
 	The last criteria is the completeness and maintenance. We want a tool that is regularly maintained and that support the eventual new feature of the language that will arise. 
 \end{enumerate}
@@ -26,16 +26,17 @@ To choose a front-end, we have to take into consideration multiples points:
 With the front-end, we now have access to the intermediate representation of the original language. 
 We can start to work on enabling more and more rules. 
 The work usually start by looking at which rule we want to implement. 
-Depending on the rule, we have to add the translation of more node. 
-If the prerequisite for the front-end are respected, the initial effort adding the mapping for a new node is an easy task, we have to identify which node in the original language correspond to the node in \slang{}, and understand its structure to create a new node. 
+Depending on the rule, we have to add the translation of more node from the original language to \slang{}. 
+If the prerequisite for the front-end are respected, the initial effort of adding the mapping for a new node is an easy task, we have to identify which node in the original language correspond to the node in \slang{}, and understand its structure to adapt it. 
 Once we have added the nodes needed by the rule, and enabled it, we can then look at the results. 
 This is the critical step, we have to make sure that the rule make sense on this new language, and that the issues reported are relevant. 
 
-In many cases, this is were the interesting part is, there is a lot of unexpected problems that can arise at this point. Hopefully, there is multiple way to improve the results. 
-The first one is to setup a parameters of the rule, that will change the behavior. 
-For example, all the rules of naming convention have to be setup with the convention of the language. 
+In many cases, this is where the unexpected problems arise, that are due to an unknown language feature, a wrong approximation, and so on...
+Hopefully, there is multiple way to improve the results. 
+The first one is to setup a parameter for the rule, that will adapt the behavior of the rule depending on the original language, and even depending on the user input.
+For example, all the rules of naming convention have to be setup with the convention of the language, and can be changed by the user by a custom setup. 
 Sometimes, the rules simply does not apply for the language. 
-For example, if a language does not have a \emph{switch} statement, all the rules related to \emph{switch} will not apply to this language.
+For example, if a language does not have a \emph{switch} statement, all the rules related to \emph{switch} will obviously not apply to this language.
 The most challenging situation arise when the situation is not clear, where the approximation of the translation lead to situations where the rules could apply, but the language specific feature change the behavior of the check. 
 These problematic situations have to be taken care case by case.
 
@@ -55,7 +56,8 @@ Similarly, we can have false and true negatives, for real issue not reported and
 \emph{Precision} is the number of true positives, over the total number of issues reported by the tool ($ \emph{true positives} + \emph{false positives} $). \emph{Recall} is the number of true positive over the number of issues present in the code. 
 Finding good balance is a challenging task, in the first case, the programmer do not want to be surrounded with issues that he does not consider as relevant, it will hide the real issues and discredit the tool. 
 In the other extreme, a checker that never report any issue will never report false positive, but obviously not be useful, and will contain a lot of false negative. 
-There is no clear solution to this trade-off, we are going to target a rate of $<10\%$ of false positive for our work, but this is an arbitrary choice, for example FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} initially targeted a rate of less than 50\% of false positive. 
+There is no clear solution to this trade-off, we are going to target a rate of less than $10\%$ of false positive for our work.
+This is an arbitrary choice, other tools like FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} initially targeted a rate of less than 50\% of false positives for example. 
 It mainly depends on the context in which the tool is used, an analysis of the software of an aircraft might want to have a high recall while a user working on a small project would like precise tool. 
 Targeting as little false positives as possible, accepting therefore more false negatives, but still report real issues is an important choice since it will greatly influence our design and implementation choices.
 
@@ -65,24 +67,30 @@ An important note is that we are not in the context of proving the absence of bu
 \label{subsec:concrete_example}
 
 Scala is particularly interesting as it is the first functional language that is going to be added to \slang{}.
+The first step is to find a good front end.
 Scalameta \cite{Scalameta:2019:Online} provide all the features that we need, is widely used by the community and is intended to be used by static analysis tool. 
 It seems to suit perfectly to the requirements for a good front end.
 
 \subsubsection{Incrementally mapping Scala to SLang}
 \label{subsubsec:scala_to_slang}
-Now that we have chosen a front end, we can use it to obtain a Scala AST from a Scala file. At this point, we already have enough information to activate a first rule: file should parse.
-The first step from this AST is to extract comments, and translate the Scalameta token into \slang{} token.
-With this simple step, we are already able to enable the 4 new rules related to comments(S4663, S1134, S1135, S1451).
-The second step is to start the translation. As in any compiler phase that perform translation, the base will be a pattern matching on the current node. 
+Now that we have chosen a front end, we can use it to obtain a Scala abstract syntax tree from a Scala file. 
+At this point, we already have enough information to activate a first rule: file should parse.
+If Scalameta is not able to parse the file, we report an issue.
+The first step from this tree is to extract comments, and translate the Scalameta token into \slang{} token.
+With this simple step, we are already able to enable new checks related to comments, like the tracking of \emph{TODO} and reporting code that is commented.
+The second step is to start the translation. 
+As in any compiler phase that perform translation, the skeleton of the code will be a pattern matching on the current node. 
 We will traverse the tree using a top-down approach. 
 The initial step is to map all nodes to native tree, that will represents nodes that we do not know anything about. 
 We still have access to the token of the native nodes, we can therefore already activate the copy paste detection and the different metrics. 
-In addition, all the rules related to the structure of a file can already be enabled: length of line, tabulations, length of file. (S103, S105, S104).
+In addition, all the rules related to the structure of a file can already be enabled: length of line, tabulations, length of file.
 With only little effort, we manage to enable 8 rules, and provide a copy/paste detection and metrics. 
 We will continue the effort by adding more and more nodes translations, and activating more and more rules.
 
-Most of the nodes from the Scala AST have a direct equivalent in \slang{}, the translation effort is just to make \slang{} that the meaning of this node in the original language is the one intended in \slang{} and that the metadata is correctly handled. This is the case for package/import declaration, literal, block for example. Surprisingly, more complex nodes such as loop, if tree, pattern match also fall into this category.
-In fact,all nodes in \slang{} have an equivalent in Scalameta and they all follow the same process: we recursively build the children and eventually make \slang{} they exists, but no additional effort than building the children and grouping the metadata is required to build the node in \slang{}.
+Most of the nodes from the Scala AST have a direct equivalent in \slang{}, the translation effort is just to make sure that the meaning of a node in the original language is the one intended in \slang{} and that the metadata is correctly handled. 
+Package and import declaration, literal and block are example of node that have a direct equivalent.
+Surprisingly, more complex nodes such as loop, if tree, pattern match also fall into this category.
+In fact, all nodes in \slang{} have an equivalent in Scalameta and the implementation always follow the same process: we recursively build the children and eventually make sure they exists, but no additional effort than building the children and grouping the metadata is required to build the node in \slang{}.
 
 \subsubsection{Reducing the false positives}
 \label{subsubsec:reducing_false_positives}
