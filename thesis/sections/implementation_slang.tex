@@ -218,9 +218,7 @@ The former will be described in \ref{subsec:how_to_deal_with_native} and the lat
 
 In SonarJava, we have access to symbols of identifier, information that we do not have in \slang{}. 
 The current computation of local variable is quite simple: all variable declaration inside the function and all arguments are considered as local variables.
-This idea can work well for Java, but it not well suited for all language.
-In particularity for \emph{Ruby}: there is no variable declaration in the language, running the checker as it is will lead to a lot of potential false negative since we will only report issues for parameters.
-This is a naive version, used to show that with a proper semantics (name definitions and scoping rules) we could expect results that are as good as the current naive version. \newline
+This is a naive version that is not made to work well for all language, but used to show that with a proper semantics (name definitions and scoping rules) we could expect results that are as good as the current naive version. \newline
 When we have this set of local variable, we can now check if the variable is in this set before reporting the issues. In practice, we could still report the issues that are not coming from local variable, this would add some false positive.
 
 \lstinputlisting[label={lst:field-change-value},
