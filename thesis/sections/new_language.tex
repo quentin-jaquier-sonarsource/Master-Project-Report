@@ -14,13 +14,13 @@ The first step is to choose a front end that we are going to use to perform the 
 
 To choose a front-end, we have to take into consideration multiples points:
 \begin{enumerate}
-	\item \textit{License} \newline The tool developed will be open source, we have to use an existing front end that that have a compatible license.
-	\item \textit{Features} \newline Static analysis requires specific needs, that is not necessarily provided by any front-end. 	For example, we need precise location of tokens to be able to report the issues to the user as precisely as possible. Another example is the comments, that are required for some of the common rule \ref{table:common_rules}, but is typically removed early in a compiler front-end since they are not directly used.
-	\item \textit{Maintenance} \newline 
+	\item \textbf{\textit{License}} \newline The tool developed will be open source, we have to use an existing front end that that have a compatible license.
+	\item \textbf{\textit{Features}} \newline Static analysis requires specific needs, that is not necessarily provided by any front-end. 	For example, we need precise location of tokens to be able to report the issues to the user as precisely as possible. Another example is the comments, that are required for some of the common rule \ref{table:common_rules}, but is typically removed early in a compiler front-end since they are not directly used.
+	\item \textbf{\textit{Maintenance}} \newline 
 	The last criteria is the completeness and maintenance. We want a tool that is regularly maintained and that support the eventual new feature of the language that will arise. 
 \end{enumerate}
 
-\subsubsection{Incrementally add new mapping and enable rules}
+\subsubsection{Incrementally add new mapping and enable checks}
 \label{subsubsec:new_mapping_and_enables_rules}
 
 With the front-end, we now have access to the intermediate representation of the original language. 
@@ -48,15 +48,15 @@ The problem of reporting relevant issues without too much noise is common in sta
 In static analysis, a common challenge is to deal with the precision and recall trade-off. When reporting an issue, we can be in two situations:
 
 \begin{enumerate}
-	\item \textit{False Positive} \newline The tool is reporting a non-existing bug.
-	\item \textit{True Positive} \newline The tool is reporting a real bug. 
+	\item \textbf{\textit{False Positive}} \newline The tool is reporting a non-existing bug.
+	\item \textbf{\textit{True Positive}} \newline The tool is reporting a real bug. 
 \end{enumerate}
 Similarly, we can have false and true negatives, for real issue not reported and non-existing bug not reported, respectively. 
 
 \emph{Precision} is the number of true positives, over the total number of issues reported by the tool ($ \emph{true positives} + \emph{false positives} $). \emph{Recall} is the number of true positive over the number of issues present in the code. 
 Finding good balance is a challenging task, in the first case, the programmer do not want to be surrounded with issues that he does not consider as relevant, it will hide the real issues and discredit the tool. 
 In the other extreme, a checker that never report any issue will never report false positive, but obviously not be useful, and will contain a lot of false negative. 
-There is no clear solution to this trade-off, we are going to target a rate of less than $10\%$ of false positive for our work.
+There is no clear solution to this trade-off, we are going to target a rate of less than $5\%$ of false positive for our work.
 This is an arbitrary choice, other tools like FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} initially targeted a rate of less than 50\% of false positives for example. 
 It mainly depends on the context in which the tool is used, an analysis of the software of an aircraft might want to have a high recall while a user working on a small project would like precise tool. 
 Targeting as little false positives as possible, accepting therefore more false negatives, but still report real issues is an important choice since it will greatly influence our design and implementation choices.
@@ -77,7 +77,7 @@ Now that we have chosen a front end, we can use it to obtain a Scala abstract sy
 At this point, we already have enough information to activate a first rule: file should parse.
 If Scalameta is not able to parse the file, we report an issue.
 The first step from this tree is to extract comments, and translate the Scalameta token into \slang{} token.
-With this simple step, we are already able to enable new checks related to comments, like the tracking of \emph{TODO} and reporting code that is commented.
+With this simple step, we are already able to enable new checks related to comments, like the tracking of comments with \emph{TODO} and reporting code that is commented.
 The second step is to start the translation. 
 As in any compiler phase that perform translation, the skeleton of the code will be a pattern matching on the current node. 
 We will traverse the tree using a top-down approach. 
@@ -130,7 +130,7 @@ Table \ref{table:interesting_mapping} shows the resulting table for Scala if we 
 This information can lead our research and lead to identify 4 potentials problematic situation.
 
 \begin{enumerate}
-	\item \textit{Function with many parameter clauses} \newline 
+	\item \textbf{\textit{Function with many parameter clauses}} \newline 
 	\lstinputlisting[label={lst:many-parameters},
 	caption=Example of Scala function with many parameter clauses]{code/many-parameters.scala}
 	
@@ -146,13 +146,13 @@ This information can lead our research and lead to identify 4 potentials problem
 	
 	This case exactly describe the challenges when implementing static analyzer, their is often multiples solutions, not really complex in themselves, but it requires a good understanding of the whole ecosystem, form the original language keyword \emph{implicit} to the final implementation on \slang{}, to be able to produce good quality results.
 	
-	\item \textit{Match statement with at least one conditional case} \newline 
+	\item \textbf{\textit{Match statement with at least one conditional case}} \newline 
 	Listing \ref{lst:pattern-match-fp}, seen previously, also appear in the list. The current situation is that the whole match statement is converted to a native tree if only one conditional case is present. 
 	The granularity of this solution is not fine enough, we still want to be able to run the different checks related to match tree, even if one branch have an unknown structure!
 	The solution chosen is to wrap the case tree inside a native in the case where a guard is present.
 	This fine granularity is far better, we are know able to compare the body of the different cases and report duplicate ones, and also compare the pattern since we are still able to compare two natives nodes.
 	
-	\item \textit{Function parameters with default value} \newline 
+	\item \textbf{\textit{Function parameters with default value}} \newline 
 	\lstinputlisting[label={lst:scala-default-modifier},
 	caption=Example of Scala function with default value]{code/scala-default-modifier.scala}
 	
@@ -160,7 +160,7 @@ This information can lead our research and lead to identify 4 potentials problem
 	For default value, \emph{Ruby}, \emph{Scala} and \emph{Kotlin} have default value, it makes sense to add the support to \slang{}. 
 	This new structure adds new issues on bad naming convention, hard coded ip inside default value, unused parameters, and few others, comforting our choice.
 
-	\item \textit{Function parameters with modifier} \newline 
+	\item \textbf{\textit{Function parameters with modifier}} \newline 
 	\lstinputlisting[label={lst:scala-modifiers},
 	caption=Example of Scala function with implicit modifier]{code/scala-modifiers.scala} 
 	
