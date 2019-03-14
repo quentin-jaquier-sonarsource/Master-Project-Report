@@ -9,25 +9,25 @@ If the initial goal is not to find as many issues as any other tool, looking at 
 
 \begin{table}[h]
 	\centering
-	\caption{Technology used by different tools to detect \emph{null} pointer dereference}
+	\caption{Tools that detect \emph{null} pointer dereference}
 	\label{table:tools_features}
-	\begin{tabular}{|l|llllll|}
+	\begin{tabular}{|l|}
 		\hline
-		& \bf SLang & \bf SonarJava & \bf Spotbugs & \bf Fbinfer  & \bf ErrorProne & \bf IntelliJ IDEA \\ 
-		&&&&& \bf Null-away & \\ \hline
-		Annotation & No    & Yes       & Yes              & Yes      & Yes                   & Yes           \\
-		Flow sensitive       & Yes   & Yes       & Yes              & Yes      & Yes                   & Yes           \\
-		Path sensitive       & No    & Yes       & Yes              & Yes      & Yes                   & Yes           \\
-		Interprocedural      & No    & Yes       & Yes   & Yes      & Yes                   & Yes           \\
-		Requires build       & No    & Both      & Yes              & Yes      & Yes                   & No    \\   
+		\bf Tools \\
+		\hline
+		SonarJava \cite{SonarJava:2019:Online} \\
+		FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} and SpotBugs \cite{spotBugs:2019:Online} \\
+		Fbinfer \cite{fbInfer:2019:Online} \\
+		ErrorProne \cite{errorProne:2019:Online} \\
+		IntelliJ IDEA \cite{intelJIDEA:2019:Online} \\
 		\hline    
 	\end{tabular}
 \end{table}
 
-Table \ref{table:tools_features} shows the different technology that the different tool use. 
-This is a high level classification of the feature, they all implement them in their own way and with different level of efficiency. 
-We can see that our tool is not using a lot of these technology, mainly due to the fact that we did not target them in the first place. 
-The next parts will discuss what this technology good for, and if we can implement it on \slang{}.
+Table \ref{table:tools_features} shows the list of tools that detect \emph{null} pointer dereference, that we can use to compare and understand the different technologies that are currently used.
+A first observation of these tools shows that they are globally using similar technology, with different level of efficiency.
+Our tool is however implementing only a fraction of these technology, mainly due to the fact that we did not target them in the first place since we tried to not become too complex. 
+The next parts will discuss the main features that are used by others tools, for what this technology is good for, and if we can implement it on \slang{}.
 
 \subsubsection{Interprocedural}
 \label{subsubsec:inter_procedrual}
