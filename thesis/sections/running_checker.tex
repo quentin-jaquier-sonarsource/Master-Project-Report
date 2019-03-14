@@ -229,48 +229,4 @@ One similar situation is that sometimes, it is indeed possible to write a unit t
 For example, if a user only calls a function if he find a specific element in a list, he will assume that the list will never be \emph{null} in this function, and therefore the check for \emph{null} is dead code. 
 This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
 
-\subsection{Anticipating other potential problems}
-\label{subsec:anticipating_problems}
-
-In the previous parts, we have shown that we were able, with some assumptions, to find with \slang{} all the issues found by the implementation on SonarJava. 
-This is encouraging, but it does not imply that nothing is lost during the translation.
-A lot of different problems can arise due to other feature that may not be present is the languages that we have covered.
-
-\subsubsection{Languages features}
-\label{subsubsec:other_language_features}
-We are going to present a high level overview of the potential problematic features, and not precisely describe an exhaustive list of the consequences and how to deal with these.
-This list is particularly useful when thinking about new checks that we can add to \slang, being aware of them can help to avoid bad surprises.
-
-\begin{enumerate}
-	\item \textbf{\textit{Call by name or by value}} \newline
-	\lstinputlisting[label={lst:call-by-name-or-value},
-	caption=Difference between call by name and by value]{code/call-by-name-or-value.scala}
-	
-	Listing \ref{lst:call-by-name-or-value} shows pseudo code that demonstrate the potential problematic question. If the language uses call by value, the code will raise a \emph{null} pointer exception, however, if we use a call by name, \emph{p2} will not be evaluated and therefore nothing wrong happen. \newline
-	\item \textbf{\textit{Functional language}} \newline
-	In subsection \ref{subsec:concrete_example}, we have described the addition of a new language on top of \slang{}.
-	Adding a functional language does bring additional challenges, but supporting the current checks implemented on \slang{} has been done without blockers. \newline
-	One typical feature of functional language that we are going to face one day or an other are the high order functions.
-	\begin{enumerate}
-		\item \textit{closure/high order function} \newline
-		We have already discussed in subsection \ref{subsubsec:other_languages} one of the problem that we faced for our check due to high order functions. 
-		How free variable are supported in closure can be implemented in many ways, 
-		\\
-		TODO
-		\\
-	\end{enumerate}
-	
-	\item \textbf{\textit{Static vs dynamic scoping}} \newline
-	\item \textbf{\textit{Static vs dynamic typing}} \newline
-	\item \textbf{\textit{Declarative vs imperative language}} \newline
-\end{enumerate}
-
-\paragraph{How can SLang cope with all these feature ?}\mbox{}\\
-\label{subsubsec:how_can_slang_cope_with_features}
-All these feature are concretely related to the same challenge: choose what we want to add in \slang{}. 
-We can always add more feature, but the language will quickly become very complex and unmaintainable. For example for the call by name/value, we can easily add the information in the node, and use this information in the checker.
-
-There is not clear answer to these problems, it is all about the tradeoff discussed in section \ref{subsubsec:precision_recall}, if one feature seems to be appearing a lot and causing problems, it would make sense to include it in the grammar.
-
-
 
