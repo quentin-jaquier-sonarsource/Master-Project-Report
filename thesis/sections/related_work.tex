@@ -162,6 +162,7 @@ The main reason of this huge difference is in fact due to the features described
 In addition, we will look more in-depth into one additional feature that is implemented in SpotBugs and producing a big difference, and see if it may be implemented on \slang{}.
 
 \begin{enumerate}
+	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textit{Summary-based interprocedural analysis} \newline
 	This is an smart and easy first step to perform interprocedural analysis.
 	The idea is to compute a summary of every methods, and use this information during the intraprocedural analysis. 
@@ -186,7 +187,7 @@ In addition, we will look more in-depth into one additional feature that is impl
 	\end{figure}
 	
 	\lstinputlisting[label={lst:spotbugs-true-false-positive},
-	caption=Example of true positive and false negative of SpotBugs]{code/spotbugs-true-false-positive.scala}
+	caption=Example of true and false negative of SpotBugs]{code/spotbugs-true-false-positive.scala}
 	
 	In listing \ref{lst:spotbugs-true-false-positive}, we have an example of a true positive and a false negative from SpotBugs. At line $\#2$, the issues is correctly reported, the tool manages to identify statically that the pointer \emph{b} is called with type \emph{B}. At line $\#4$ however, the tool is not reporting any issue. This is due to the fact that the type of \emph{a} is \emph{B}, the tool is not able to identify the potential run-time type of the variable.\newline
 	Obtaining equivalents results does not require complex features, there is no strong push-back to implement it on \slang{}, and could already greatly increase the number of issues reported by \slang{}!

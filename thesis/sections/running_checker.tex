@@ -36,6 +36,7 @@ We will discuss some of them in the following part, to see if this comes from a 
 
 The difference between the two implementations is mainly due to the way ternary expression and loop header is currently handled in \slang.
 \begin{enumerate}
+	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textbf{\textit{Ternary expression}} \newline 
 	\label{subsubsec:reducing_false_positive_ternary}
 	Ternary expression have been used as example previously, and they actually appear to be causing false positives in real project.
@@ -130,6 +131,7 @@ Table \ref{table:large_scale_issues} shows the number of issues per language tha
 The first observation is that there are issues for Java, Scala, and Kotlin!
 
 \begin{enumerate}
+	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textbf{\textit{Java}} \newline
 	The number of issues reported on Java code is existing, there is a lot of interesting bug, and if we look at the number per project, it is hardly ever above 30 issues, meaning that it is not generating a lot of noise in overall.
 	The true positives rate is hard to estimate with this number of issues, but by looking randomly in the list, we did not manage to find any false positive, and the majority of them are still on the master branch of their Github repository. 
