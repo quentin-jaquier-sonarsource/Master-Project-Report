@@ -36,19 +36,20 @@ The nodes needed for the control flow graph are the one that we can expect for i
 The way we handle them will be described in subsection \ref{subsec:cfg_on_slang}.
 The last column describes others nodes that are needed indirectly by the checker:
 \begin{enumerate}
+	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textbf{\textit{Variable declaration}} \newline
 	\lstinputlisting[label={lst:local-scope-in-while},
-	caption=Example of local scope inside a loop that can shadow a field]{code/local-scope-in-while.scala}
+	caption=Local scope inside a loop that can shadow a field]{code/local-scope-in-while.scala}
 	
 	In section \ref{subsubsec:identifying_local_variable}, we are going to describe how we perform a naive semantic, that is assumed inside the check.
 	In this semantic, we are not going to be able to differentiate if two pointers that have the same name refer to the same declaration.
 	The idea to better support this limitation is that we will kill the pointer in the analysis when we see a declaration, the same way we are killing it when we see an assignment.
 	In listing \ref{lst:local-scope-in-while} the pointer is used at line $\#1$ and check for \emph{null} at line $\#4$, but the two identifier \emph{p} do not refer to the same symbol.
 	In this case, removing \emph{p} from the set when it is declared at line $\#3$ will enable us to remove the false positive.
-	
+
 	\item \textbf{\textit{Function invocation}} \newline
 	\lstinputlisting[label={lst:function-invocation-support},
-	caption=Example of pointer used as a parameter of a function call]{code/function-invocation-support.scala}
+	caption=Pointer used as a parameter of a function call]{code/function-invocation-support.scala}
 	
 	As discussed before, we do not need explicitly function invocation, only member selection. 
 	Due to a specific way we handle nodes that are not translated that we will explain in section \ref{subsec:how_to_deal_with_native}, we will add function invocation to be able to report pointer use that happens inside a function call, as illustrated in listing \ref{lst:function-invocation-support}.
@@ -106,6 +107,7 @@ We start by creating an \emph{END} node, that contains no element and represents
 We will then recursively build the graph by matching on the type of the tree.
 
 \begin{enumerate}
+	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textbf{\textit{Block and other nodes}} \newline 
 	\label{subsubsec:block_and_others}
 	The simplest tree that we will face are the blocks, they represent a list of statements, we can therefore directly recursively build the graph for all children, that will add the content of the block inside the current basic block. 
@@ -310,6 +312,7 @@ This information can now be used by any checker that use a control flow graph, n
 This information can be used in different ways to help to define the multiple level of granularity of the implementation of a new checker:
 
 \begin{enumerate}
+\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 \item \textbf{\textit{Ignore this information}} \newline
 In some case, it may make sense to ignore this information, and to treat unreliable nodes as others. 
 In our case, we have shown previously that this solution is not suitable, as it produces too many false positives. \newline
@@ -371,14 +374,15 @@ In this example, we report an issue, that is a true positive.
 We have already presented the main problematic situations, coming form native nodes, but there is still a few cases that can raise false positive that we have to take care.
 
 \begin{enumerate}
+	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textbf{\textit{Boolean short-circuit}} \newline 
 	\label{subsubsec:boolean_short_circuit}
 	Our current implementation of the control flow graph does not encode the possible path due to Boolean short-circuit. 
 	This will lead to a wrong evaluation order, even if the nodes are known. 
 	Since the evaluation order is not correct, it makes sense to treat them the same way we do with native nodes! 
 	We will hence keep all the content of these nodes, to be able to use them in the checkers, but mark them as unreliable. 
-	
-	\lstinputlisting[label={lst:boolean-short-circuit},
+
+\lstinputlisting[label={lst:boolean-short-circuit},
 	caption=Problematic situations due to Boolean short circuit]{code/boolean-short-circuit.scala}
 	
 	With this addition, we are now able to avoid the false negative that were reported in the two examples of listing \ref{lst:boolean-short-circuit}.
