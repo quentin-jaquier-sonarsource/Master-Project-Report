@@ -1,4 +1,4 @@
 if (p != null) {
 	p.toString();
-	if (p == null) { //... }
+	if (p == null) { }
 }
