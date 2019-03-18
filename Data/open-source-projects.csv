@@ -1,132 +1,131 @@
-Project, Sources
-SonarSource JavaScript,https://github.com/SonarSource/SonarJS.git
-sonargroovy,https://github.com/SonarSource/sonar-groovy.git
-Sonar Timeline plugin,https://github.com/SonarCommunity/sonar-timeline.git
-Sonargraph 7 SonarQube Plugin,https://github.com/SonarCommunity/sonar-sonargraph.git
+Activiti,https://github.com/Activiti/Activiti.git
+AisLib application framework,https://github.com/aispl/net-sf-aislib.git
+Ambrose,https://github.com/twitter/ambrose.git
+Apache Abdera,http://svn.apache.org/repos/asf/abdera/java/trunk
+Apache Commons BCEL,http://svn.apache.org/repos/asf/commons/proper/bcel/trunk
+Apache Commons Collections,http://git-wip-us.apache.org/repos/asf/commons-collections.git
+Apache Commons Configuration,http://svn.apache.org/repos/asf/commons/proper/configuration/trunk
+Apache Commons Exec,http://svn.apache.org/repos/asf/commons/proper/exec/trunk
+Apache Commons Logging,http://svn.apache.org/repos/asf/commons/proper/logging/trunk
+Apache Commons Pool,https://github.com/apache/commons-pool.git
+Apache Commons VFS,http://svn.apache.org/repos/asf/commons/proper/vfs/trunk
+Apache Directory LDAP API,http://svn.apache.org/repos/asf/directory/shared/trunk
+Apache Empire-db,http://git-wip-us.apache.org/repos/asf/empire-db.git
+Apache Jackrabbit,http://svn.apache.org/repos/asf/jackrabbit/trunk
+Apache Maven Enforcer,http://svn.apache.org/repos/asf/maven/enforcer/trunk
 Apache MyFaces CODI,http://svn.apache.org/repos/asf/myfaces/extensions/cdi/trunk
-Sonar Toxicity Chart Plugin,https://github.com/SonarCommunity/sonar-toxicitychart.git
-[KillTheNoise] XWiki Commons,https://github.com/xwiki/xwiki-commons.git
-SonarSource :: Language Recognizer :: Squid Bridge,https://github.com/SonarSource/sslr-squid-bridge.git
-elasticsearch,https://github.com/elasticsearch/elasticsearch.git
-AssertJ fluent assertions for Joda Time,https://github.com/joel-costigliola/assertj-joda-time.git
+Apache OpenNLP Reactor,http://svn.apache.org/repos/asf/opennlp/trunk
 Apache Pluto,http://svn.apache.org/repos/asf/portals/pluto/trunk
 Apache Tika,https://github.com/apache/tika.git
-AisLib application framework,https://github.com/aispl/net-sf-aislib.git
-SonarQube Findbugs Plugin,https://github.com/SonarSource/sonar-findbugs.git
-wildfly_java9,https://github.com/wildfly/wildfly.git
-JIRA Plugin for SonarQube,https://github.com/SonarCommunity/sonar-jira.git
-L10n :: Portuguese Pack,https://github.com/SonarCommunity/sonar-l10n-pt.git
-SonarQube CSS Plugin,https://github.com/SonarQubeCommunity/sonar-css.git
-docker-maven-plugin,https://github.com/fabric8io/docker-maven-plugin.git
-Flex,https://github.com/SonarSource/sonar-flex.git
-Activiti,https://github.com/Activiti/Activiti.git
-OPS4J Pax Logging (Build POM),https://github.com/ops4j/org.ops4j.pax.logging.git
-SonarQube Clirr Plugin,https://github.com/SonarCommunity/sonar-clirr.git
-Apache Directory LDAP API,http://svn.apache.org/repos/asf/directory/shared/trunk
-Grapht Dependency Injector,https://github.com/grouplens/grapht
-markdown4j,http://jdcasey@github.com/jdcasey/markdown4j.git
-Code Smells Plugin,https://github.com/QualInsight/qualinsight-plugins-sonarqube-smell.git
-Easy Rules,https://github.com/EasyRules/easyrules.git
-Sonar JMeter Plugin (parent),https://github.com/SonarCommunity/sonar-jmeter.git
-JaCoCo,https://github.com/jacoco/jacoco.git
-SonarQube Issue Assign Plugin,https://github.com/SonarCommunity/sonar-issue-assign.git
-sonar-persistit,https://github.com/SonarSource/sonar-persistit.git
-Apache OpenNLP Reactor,http://svn.apache.org/repos/asf/opennlp/trunk
-Sonar Build Stability Plugin,https://github.com/SonarCommunity/sonar-build-stability.git
-Polyforms Framework,https://github.com/Polyforms/Polyforms.git
-PHP,https://github.com/SonarSource/sonar-php.git
-QualInsight Cobertura Mojo,https://github.com/QualInsight/qualinsight-mojo-cobertura.git
-Fabric8 Maven :: Build,https://github.com/fabric8io/fabric8-maven-plugin.git
-Sonar Erlang,https://github.com/SonarCommunity/sonar-erlang.git
-L10n :: French Pack,https://github.com/SonarCommunity/sonar-l10n-fr.git
-guava_java9,https://github.com/google/guava.git
-AssertJ Assertions Generator,https://github.com/joel-costigliola/assertj-assertions-generator.git
-jhipster,https://github.com/jhipster/jhipster.git
-Tudu-Lists,https://github.com/jdubois/Tudu-Lists.git
 Apache Tobago,http://svn.apache.org/repos/asf/myfaces/tobago/trunk
-sonarqube,https://github.com/SonarSource/sonarqube.git
-SonarQube Android Lint Plugin,https://github.com/SonarCommunity/sonar-android.git
+Apache XBean,http://svn.apache.org/repos/asf/geronimo/xbean/trunk
+AssertJ - Fluent assertions for java unit testing,https://github.com/joel-costigliola/assertj-maven-parent-pom.git
+AssertJ Assertions Generator,https://github.com/joel-costigliola/assertj-assertions-generator.git
+AssertJ fluent assertions for Joda Time,https://github.com/joel-costigliola/assertj-joda-time.git
+Buck,https://github.com/facebook/buck.git
+Cayenne,https://git-wip-us.apache.org/repos/asf/cayenne.git
+Checkstyle,https://github.com/checkstyle/checkstyle.git
+Code Smells Plugin,https://github.com/QualInsight/qualinsight-plugins-sonarqube-smell.git
+CodeStory - Fluent-http,https://github.com/CodeStory/fluent-http.git
+Com.squareup.okio-okio-parent,https://github.com/square/okio.git
+Cucumber-reporting,https://github.com/damianszczepanik/cucumber-reporting.git
+docker-maven-plugin,https://github.com/fabric8io/docker-maven-plugin.git
+Easy Rules,https://github.com/EasyRules/easyrules.git
+Easybatch,https://github.com/easybatch/easybatch-framework.git
+EBCDIC to ASCII converter,https://github.com/SonarSource/ebcdic-to-ascii-converter.git
+Elasticsearch,https://github.com/elasticsearch/elasticsearch.git
+Fabric8 Maven :: Build,https://github.com/fabric8io/fabric8-maven-plugin.git
+FEST Util,https://github.com/alexruiz/fest-util.git
+FlatPack,https://github.com/appendium/flatpack.git
+Flex,https://github.com/SonarSource/sonar-flex.git
+Grapht Dependency Injector,https://github.com/grouplens/grapht
+Guava,https://github.com/google/guava.git
+Guava_java9,https://github.com/google/guava.git
+HelloJava10,https://github.com/m-g-sonar/HelloJava10.git
+HikariCP,https://github.com/brettwooldridge/HikariCP.git
+Hipster-pom,https://github.com/citiususc/hipster.git
+Initializr,https://github.com/spring-io/initializr.git
+JaCoCo,https://github.com/jacoco/jacoco.git
+JDBDT,https://github.com/edrdo/jdbdt.git
+Jdk9,http://hg.openjdk.java.net/jdk9/jdk9
+Jhipster,https://github.com/jhipster/jhipster.git
+Jhipster-sample-app,https://github.com/jhipster/jhipster-sample-app.git
+JIRA Plugin for SonarQube,https://github.com/SonarCommunity/sonar-jira.git
+JmxTrans - parent project,https://github.com/jmxtrans/jmxtrans.git
+Jooq,https://github.com/jOOQ/jOOQ.git
+JSR 354 (Money and Currency API),https://github.com/JavaMoney/jsr354-api.git
+JUnit,https://github.com/junit-team/junit4.git
+L10n :: French Pack,https://github.com/SonarCommunity/sonar-l10n-fr.git
+L10n :: Korean Pack,https://github.com/SonarCommunity/sonar-l10n-ko.git
+L10n :: Portuguese Pack,https://github.com/SonarCommunity/sonar-l10n-pt.git
+Lightblue-audit-hook,https://github.com/lightblue-platform/lightblue-audit-hook.git
+Lightblue-core,https://github.com/lightblue-platform/lightblue-core.git
+Markdown4j,http://jdcasey@github.com/jdcasey/markdown4j.git
+Maven hpi Plugin,git://git.eclipse.org/gitroot/hudson/org.eclipse.hudson.maven-hpi-plugin.git
+Maven Release,http://svn.apache.org/repos/asf/maven/release/trunk
+Moneta (JSR 354 RI),https://github.com/JavaMoney/jsr354-ri.git
+Mp3agic,https://github.com/mpatric/mp3agic.git
+OPS4J Pax Logging (Build POM),https://github.com/ops4j/org.ops4j.pax.logging.git
 PageObject library,https://github.com/lkwg82/de.lgohlke.selenium-pageobjects.git
-Symphony Java Client,https://github.com/symphonyoss/symphony-java-client.git
+PHP,https://github.com/SonarSource/sonar-php.git
+Pippo Parent,https://github.com/decebals/pippo.git
+Polyforms Framework,https://github.com/Polyforms/Polyforms.git
+Python,https://github.com/SonarSource/sonar-python.git
+QualInsight Cobertura Mojo,https://github.com/QualInsight/qualinsight-mojo-cobertura.git
+Restcomm Sip Servlets,https://github.com/RestComm/sip-servlets.git
+Silencio,https://github.com/damianszczepanik/silencio.git
+Simple-spring-memcached-parent,https://github.com/ragnor/simple-spring-memcached.git
+Sonar :: Issues Report :: Plugin,https://github.com/SonarCommunity/sonar-issues-report.git
+Sonar :: Update Center,https://github.com/SonarSource/sonar-update-center.git
+Sonar Branding Plugin,https://github.com/SonarCommunity/sonar-branding.git
+Sonar Build Stability Plugin,https://github.com/SonarCommunity/sonar-build-stability.git
+Sonar Clover Plugin,https://github.com/SonarSource/sonar-clover.git
 Sonar Crowd Plugin,https://github.com/SonarCommunity/sonar-crowd.git
-SonarQube Scanner for Ant,https://github.com/SonarSource/sonar-scanner-ant.git
-spring-petclinic,https://github.com/spring-projects/spring-petclinic.git
-hipster-pom,https://github.com/citiususc/hipster.git
-initializr,https://github.com/spring-io/initializr.git
+Sonar Erlang,https://github.com/SonarCommunity/sonar-erlang.git
+Sonar Google Analytics Plugin,https://github.com/SonarCommunity/sonar-google-analytics.git
+Sonar JMeter Plugin (parent),https://github.com/SonarCommunity/sonar-jmeter.git
 Sonar OpenID Plugin,https://github.com/SonarCommunity/sonar-openid
 Sonar Pitest Plugin,https://github.com/SonarCommunity/sonar-pitest.git
-Restcomm Sip Servlets,https://github.com/RestComm/sip-servlets.git
-Spark,https://github.com/perwendel/spark.git
-SVG Badges Plugin,https://github.com/QualInsight/qualinsight-plugins-sonarqube-badges.git
-SonarQube Motion Chart Plugin,https://github.com/SonarCommunity/sonar-motion-chart.git
-HikariCP,https://github.com/brettwooldridge/HikariCP.git
-SonarQube LDAP,https://github.com/SonarSource/sonar-ldap.git
-Apache Commons Configuration,http://svn.apache.org/repos/asf/commons/proper/configuration/trunk
-Moneta (JSR 354 RI),https://github.com/JavaMoney/jsr354-ri.git
-Apache Commons VFS,http://svn.apache.org/repos/asf/commons/proper/vfs/trunk
-jhipster-sample-app,https://github.com/jhipster/jhipster-sample-app.git
-Apache Jackrabbit,http://svn.apache.org/repos/asf/jackrabbit/trunk
-Sonar Clover Plugin,https://github.com/SonarSource/sonar-clover.git
-Spojo,https://sWoRm@github.com/sWoRm/Spojo.git
-mp3agic,https://github.com/mpatric/mp3agic.git
-CodeStory - Fluent-http,https://github.com/CodeStory/fluent-http.git
-FlatPack,https://github.com/appendium/flatpack.git
-SonarQube Cobertura Plugin,https://github.com/SonarCommunity/sonar-cobertura.git
-tomcat7,https://github.com/apache/tomcat70.git
-Sonar :: Update Center,https://github.com/SonarSource/sonar-update-center.git
-xwiki-commons_master,https://github.com/xwiki/xwiki-commons.git
-Sonar Google Analytics Plugin,https://github.com/SonarCommunity/sonar-google-analytics.git
-cucumber-reporting,https://github.com/damianszczepanik/cucumber-reporting.git
-checkstyle,https://github.com/checkstyle/checkstyle.git
-lightblue-audit-hook,https://github.com/lightblue-platform/lightblue-audit-hook.git
-tomcat9,https://github.com/apache/tomcat.git
-Tab Metrics,https://github.com/SonarCommunity/sonar-tabmetrics.git
-Stapler Parent,git://git.eclipse.org/gitroot/hudson/org.eclipse.hudson.stapler.git
-Python,https://github.com/SonarSource/sonar-python.git
-tomcat8,https://github.com/apache/tomcat80.git
-Apache Commons Pool,https://github.com/apache/commons-pool.git
-Apache XBean,http://svn.apache.org/repos/asf/geronimo/xbean/trunk
-Sonar Branding Plugin,https://github.com/SonarCommunity/sonar-branding.git
-Sonar :: Issues Report :: Plugin,https://github.com/SonarCommunity/sonar-issues-report.git
-AssertJ - Fluent assertions for java unit testing,https://github.com/joel-costigliola/assertj-maven-parent-pom.git
-Wicket Parent,http://git-wip-us.apache.org/repos/asf/wicket.git
-Pippo Parent,https://github.com/decebals/pippo.git
-SonarSource :: Language Recognizer,https://github.com/SonarSource/sslr.git
-FEST Util,https://github.com/alexruiz/fest-util.git
-L10n :: Korean Pack,https://github.com/SonarCommunity/sonar-l10n-ko.git
-sonarjava,https://github.com/SonarSource/sonar-java.git
-easybatch,https://github.com/easybatch/easybatch-framework.git
-Maven hpi Plugin,git://git.eclipse.org/gitroot/hudson/org.eclipse.hudson.maven-hpi-plugin.git
-lightblue-core,https://github.com/lightblue-platform/lightblue-core.git
-com.squareup.okio-okio-parent,https://github.com/square/okio.git
-sonarcpp,https://${GITHUB_TOKEN}@github.com/SonarSource/sonar-cpp.git
-HelloJava10,https://github.com/m-g-sonar/HelloJava10.git
-Apache Commons Collections,http://git-wip-us.apache.org/repos/asf/commons-collections.git
-JmxTrans - parent project,https://github.com/jmxtrans/jmxtrans.git
-JSR 354 (Money and Currency API),https://github.com/JavaMoney/jsr354-api.git
-silencio,https://github.com/damianszczepanik/silencio.git
-Sonar Trac Plugin,https://github.com/SonarCommunity/sonar-trac.git
-Maven Release,http://svn.apache.org/repos/asf/maven/release/trunk
-buck,https://github.com/facebook/buck.git
-JUnit,https://github.com/junit-team/junit4.git
-jooq,https://github.com/jOOQ/jOOQ.git
-Apache Abdera,http://svn.apache.org/repos/asf/abdera/java/trunk
-EBCDIC to ASCII converter,https://github.com/SonarSource/ebcdic-to-ascii-converter.git
-jdk9,http://hg.openjdk.java.net/jdk9/jdk9
-Apache Commons Exec,http://svn.apache.org/repos/asf/commons/proper/exec/trunk
-Apache Maven Enforcer,http://svn.apache.org/repos/asf/maven/enforcer/trunk
-Widget Lab,https://github.com/SonarCommunity/sonar-widget-lab.git
+Sonar Timeline plugin,https://github.com/SonarCommunity/sonar-timeline.git
 Sonar Total Quality Plugin,https://github.com/SonarCommunity/sonar-total-quality.git
-SonarQube StyleCop Plugin,https://github.com/SonarCommunity/sonar-stylecop.git
+Sonar Toxicity Chart Plugin,https://github.com/SonarCommunity/sonar-toxicitychart.git
+Sonar Trac Plugin,https://github.com/SonarCommunity/sonar-trac.git
 Sonar Useless Code Tracker Plugin,https://github.com/SonarCommunity/sonar-useless-code-tracker.git
-Ambrose,https://github.com/twitter/ambrose.git
-JDBDT,https://github.com/edrdo/jdbdt.git
-Apache Commons Logging,http://svn.apache.org/repos/asf/commons/proper/logging/trunk
-Apache Commons BCEL,http://svn.apache.org/repos/asf/commons/proper/bcel/trunk
+Sonarcpp,https://${GITHUB_TOKEN}@github.com/SonarSource/sonar-cpp.git
+Sonargraph 7 SonarQube Plugin,https://github.com/SonarCommunity/sonar-sonargraph.git
+Sonargroovy,https://github.com/SonarSource/sonar-groovy.git
+Sonarjava,https://github.com/SonarSource/sonar-java.git
+Sonar-persistit,https://github.com/SonarSource/sonar-persistit.git
+Sonarqube,https://github.com/SonarSource/sonarqube.git
+SonarQube Android Lint Plugin,https://github.com/SonarCommunity/sonar-android.git
+SonarQube Clirr Plugin,https://github.com/SonarCommunity/sonar-clirr.git
+SonarQube Cobertura Plugin,https://github.com/SonarCommunity/sonar-cobertura.git
+SonarQube CSS Plugin,https://github.com/SonarQubeCommunity/sonar-css.git
+SonarQube Findbugs Plugin,https://github.com/SonarSource/sonar-findbugs.git
+SonarQube Issue Assign Plugin,https://github.com/SonarCommunity/sonar-issue-assign.git
+SonarQube LDAP,https://github.com/SonarSource/sonar-ldap.git
+SonarQube Motion Chart Plugin,https://github.com/SonarCommunity/sonar-motion-chart.git
 SonarQube Scanner API - Parent,https://github.com/SonarSource/sonar-scanner-api.git
+SonarQube Scanner for Ant,https://github.com/SonarSource/sonar-scanner-ant.git
+SonarQube StyleCop Plugin,https://github.com/SonarCommunity/sonar-stylecop.git
+SonarSource :: Language Recognizer,https://github.com/SonarSource/sslr.git
+SonarSource :: Language Recognizer :: Squid Bridge,https://github.com/SonarSource/sslr-squid-bridge.git
+SonarSource JavaScript,https://github.com/SonarSource/SonarJS.git
+Spark,https://github.com/perwendel/spark.git
+Spojo,https://sWoRm@github.com/sWoRm/Spojo.git
+Spring-petclinic,https://github.com/spring-projects/spring-petclinic.git
+Spring-velocity-support,https://github.com/alibaba/spring-velocity-support.git
+Stapler Parent,git://git.eclipse.org/gitroot/hudson/org.eclipse.hudson.stapler.git
+SVG Badges Plugin,https://github.com/QualInsight/qualinsight-plugins-sonarqube-badges.git
+Symphony Java Client,https://github.com/symphonyoss/symphony-java-client.git
+Tab Metrics,https://github.com/SonarCommunity/sonar-tabmetrics.git
+Tomcat7,https://github.com/apache/tomcat70.git
+Tomcat8,https://github.com/apache/tomcat80.git
+Tomcat9,https://github.com/apache/tomcat.git
+Tudu-Lists,https://github.com/jdubois/Tudu-Lists.git
+Wicket Parent,http://git-wip-us.apache.org/repos/asf/wicket.git
+Widget Lab,https://github.com/SonarCommunity/sonar-widget-lab.git
+Wildfly_java9,https://github.com/wildfly/wildfly.git
 XML,https://github.com/SonarSource/sonar-xml.git
-simple-spring-memcached-parent,https://github.com/ragnor/simple-spring-memcached.git
-Cayenne,https://git-wip-us.apache.org/repos/asf/cayenne.git
-Apache Empire-db,http://git-wip-us.apache.org/repos/asf/empire-db.git
-guava,https://github.com/google/guava.git
-spring-velocity-support,https://github.com/alibaba/spring-velocity-support.git
+XWiki Commons,https://github.com/xwiki/xwiki-commons.git
+Xwiki-commons_master,https://github.com/xwiki/xwiki-commons.git

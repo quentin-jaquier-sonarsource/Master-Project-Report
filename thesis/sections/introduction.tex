@@ -11,10 +11,10 @@ In 2018, SonarSource decided to respond to this demand and add the support for 5
 Supporting 5 new languages was a challenging objective since adding a new language to the list used to take month of work, the team had to question their whole process to tackle this challenge.
 Historically, the typical process to develop a new static analysis tool at SonarSource was to build a front-end, specifically a lexer and a parser.
 The next part of the work is to implement the different checks, the metrics, copy-paste detection and syntax highlighting. The main content of the work is done, but it still needs to be regularly maintained to stay up to date.
-Since each language produce a different tree, every check have to be implemented individually for every language, the complexity of the current situation is therefore a multiplication between the number of language, and the number of rule. 
+Since each language produce a different tree, every check have to be implemented individually for every language, the complexity of the current situation is therefore a multiplication between the number of languages, and the number of rule. 
 As the objective is to increase the number of language, the current situation does not scale.
 The first observation that they made is that implementing the front-end for a language is a hard task, that typically takes most of the production time. This is more or less implementing the front end of a compiler, doing it right and following the evolution of the language is not a trivial task.
-Hopefully, there exist open-source project that already provide complete and maintained parsing that we can use. 
+Hopefully, open-source project that already provide complete and maintained parsing exists. 
 This is the first important choice: SonarSource is not going to develop their own front end anymore, but re-use existing one.
 A second observation is that many rules are implemented the same way, and that some of them are common, they make sense for every programming language.
 

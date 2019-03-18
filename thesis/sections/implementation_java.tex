@@ -30,7 +30,7 @@ We can now safely consider that when a pointer checked, it will never be in the 
 Figure \ref{figure:new-way-to-split} shows the old and new control flow graph for the code of listing \ref{lst:native-block-creation}. 
 By doing this, we will be able to support the example shown in listing \ref{lst:native-block-creation}, the check for \emph{null} breaks the block in three, the use and check will therefore not be in the same basic block.
 
-Once the \emph{gen} [\ref{eqn:dataflow3}] and \emph{kill} [\ref{eqn:dataflow4}] set has been generated for every basic block, we can start to run the analysis with a work list approach.
+Once the \emph{gen} (equation \ref{eqn:dataflow3}) and \emph{kill} (equation \ref{eqn:dataflow4}) set has been generated for every basic block, we can start to run the analysis with a work list approach.
 The idea is to add all basic block in a queue and compute the new \emph{out} set of the current head. 
 Since we are performing a forward analysis, if the new out set have changed, this means that all the successors might potentially change as well. 
 We therefore add the current basic block and all of it successor at the end of the work list, if the processed block sets have changed. 
