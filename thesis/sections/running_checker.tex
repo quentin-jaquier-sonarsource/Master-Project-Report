@@ -230,3 +230,61 @@ For example, if a user only calls a function if he find a specific element in a 
 This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
 
 
+
+\subsection{In-depth comparison with SpotBugs}
+\label{subsec:indpeth_comparison_spotbugs}
+
+SpotBugs \cite{spotBugs:2019:Online} is the successor of Findbugs \cite{FindBugs:2019:Online}, an open-source static analysis tool, it implements multiple checks related to \emph{null} dereference, it is therefore a good candidate to have a comparison with on the sources previously tested.
+
+\begin{table}[h]
+	\centering
+	\caption{SLang and Spotbugs comparison on open-source projects}
+	\label{table:slang_vs_spotbugs}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\bf SLang & \bf $\text{SLang} \cap \text{SpotBugs}$ & \bf SpotBugs: annotations \\
+		21 & 21 & 263 \\ \hline
+		\bf SpotBugs: others & \bf SpotBugs: correctness & \\ 
+		161 & 424 &  \\ \hline
+	\end{tabular}
+\end{table}
+
+Table \ref{table:slang_vs_spotbugs} shows the number of issues reported by the two tools on more than hundred open-source projects, with the setup described in section \ref{subsec:experimental_setup}. 
+For SpotBugs, we used the default configuration, namely confidence level and effort set to default, and took only the issues related to real potential bug.
+
+\begin{table}[h]
+	\centering
+	\caption{Examples of rules reported by SpotBugs}
+	\label{table:spotbugs-rules}
+	\begin{tabular}{|c|c|}
+		\hline
+		\bf Rule & \bf Category\\ \hline
+		Nullcheck of value previously dereferenced & Correctness  \\
+		Possible null pointer dereference & Correctness  \\
+		Load of known null value & Dodgy code \\
+		Method with Boolean return type should not return null & Bad practice \\ \hline
+	\end{tabular}
+\end{table}
+
+Table \ref{table:slang_vs_spotbugs} shows a subset of more than 30 checks related to \emph{null} pointer dereference that are reported by SpotBugs. 
+For our purpose, we are only interested by the checks that are labeled as correctness, as they represent the bugs that we try to identify and not the code smells that are not directly of interest for us. \newline
+Note that the number is different from the previous experiments because SpotBugs was crashing during the analysis of some of the project (OpenJDK, elastic search). 
+This leads to our first observation: our tool can be ran with no configuration directly on any of more than 100 of projects, and during the experiments presented in section \ref{subsubsec:other_languages}, our plugin did not experience a single crash on a huge amount of file!
+This is particularly good: if we want to introduce our tool on top of huge project like OpenJDK, it is extremely complex to debug if it does not work out of the box.
+The second observation is that every issues reported by \slang{}, is also reported by SpotBugs. 
+This results may seem discouraging, we are not finding anything new, but it also shows that the issues reported by our tools does matter for others tools as well. 
+These issues are reported by SpotBugs as “NullCheck of value previously dereferenced“, who is in fact corresponding to the issues that we report when we use the forward version of the analysis. 
+In addition, \slang{} implementation is reporting all issues that are reported under this category, showing that we are not missing any obvious issues. \newline
+
+While we would want to compute the intersection automatically, this number has to be computed by hand, since fully automatically computing the intersection is not a trivial task \cite{Gabel:2010:OIE:1806799.1806806}. 
+First, due to the fact that SpotBugs works on byte-code, we can not rely on the positions (even the line) of the reported issues reported by the tool. 
+This problem is even worth since the tool seem to report the issues in an inconsistent way, sometimes in a check for \emph{null}, or at the line where the pointer is used. 
+One solution would be to look at the file level, and compare the number of issues. 
+This would be possible if the issues were reported into the same category, but SpotBugs is reporting the issues related to \emph{null} pointer in multiple categories, if we include all of them into the comparison, we greatly increase the chance to have unrelated issues reported in the file. \newline
+One surprising observation is the number of issues, SpotBugs is reporting more than 20x more issues! 
+We can split this number into two category: the first one is the issues related to annotation. 
+It is interesting to do the differentiation to understand what we can gain from adding a given feature. 
+The second is the other issues related to \emph{null}, without the help of annotation. 
+It can be interesting for us since it does not require any language specific knowledge, and can serve as a goal that can be reached by our tool.
+
+
