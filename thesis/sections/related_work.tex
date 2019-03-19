@@ -18,7 +18,7 @@ The idea is similar to island parsing \cite{Moonen:2001}, where the grammar only
 
 \begin{table}[h]
 	\centering
-	\caption{Issues reported on OpenJDK 8b132 by the micro-grammar approach}
+	\caption{Issues reported by the micro-grammar approach}
 	\label{table:micro_grammar_issues}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -29,7 +29,7 @@ The idea is similar to island parsing \cite{Moonen:2001}, where the grammar only
 
 \begin{table}[h]
 	\centering
-	\caption{Issues reported on OpenJDK 8b132 by \slang{}}
+	\caption{Issues reported by \slang{}}
 	\label{table:slang_issues_jdk8}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -101,7 +101,7 @@ We have seen in section \ref{subsubsec:inter_procedrual} that interprocedural an
 Annotation are typically used to declare that a function can return a \emph{null} value, or that a function should never be called with \emph{null} as argument.
 
 \lstinputlisting[label={lst:annotated-code},
-caption=Example of annotated code]{code/annotated-code.scala}
+caption=Annotated code]{code/annotated-code.scala}
 
 In listing \ref{lst:annotated-code} for example, the function \emph{f} is guaranteed to never return \emph{null}, and the callee can directly dereference the result of this function without further checking..
 For the parameters, it enforces that \emph{f} can give \emph{null} as a first parameter, but not for the second one.\newline
@@ -128,7 +128,7 @@ For example, if a pointer is checked for \emph{null}, the tool will know that th
 For our purpose, we could also learn the value of a given pointer with assignment for example.
 
 \lstinputlisting[label={lst:simple-np},
-caption=Simple example of null pointer exception]{code/simple-np.scala}
+caption=Simple null pointer exception]{code/simple-np.scala}
 
 Listing \ref{lst:simple-np} shows a simple code that obviously raise an exception. Our checker is currently not able to detect it, since it does not try to know the current value of a pointer.
 Path sensitive tools would be able to find this kind of issues.
@@ -184,14 +184,14 @@ This is related to the problem of the name reference that we faced during the pr
 
 \begin{figure}[H]
 	\centering
-	\caption{Pseudo code of a class that extends an abstract class}
+	\caption{Class that extends an abstract class}
 	\label{figure:class-extends-abtract}
 	\setlength{\tabcolsep}{24pt}
 	\begin{tabular}{cc}
 		\multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-1.scala}} & \multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-2.scala}} \\
 	\end{tabular}
 
-\lstinputlisting[label={lst:spotbugs-true-false-positive}]{code/spotbugs-true-false-positive.scala}
+\lstinputlisting[nolol=true]{code/spotbugs-true-false-positive.scala}
 \end{figure}
 
 Method reference can be complex, that happen to be producing false negative in SpotBugs. 

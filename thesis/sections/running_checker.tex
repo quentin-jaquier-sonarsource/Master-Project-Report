@@ -17,7 +17,7 @@ The idea is to run the two implementation, and compare the results.
 
 \begin{table}[h]
 	\centering
-	\caption{Early number of issues reported by the two implementation, before improvement}
+	\caption{Early number of issues reported by the two implementations, before improvement}
 	\label{table:early-sonarjava-vs-slang}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -85,7 +85,7 @@ With the two modification done on \slang{}, on the same source and setup that we
 
 \begin{table}[h]
 	\centering
-	\caption{Final issues found by the two implementations for Java, with the source and setup described in section \ref{subsec:experimental_setup}}
+	\caption{Final issues found by the two implementations for Java, with the setup described in section \ref{subsec:experimental_setup}}
 	\label{table:issues-per-project}
 	\begin{tabular}{|c|c|}
 		\hline
@@ -145,7 +145,7 @@ The first observation is that we have issues for all three languages!
 	The experiment also show that this statement is not consistently used by the community though.
 	
 	\lstinputlisting[label={lst:variable-shadow-in-pm},
-	caption=Example of false positive in Scala]{code/variable-shadow-in-pm.scala}
+	caption=False positive due to high-order function]{code/variable-shadow-in-pm.scala}
 	
 	The true positives rate is slightly lower for Scala, this can be explained by situation similar to the one in listing \ref{lst:variable-shadow-in-pm}. 
 	In this case, our naive semantic described in \ref{subsubsec:identifying_local_variable} consider that both pointer \emph{p} refers to the same pointer, but it is not the case as the second one is the element of the list \emph{p}, and not the list itself.
@@ -156,7 +156,7 @@ The first observation is that we have issues for all three languages!
 	The checker only reports 10 issues on Kotlin, and all of them are false positives.
 	
 	\lstinputlisting[label={lst:false-positive-kotlin},
-	caption=Kotlin code that raise a false positive]{code/false-positive-kotlin.scala}
+	caption=False positive in Kotlin]{code/false-positive-kotlin.scala}
 	
 	Listing \ref{lst:false-positive-kotlin} shows Kotlin code with an interesting situation that reflect the reason of the false positives. 
 	At line $\#3$, we can see that the function \emph{isBooleanOrInt} from the pointer \emph{a} is called without a safe call with \emph{.?}, it is exactly what we want to detect and might look like a true positive at first glance. 
@@ -220,7 +220,7 @@ One of the problem is that sometimes, it is indeed possible to write a unit test
 These kind of issues should however not directly be classified as false positive, as it can also report dead code.
 
 \lstinputlisting[label={lst:contradiction-code},
-caption=Example of contradicting code that lead to dead code]{code/contradiction-code.scala}
+caption=Contradicting code that lead to dead code]{code/contradiction-code.scala}
 
 \paragraph{Potential Null Pointer Exception or Dead code ?}\mbox{}\\
 \label{subsubsec:dead_code}
@@ -241,7 +241,7 @@ SpotBugs \cite{spotBugs:2019:Online} is the successor of Findbugs \cite{FindBugs
 
 \begin{table}[h]
 	\centering
-	\caption{SLang and Spotbugs comparison on open-source projects}
+	\caption{\slang{} and Spotbugs comparison on open-source projects}
 	\label{table:slang_vs_spotbugs}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -257,7 +257,7 @@ For SpotBugs, we used the default configuration, namely confidence level and eff
 
 \begin{table}[h]
 	\centering
-	\caption{Examples of issues reported by SpotBugs}
+	\caption{Sample of issues kinds reported by SpotBugs}
 	\label{table:spotbugs-rules}
 	\begin{tabular}{|c|c|}
 		\hline

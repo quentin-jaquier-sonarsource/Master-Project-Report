@@ -17,7 +17,7 @@ The alternative that we use in this work is done during the control flow graph c
 In order to support the backward and forward analysis, we should break before and after the check for \emph{null}. 
 We can now safely consider that when a pointer checked, it will never be in the same basic block as where it is used or killed.
 \begin{figure}[h]
-\caption{Example of the new way to split basic block}
+\caption{New way to split basic block}
 \label{figure:new-way-to-split}
 \setlength{\tabcolsep}{24pt}
 	\begin{tabular}{cc}

@@ -138,7 +138,7 @@ This information can lead our research and lead to identify 4 potentials problem
 	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
 	\item \textbf{\textit{Function with many parameter clauses}} \newline 
 	\lstinputlisting[label={lst:many-parameters},
-	caption=Example of Scala function with many parameter clauses]{code/many-parameters.scala}
+	caption=Scala function with many parameter clauses]{code/many-parameters.scala}
 	
 	Listing \ref{lst:many-parameters} shows an example of a Scala function with multiple parameters, that is common in Scala, but not necessarily in other languages. 
 	Mapping the whole function to a native node is a big loss, we are not going to be able to run all the checks that we could run inside functions.
@@ -162,7 +162,7 @@ This information can lead our research and lead to identify 4 potentials problem
 	
 	\item \textbf{\textit{Function parameters with default value}} \newline 
 	\lstinputlisting[label={lst:scala-default-modifier},
-	caption=Example of Scala function with default value]{code/scala-default-modifier.scala}
+	caption=Scala function with default value]{code/scala-default-modifier.scala}
 	
 	In listing \ref{lst:scala-default-modifier}, we can see function parameters with default value. Once again, the first question is to know if it is worth it to add the support for such construct. 
 	This time, \emph{Ruby}, \emph{Scala} and \emph{Kotlin} have default value, it makes sense to add the support to \slang{}. 
@@ -170,7 +170,7 @@ This information can lead our research and lead to identify 4 potentials problem
 
 	\item \textbf{\textit{Function parameters with modifier}} \newline 
 	\lstinputlisting[label={lst:scala-modifiers},
-	caption=Example of Scala function with implicit modifier]{code/scala-modifiers.scala} 
+	caption=Scala function with implicit modifier]{code/scala-modifiers.scala} 
 	
 	
 	Listing \ref{lst:scala-modifiers} shows a problematic situation with the rule that check for unused parameters in Scala. In this case, the parameter \emph{param} seems to be unused in \emph{f} while it is implicitly passed to \emph{g}.

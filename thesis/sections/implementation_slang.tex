@@ -12,7 +12,7 @@ The IR does not need to includes all node types in order to work, only the one n
 We therefore have to make sure that we have all the nodes that we need in \slang{} for the implementation of the checker.
 
 \begin{table}[h]
-	\caption{All nodes needed for the null pointer dereference check}
+	\caption{Nodes needed for the null pointer dereference check}
 	\label{table:nodes-needed}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -153,10 +153,10 @@ We will then recursively build the graph by matching on the type of the tree.
 	At the same time, we can build the sequence of the body of cases, re-starting each time we see a break.
 	
 	\lstinputlisting[label={lst:pattern-match},
-	caption=Example of fallthrough pattern matching]{code/pattern-match.scala}
+	caption=Fallthrough pattern matching]{code/pattern-match.scala}
 	
 	\begin{figure}[h]
-		\caption{Corresponding CFG of the code of listing \ref{lst:pattern-match}}
+		\caption{Listing \ref{lst:pattern-match}'s corresponding CFG }
 		\label{figure:pat-mat-cfg}
 		\includegraphics[]{figure/pat-mat-cfg.pdf}
 	\end{figure}
@@ -237,7 +237,7 @@ It is finally time to explain how we are going to deal with the native nodes.
 For our concern, we will see the native nodes as a nodes that we do not know anything about, with a list of children.
 
 \lstinputlisting[label={lst:ternary-expression-belief},
-caption=Pseudo code with a ternary expression]{code/ternary-expression-belief.scala}
+caption=Simple ternary expression]{code/ternary-expression-belief.scala}
 
 \begin{figure}[h]
 	\caption{\slang{} AST from the code of listing \ref{lst:ternary-expression-belief}}
@@ -279,7 +279,7 @@ This is a reasonable assumption since programming language hardly ever provide e
 caption=Pseudo code with a ternary expression]{code/ternary-expression-example.scala}
 
 \begin{figure}[h]
-	\caption{Basic block content of the code in listing above}
+	\caption{Basic block content of the code in listing \ref{lst:ternary-expression-example}}
 	\label{figure:basic-block-content}
 	\includegraphics[]{figure/basic-block-content.pdf}
 \end{figure}

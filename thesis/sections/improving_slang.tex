@@ -89,7 +89,7 @@ Intuitively, we can see the analysis as follow:
 
 \begin{table}[h]
 	\centering
-	\caption{Number of issues per type of analysis, with the source setup described in section \ref{subsec:experimental_setup}}
+	\caption{Number of issues per type of analysis, with the setup described in section \ref{subsec:experimental_setup}}
 	\label{table:issue_per_analysis_type}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -121,7 +121,7 @@ In practice, to help the user to better understand the issue, we could report mu
 Intuitively, it is not surprising that the \emph{MAY} analysis performs poorly if we do not take into account the paths that are unfeasible.
 
 \lstinputlisting[label={lst:may-analysis-issue},
-caption=Example of false positive of MAY anaylsis]{code/may-analysis-fp.scala}
+caption=False positive of MAY anaylsis]{code/may-analysis-fp.scala}
 
 Listing \ref{lst:may-analysis-issue} shows an example of a false positive that is reported by the \emph{MAY} analysis. 
 This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not \emph{null}, the check for \emph{null} later at line $\#4$ does not mean that there is a potential exception.
