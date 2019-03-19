@@ -11,14 +11,14 @@ None of them implements the checks on an universal language, but it is a good wa
 
 How to Build Static Checking Systems Using Orders of Magnitude Less Code \cite{Brown:2016:BSC:2954679.2872364} is raising a similar concern that we tried to solve. 
 They observed that the current situation makes it hard to target new languages due to the complexity of the current systems. 
-The main idea is similar to \slang{}, they implemented a checker that is based on an incomplete grammar, that is called micro-grammars.
+The main idea is similar to \slang{}, they implemented a checker that is based on an incomplete grammar, that is called micro grammars.
 With this approach, they managed to implement a checker that is order of magnitude smaller than typical systems.
 The results that they obtain is encouraging, they manage to find hundreds of issues with an acceptable false positive rate, even some of them that were not reported by they previous work. 
 The idea is similar to island parsing, where the grammar only describe some part of a language, without requirement to have the whole syntax.
 
 \begin{table}[h]
 	\centering
-	\caption{Micro grammar null pointer dereference issues on OpenJDK}
+	\caption{Issues reported on OpenJDK 8b132 by the micro grammar approach}
 	\label{table:micro_grammar_issues}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -27,10 +27,23 @@ The idea is similar to island parsing, where the grammar only describe some part
 	\end{tabular}
 \end{table}
 
-Table \ref{table:micro_grammar_issues} is showing the number of issues reported by the micro grammar approach on OpenJDK 8 and table X the issues reported by our tool.
-By reporting 0\% of false positive on Java code, our implementation performs slightly better than the micro grammar that reports an already very low rate.
-Hovewer, our approach reports less issues. TODO
-Both results are similar, and both work reaches similar conclusion, that it is possible to find interesting issues with an universal approach.
+\begin{table}[h]
+	\centering
+	\caption{Issues reported on OpenJDK 8b132 by \slang{}}
+	\label{table:slang_issues_jdk8}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\bf Issues & \bf False positives & \bf \% \\ \hline
+		28 &  0 &  0 \\ \hline
+	\end{tabular}
+\end{table}
+
+Table \ref{table:micro_grammar_issues} and \ref{table:slang_issues_jdk8} are showing the number of issues reported by the micro grammar approach and \slang{} on OpenJDK 8b132.
+By reporting no false positive on Java code, our implementation performs better than the micro grammar that reports an already very low rate.
+However, our implementation reports less issues.
+Unfortunately, the paper does not provide the list of issues reported to help us identify the one that we are missing.
+One probable explanation is that we choose to only report the issues that come from local identifier (subsection \ref{subsubsec:identifying_local_variable}), this approach does not report any false positive, at the cost of few false negative.
+Both results are more or less similar, and both works reach the conclusion that it is possible to find interesting issues with an universal approach.
 
 \subsection{Technology used by other tools}
 \label{subsec:other_tools_technology}
