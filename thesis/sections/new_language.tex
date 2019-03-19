@@ -56,7 +56,7 @@ Similarly, we can have false and true negatives, for real issue not reported and
 \emph{Precision} is the number of true positives, over the total number of issues reported by the tool ($ \emph{true positives} + \emph{false positives} $). \emph{Recall} is the number of true positive over the number of issues present in the code. 
 Finding good balance is a challenging task, in the first case, the programmer do not want to be surrounded with issues that he does not consider as relevant, it will hide the real issues and discredit the tool. 
 In the other extreme, a checker that never report any issue will never report false positive, but obviously not be useful, and will contain a lot of false negative. 
-There is no clear solution to this trade-off, we are going to target a rate of less than $5\%$ of false positive for our work.
+There is no clear solution to this trade-off, we are going to target a rate of less than \textbf{5\%} of false positive for our work.
 This is an arbitrary choice, other tools like FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} initially targeted a rate of less than 50\% of false positives for example. 
 It mainly depends on the context in which the tool is used, an analysis of the software of an aircraft might want to have a high recall while a user working on a small project would like precise tool. 
 Targeting as little false positives as possible, accepting therefore more false negatives, but still report real issues is an important choice since it will greatly influence our design and implementation choices.

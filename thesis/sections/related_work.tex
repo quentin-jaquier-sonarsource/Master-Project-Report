@@ -2,23 +2,23 @@
 \label{sec:related_work}
 
 There is a lot of work about variations of null pointer consistency check available in the open-source world.
-The most relevant and closely related work that uses an universal representation is the micro grammar approach \cite{Brown:2016:BSC:2954679.2872364} that we will discuss in subsection \ref{subsec:micro_grammar}.
-In subsection \ref{subsec:other_tools}, we will present the different techniques that other popular tools use to perform null pointer dereference check.
-None of them implements the checks on an universal language, but it is a good way to understand the technologies that they use to perform the checks, and anticipate the problems that can arise if we want to implements equivalent features on \slang{}.
+The most relevant and closely related work that is based on an universal representation is the micro-grammar approach \cite{Brown:2016:BSC:2954679.2872364} that we will discuss in subsection \ref{subsec:micro_grammar}.
+In subsection \ref{subsec:other_tools_technology}, we will present the different techniques that other popular tools use to perform null pointer dereference check and discuss the differences with other popular tools in subsection \ref{subsec:other_tools_features}.
+None of them implements the checks on an universal language, but it is a good way to understand the technologies that they use to perform the checks, and anticipate the problems that can arise if we want to implement equivalent features on \slang{}.
 
-\subsection{Micro grammar}
+\subsection{Micro-grammar}
 \label{subsec:micro_grammar}
 
 How to Build Static Checking Systems Using Orders of Magnitude Less Code \cite{Brown:2016:BSC:2954679.2872364} is raising a similar concern that we tried to solve. 
 They observed that the current situation makes it hard to target new languages due to the complexity of the current systems. 
-The main idea is similar to \slang{}, they implemented a checker that is based on an incomplete grammar, that is called micro grammars.
+The main idea is similar to \slang{}, they implemented a checker that is based on an incomplete grammar, that is called \textbf{micro-grammar}.
 With this approach, they managed to implement a checker that is order of magnitude smaller than typical systems.
-The results that they obtain is encouraging, they manage to find hundreds of issues with an acceptable false positive rate, even some of them that were not reported by they previous work. 
-The idea is similar to island parsing, where the grammar only describe some part of a language, without requirement to have the whole syntax.
+The results that they obtain is encouraging, they manage to find hundreds of issues with an acceptable false positive rate. 
+The idea is similar to island parsing \cite{Moonen:2001}, where the grammar only describes some part of a language, without requirement to have the whole syntax, enabling the tool to be fast, flexible and robust when confronted to unexpected language features.
 
 \begin{table}[h]
 	\centering
-	\caption{Issues reported on OpenJDK 8b132 by the micro grammar approach}
+	\caption{Issues reported on OpenJDK 8b132 by the micro-grammar approach}
 	\label{table:micro_grammar_issues}
 	\begin{tabular}{|c|c|c|}
 		\hline
@@ -38,8 +38,8 @@ The idea is similar to island parsing, where the grammar only describe some part
 	\end{tabular}
 \end{table}
 
-Table \ref{table:micro_grammar_issues} and \ref{table:slang_issues_jdk8} are showing the number of issues reported by the micro grammar approach and \slang{} on OpenJDK 8b132.
-By reporting no false positive on Java code, our implementation performs better than the micro grammar that reports an already very low rate.
+Table \ref{table:micro_grammar_issues} and \ref{table:slang_issues_jdk8} are showing the number of issues reported by the micro-grammar approach and \slang{} on OpenJDK 8b132.
+By reporting no false positive on Java code, our implementation performs better than the micro-grammar that reports an already very low rate.
 However, our implementation reports less issues.
 Unfortunately, the paper does not provide the list of issues reported to help us identify the one that we are missing.
 One probable explanation is that we choose to only report the issues that come from local identifier (subsection \ref{subsubsec:identifying_local_variable}), this approach does not report any false positive, at the cost of few false negative.
@@ -49,8 +49,6 @@ Both results are more or less similar, and both works reach the conclusion that 
 \label{subsec:other_tools_technology}
 
 If the initial goal is not to find as many issues as any other tool, looking at the features they provide is a good way to know how to improve the current checker and to anticipate if it is possible to implement them on top of \slang{}.
-None of them uses an universal language, we are not going to compare two implementation
-
 
 \begin{table}[h]
 	\centering
@@ -141,12 +139,12 @@ In the current situation, we do not have path-sensitivity in our checker, but we
 \subsection{Popular tools}
 \label{subsec:other_tools_features}
 
-The idea here is not to describe in depth the exact functioning of a particular tool, but to describe some of the features implemented by other tools that can be interesting for our purpose of anticipating the potential problems of an eventual implementation on \slang{}.
+None of the popular tools are based on an incomplete representation, but they face challenges that can be similar to what we can experience, helping us to anticipate the potential problems that can arise in the future.
 
 \subsubsection{IntellJ IDEA}
 \label{subsubsec:intellj_idea}
 
-IntellJ is an IDEA, this is a particularly interesting since it requires interactivity, a user wants to see the issues being raised while he writes code, without having to rebuild the whole project. 
+IntellJ is a development environment, this is a particularly interesting since it requires interactivity, a user wants to see the issues being raised while he writes code, without having to rebuild the whole project. 
 This tool is also performing a \emph{null} pointer analysis using annotation. 
 It warns when the user use a pointer that is \nullable{}, without checking it for \emph{null}. 
 To detect that a pointer is checked for \emph{null}, it uses a pattern that is customizable. 
@@ -161,9 +159,9 @@ All our work that try to reduce the overall complexity would be pointless if we 
 
 \emph{Null} away is a tool built on top of error prone. 
 To perform \emph{null} pointer consistency, the process first checks if the value dereferenced is obviously \emph{non-null} (annotated \emph{@Non-null}). 
-If it is not the case, it performs a data-flow analysis to try to show the that the value is \emph{non-null}. 
-The data-flow analysis is using existing \emph{null} check into the code, therefore, if a field is annotated as \nullable{} and is dereferenced, an error will be reported only if the value is not checked for \emph{null}. \newline
-The key idea here is to perform the analysis in multiple steps of increasing complexity, skipping costly part, like the creation of the control flow graph, if it is possible.
+If it is not the case, it performs a data-flow analysis to try to infer the that the value should be annotated \emph{non-null}. 
+The data-flow analysis is using existing \emph{null} check into the code, if a field is annotated as \nullable{} and is dereferenced, an error will be reported if the value is not checked for \emph{null}. \newline
+The key idea here is to perform the analysis in multiple steps of increasing complexity, skipping costly part, like the creation of the control flow graph, if it is not required.
 Having multiple steps is a particularly good idea for \slang{}, not only for performance, but also for the quality of the results. 
 If we can report an issue, or prevent a complex computation before facing the uncertainties due to \slang{}, it may prevent us to make bad decisions.
 
@@ -171,37 +169,34 @@ If we can report an issue, or prevent a complex computation before facing the un
 \label{subsec:spotbugs_specific}
 
 We have seen in subsection \ref{subsec:indpeth_comparison_spotbugs} that SpotBugs is reporting way more issues related to null dereference that our implementation is reporting.
-The main reason of this huge difference is in fact due to the features described previously in subsection \ref{subsec:other_tools_technology}.
+The main reason of this huge difference is mainly due to the features described previously in subsection \ref{subsec:other_tools_technology}.
 In addition, we will look more in-depth into one additional feature that is implemented in SpotBugs and producing a big difference, and see if it may be implemented on \slang{}.
 
-\begin{enumerate}
-	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
-	\item \textit{Summary-based interprocedural analysis} \newline
-	This is an smart and easy first step to perform interprocedural analysis.
-	The idea is to compute a summary of every methods, and use this information during the intraprocedural analysis. 
-	In our case, we would like for example to store if a method can return \emph{null}, or if a parameter could be \emph{non-null} to then report if \emph{null} is passed as his argument. 
-	We can have this information by looking at annotation.
-	If the annotation are not present, we can still perform intraprocedural analysis to infer ourselves the annotation. 
-	For example, if a method ever return \emph{null}, we can annotate the function as \nullable{}, and if a function always dereference an argument without checking it for \emph{null}, we can consider the argument as \emph{non-null}. 
-	The good part is that we already have the nodes and data required to build the summary. 
-	The feature currently missing in \slang{} is the method reference. 
-	We obviously need to be able to identify which method is called to be able to retrieve the summary.
-	This is related to the problem of the name reference that we faced during in the previous parts, naive solution exist, but proper semantics have to be completed to obtain interesting results.
-	
-	
-	\begin{figure}[h]
-		\centering
-		\caption{Pseudo code of a class that extends an abstract class}
-		\label{figure:class-extends-abtract}
-		\setlength{\tabcolsep}{24pt}
-		\begin{tabular}{cc}
-			\multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-1.scala}} & \multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-2.scala}} \\
-		\end{tabular}
-	\end{figure}
-	
-	\lstinputlisting[label={lst:spotbugs-true-false-positive},
-	caption=Example of true and false negative of SpotBugs]{code/spotbugs-true-false-positive.scala}
-	
-	In listing \ref{lst:spotbugs-true-false-positive}, we have an example of a true positive and a false negative from SpotBugs. At line $\#2$, the issues is correctly reported, the tool manages to identify statically that the pointer \emph{b} is called with type \emph{B}. At line $\#4$ however, the tool is not reporting any issue. This is due to the fact that the type of \emph{a} is \emph{B}, the tool is not able to identify the potential run-time type of the variable.\newline
-	Obtaining equivalents results does not require complex features, there is no strong push-back to implement it on \slang{}, and could already greatly increase the number of issues reported by \slang{}!
-\end{enumerate}
+\subparagraph{Summary-based interprocedural analysis}
+Summary-based analysis is a smart and easy first step to perform interprocedural analysis.
+The idea is to compute a summary of every methods, and use this information during the intraprocedural analysis. 
+In our case, we would like to store if a method can return \emph{null}, or if a parameter could be \emph{non-null} to then report if \emph{null} is passed as his argument.
+We can have this information by looking at annotation, if the annotations are not present, we can still perform intraprocedural analysis to infer ourselves the annotation. 
+For example, if a method ever return \emph{null}, we can annotate the function as \nullable{}, and if a function always dereference an argument without checking it for \emph{null}, we can infer that the argument is \emph{non-null}. 
+The good part is that we already have the nodes and data required to build the summary, however, we are missing the method references in \slang{} to be able to implement this check.
+We need to be able to identify which method is called to be able to retrieve the summary of the function that is called.
+This is related to the problem of the name reference that we faced during the previous parts, naive solutions exist, but proper semantics have to be computed to obtain interesting results.
+
+\begin{figure}[H]
+	\centering
+	\caption{Pseudo code of a class that extends an abstract class}
+	\label{figure:class-extends-abtract}
+	\setlength{\tabcolsep}{24pt}
+	\begin{tabular}{cc}
+		\multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-1.scala}} & \multicolumn{1}{c}{\lstinputlisting[numbers=none,nolol=true]{code/abstract-class-2.scala}} \\
+	\end{tabular}
+
+\lstinputlisting[label={lst:spotbugs-true-false-positive}]{code/spotbugs-true-false-positive.scala}
+\end{figure}
+
+Method reference can be complex, that happen to be producing false negative in SpotBugs. 
+In figure \ref{figure:class-extends-abtract}, we have an example of a true positive and a false negative from SpotBugs. 
+At line $\#2$, the issues is correctly reported, the tool manages to identify statically that the pointer \emph{b} is called with type \emph{B}. 
+At line $\#4$ however, the tool is not reporting any issue. 
+This is due to the fact that the type of \emph{a} is \emph{B}, the tool is not able to identify the potential run-time type of the variable.\newline
+This is clearly a challenge that we will also face in the future of \slang{}, but we have seen that there is no strong push-back to implement it, and it could already greatly increase the number of issues reported by \slang{}, even if we have the same false negative as SpotBugs.

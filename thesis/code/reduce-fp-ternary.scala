@@ -1,3 +1,3 @@
-int s = p.isEmpty()  ? "0" : p.length;
+s = p.isEmpty()  ? "Empty" : p.length;
 // More code ...
 (p == null);
