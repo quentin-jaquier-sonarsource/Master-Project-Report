@@ -1,15 +1,15 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have described the use of an universal intermediate representation used in SonarSource to perform static analysis.
-It has enable the company to reduce the complexity of the ecosystem, the maintenance, and the overall effort to implement more than 40 checks on a new language, without any strong push-backs.
+We have described the use of a universal intermediate representation used in SonarSource to perform static analysis.
+It has enabled the company to reduce the complexity of the ecosystem, the maintenance, and the overall effort to implement more than 40 checks on a new language, without any strong push-backs.
 With this representation, SonarSource managed to provide 5 new languages in less than a year, an effort that would not be possible without it.
 
 In addition to these 40 checks, we pushed \slang{} further, and manage to run a null pointer dereference checker on top of this incomplete representation. 
 After some effort to adapt the language, the checker turns out to be as efficient as the implementation on the original intermediate representation.
-During the implementation, the control flow graph shows some weak spots due to the presence of native nodes, but we manage to introduce the concept of unreliable basic block, block with the evaluation order of its content that can not be trusted, in order to report a good amount of issues with no obvious false positive.
-The algorithm contains no complex elements, and is still able to find multiple thousands of issues on existing open-source project, on both Scala and Java.
+During the implementation, the control flow graph shows some weak spots due to the presence of native nodes, but we manage to introduce the concept of unreliable basic block, block with the evaluation order of its content that cannot be trusted, in order to report a good amount of issues with no obvious false positive.
+The algorithm contains no complex elements and is still able to find multiple thousands of issues on existing open-source project, on both Scala and Java.
 
-Finally, we have looked at popular tools that also perform null pointer dereference checks, we have identify multiple possible improvements, and pointed language features that can becomes limitations of the current approach.
+Finally, we have looked at popular tools that also perform null pointer dereference checks, we have identified multiple possible improvements, and pointed language features that can becomes limitations of the current approach.
 
 \slang{} seems to have started in a very good way and has already demonstrated his power, but we have to keep in mind that the language is less than one year's old, if it suits well the situations that SonarSource face today, it still have many challenge to face.

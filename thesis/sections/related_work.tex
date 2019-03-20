@@ -43,7 +43,7 @@ By reporting no false positive on Java code, our implementation performs better 
 However, our implementation reports less issues.
 Unfortunately, the paper does not provide the list of issues reported to help us identify the one that we are missing.
 One probable explanation is that we choose to only report the issues that come from local identifier (subsection \ref{subsubsec:identifying_local_variable}), this approach does not report any false positive, at the cost of few false negative.
-Both results are more or less similar, and both works reach the conclusion that it is possible to find interesting issues with an universal approach.
+Both results are more or less similar, and both works reach the conclusion that it is possible to find interesting issues with a universal approach.
 
 \subsection{Technology used by other tools}
 \label{subsec:other_tools_technology}
@@ -77,10 +77,10 @@ The next parts will discuss the main features that are used by others tools, for
 
 Our current checker is only supporting intraprocedural analysis, going further is obviously a way to find more issue, since it would enable us to learn belief from arguments not only inside one function, but also outside it.
 The main difficulty is to define which function is called at run time, if it is possible to do it for one language, having a consistent way to do it in a language agnostic way is a real challenge. 
-One of the way is to compute the summary of every function, and to use this information during the intraprocedural analysis. 
+One of the ways is to compute the summary of every function, and to use this information during the intraprocedural analysis. 
 For example, we can store for every function if it can return \emph{null}, then when the result of this function call is assigned to a variable, we can consider it the same way as if it was \emph{null}. 
 This idea is used by SpotBugs and will be described in subsection \ref{subsec:spotbugs_specific}. 
-There is multiple other ways to perform interprocedural analysis, that represents more precisely the execution flow, however the ideas are complex and will not be described in this work.
+There are multiple other ways to perform interprocedural analysis, that represents more precisely the execution flow, however the ideas are complex and will not be described in this work.
 
 \subsubsection{Requires the build}
 \label{subsubsec:require_build}
@@ -113,11 +113,11 @@ The downside of this method is that it requires a consistent and coordinate use 
 
 Annotation could be added on top of \slang{}, finding annotation that are relevant for any language is possible if they share the same concepts. 
 For example, a \emph{non-null} annotation makes sense in any language that has the concept of \emph{null}. 
-In other cases, this can be more tricky; for example, the annotation \emph{initializer}, used in the context of \emph{null} pointer exception, can not be used in an language agnostic way, since the initialization is not the same in any language.\newline
+In other cases, this can be trickier; for example, the annotation \emph{initializer}, used in the context of \emph{null} pointer exception, can not be used in a language agnostic way, since the initialization is not the same in any language.\newline
 One solution to this is to provide a way to configure the tool. 
 Using configurable check is always a danger for the user experience. For example, NullAway is providing more than 10 configuration flags, some of them being mandatory, all of them related to \emph{null} dereference. 
 In the context of \slang{}, having so much configuration to do for every checks and every language simply does not scale at all.\newline
-An interesting note is that annotation are principally used is to help to reduce the complexity of the analysis, however no annotation is required to detect all pointer if we have a perfect interprocedural analysis.
+An interesting note is that annotations are principally used is to help to reduce the complexity of the analysis, however no annotation is required to detect all pointer if we have a perfect interprocedural analysis.
 
 \subsubsection{Path sensitivity}
 \label{subsubsec:path_sensitivity}
@@ -133,7 +133,7 @@ caption=Simple null pointer exception]{code/simple-np.scala}
 Listing \ref{lst:simple-np} shows a simple code that obviously raise an exception. Our checker is currently not able to detect it, since it does not try to know the current value of a pointer.
 Path sensitive tools would be able to find this kind of issues.
 In addition, we could also use the path sensitivity to improve the \emph{MAY} analysis introduce in subsection \ref{subsubsec:may_vs_must}, to remove the obvious false positives. 
-The main challenge of this kind of analysis is to deal with the fact that the number of path grow exponentially, making it hard to scale. 
+The main challenge of this kind of analysis is to deal with the fact that the number of paths grow exponentially, making it hard to scale. 
 In the current situation, we do not have path-sensitivity in our checker, but we already have all the features required, implementing it with the same constraints as an implementation over a original language seem to be possible.
 
 \subsection{Popular tools}
@@ -149,9 +149,9 @@ This tool is also performing a \emph{null} pointer analysis using annotation.
 It warns when the user use a pointer that is \nullable{}, without checking it for \emph{null}. 
 To detect that a pointer is checked for \emph{null}, it uses a pattern that is customizable. 
 This will not work if the user is using custom methods to perform the null-check. 
-In this case, the user can use a contract, that would for example say that this method fail if the argument is \emph{null}, or more simply configure the custom function that perform the \emph{null} check.\newline
-Having configurable setting for a check in \slang{} is far from being ideal, even if the effort to configure one check seems to be minimal, if we have a configuration to do for every rule, this can quickly becomes a nightmare for the user. 
-All our work that try to reduce the overall complexity would be pointless if we have a configuration for every checks.
+In this case, the user can use a contract, that would for example say that this method fails if the argument is \emph{null}, or more simply configure the custom function that perform the \emph{null} check.\newline
+Having configurable setting for a check in \slang{} is far from being ideal, even if the effort to configure one check seems to be minimal, if we have a configuration to do for every rule, this can quickly become a nightmare for the user. 
+All our work that try to reduce the overall complexity would be pointless if we have a configuration for every check.
 
 
 \subsubsection{Error prone: Null away}
@@ -174,13 +174,13 @@ In addition, we will look more in-depth into one additional feature that is impl
 
 \subparagraph{Summary-based interprocedural analysis}
 Summary-based analysis is a smart and easy first step to perform interprocedural analysis.
-The idea is to compute a summary of every methods, and use this information during the intraprocedural analysis. 
+The idea is to compute a summary of every methods and use this information during the intraprocedural analysis. 
 In our case, we would like to store if a method can return \emph{null}, or if a parameter could be \emph{non-null} to then report if \emph{null} is passed as his argument.
 We can have this information by looking at annotation, if the annotations are not present, we can still perform intraprocedural analysis to infer ourselves the annotation. 
 For example, if a method ever return \emph{null}, we can annotate the function as \nullable{}, and if a function always dereference an argument without checking it for \emph{null}, we can infer that the argument is \emph{non-null}. 
 The good part is that we already have the nodes and data required to build the summary, however, we are missing the method references in \slang{} to be able to implement this check.
 We need to be able to identify which method is called to be able to retrieve the summary of the function that is called.
-This is related to the problem of the name reference that we faced during the previous parts, naive solutions exist, but proper semantics have to be computed to obtain interesting results.
+This is related to the problem of the name reference that we faced during the previous parts, naive solutions exist, but proper semantics must be computed to obtain interesting results.
 
 \begin{figure}[H]
 	\centering

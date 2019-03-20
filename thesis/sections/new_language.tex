@@ -6,7 +6,7 @@ In this part, we are going to discuss the challenge to add a new language to \sl
 \subsection{General Procedure}
 \label{subsec:general_procedure}
 
-The addition of a new language follows a general procedure that can be described in a high level way.
+The addition of a new language follows a general procedure that can be described in a high-level way.
 The first step is to choose a front-end that we are going to use to perform the parsing of the language.
 
 \subsubsection{Front-end}
@@ -17,7 +17,7 @@ To choose a front-end, we have to take into consideration multiple points:
 	\item \textbf{\textit{License}} \newline The tool developed will be open source, we have to use an existing front end that that have a compatible license.
 	\item \textbf{\textit{Features}} \newline Static analysis requires specific needs, that is not necessarily provided by any front-end. 	For example, we need precise location of tokens to be able to report the issues to the user as precisely as possible. Another example is the comments, that are required for some of the common rule \ref{table:common_rules}, but is typically removed early in a compiler front-end since they are not directly used.
 	\item \textbf{\textit{Maintenance}} \newline 
-	The last criteria is the completeness and maintenance. We want a tool that is regularly maintained and that support the eventual new feature of the language that will arise. 
+	The last criteria are the completeness and maintenance. We want a tool that is regularly maintained and that support the eventual new feature of the language that will arise. 
 \end{enumerate}
 
 \subsubsection{Incrementally add new mapping and enable checks}
@@ -25,22 +25,22 @@ To choose a front-end, we have to take into consideration multiple points:
 
 With the front-end, we now have access to the intermediate representation of the original language. 
 We can start to work on running more and more checks. 
-The work usually start by looking at which rule we want to implement. 
+The work usually starts by looking at which rule we want to implement. 
 Depending on the rule, we have to add the translation of more node from the original language to \slang{}. 
 If the prerequisite for the front-end are respected, the initial effort of adding the mapping for a new node is an easy task, we have to identify which node in the original language correspond to the node in \slang{}, and understand its structure to adapt it. 
 Once we have added the nodes needed by the rule, and enabled it, we can then look at the results. 
-This is the critical step, we have to make sure that the rule make sense on this new language, and that the issues reported are relevant. 
+This is the critical step, we must make sure that the rule make sense on this new language, and that the issues reported are relevant. 
 
 In many cases, this is where the unexpected problems arise, that are due to an unknown language feature, a wrong approximation, and so on...
 Hopefully, there is multiple way to improve the results. 
 The first one is to setup a parameter for the rule, that will adapt the behavior of the rule depending on the original language, and even depending on the user input.
-For example, all the rules of naming convention have to be setup with the convention of the language, and can be changed by the user by a custom setup. 
-Sometimes, the rules simply does not apply for the language. 
+For example, all the rules of naming convention have to be setup with the convention of the language and can be changed by the user by a custom setup. 
+Sometimes, the rule simply does not apply for the language. 
 For example, if a language does not have a \emph{switch} statement, all the rules related to \emph{switch} will obviously not apply to this language.
 The most challenging situation arise when the situation is not clear, where the approximation of the translation lead to situations where the rules could apply, but the language specific feature change the behavior of the check. 
-These problematic situations have to be taken care case by case.
+These problematic situations must be taken care case by case.
 
-The problem of reporting relevant issues without too much noise is common in static analysis, and is often referred as the precision and recall trade-off.
+The problem of reporting relevant issues without too much noise is common in static analysis, it is often referred as the precision and recall trade-off.
 
 \subsubsection{Precision and Recall trade-off}
 \label{subsubsec:precision_recall}
@@ -54,7 +54,7 @@ In static analysis, a common challenge is to deal with the precision and recall 
 Similarly, we can have false and true negatives, for real issue not reported and non-existing bug not reported, respectively. 
 
 \emph{Precision} is the number of true positives, over the total number of issues reported by the tool ($ \emph{true positives} + \emph{false positives} $). \emph{Recall} is the number of true positive over the number of issues present in the code. 
-Finding good balance is a challenging task, in the first case, the programmer do not want to be surrounded with issues that he does not consider as relevant, it will hide the real issues and discredit the tool. 
+Finding good balance is a challenging task, in the first case, the programmer does not want to be surrounded with issues that he does not consider as relevant, it will hide the real issues and discredit the tool. 
 In the other extreme, a checker that never report any issue will never report false positive, but obviously not be useful, and will contain a lot of false negative. 
 There is no clear solution to this trade-off, we are going to target a rate of less than \textbf{5\%} of false positive for our work.
 This is an arbitrary choice, other tools like FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} initially targeted a rate of less than 50\% of false positives for example. 
@@ -82,17 +82,17 @@ The second step is to start the translation.
 As in any compiler phase that perform translation, the skeleton of the code will be a pattern matching on the current node. 
 We will traverse the tree using a top-down approach. 
 The initial step is to map all nodes to \textbf{native trees}, that will represents nodes that we do not know anything about. 
-We still have access to the token of the native nodes, we can therefore already activate the copy paste detection and the different metrics. 
+We still have access to the token of the native nodes; we can therefore already activate the copy paste detection and the different metrics. 
 In addition, all the rules related to the structure of a file can already be enabled: length of line, tabulations, length of file.
 With only little effort, we manage to enable 8 checks, and provide a copy/paste detection and metrics. 
-We will continue the effort by adding more and more nodes translations, and activating more and more rules.
+We will continue the effort by adding more and more nodes translations and activating more and more rules.
 
 Most of the nodes from \slang{} have a direct equivalent in the Scalameta tree, the translation effort is just to make sure that the meaning of a node in
 the original language is the one intended in \slang{}, adapt it if not, and that the metadata is correctly handled. Package declaration, literal and block are example of node that, as expected, have a direct equivalent in \slang{} but surprisingly, more complex nodes such as if tree, and pattern match also fall into this category. 
 For the Scalameta nodes that have no equivalent in
 \slang{}, we are going to translate them to native tree.
 
-The overall mapping stay pretty simple, we sometimes have to regroup
+The overall mapping stays pretty simple, we sometimes have to regroup
 multiple children of the original node into one single native node, but it does
 not contains any complex trick.
 
@@ -143,7 +143,7 @@ This information can lead our research and lead to identify 4 potentials problem
 	Listing \ref{lst:many-parameters} shows an example of a Scala function with multiple parameters, that is common in Scala, but not necessarily in other languages. 
 	Mapping the whole function to a native node is a big loss, we are not going to be able to run all the checks that we could run inside functions.
 	Adding the support for multiple list to \slang{} is a first solution, but we have to make sure that the benefit for this addition is worth the added complexity.
-	In our situation, multiples lists support does not add any value to the checks, none of them would use this information, adding it is not worth.
+	In our situation, multiple list support do not add any value to the checks, none of them would use this information, adding it is not worth.
 	A second solution is to merge all the parameters to a single list.
 	This works fine, we recover the possibility to run all checks that apply to functions.
 	However, the check that limits the number of parameters raise some unexpected issues.
@@ -156,9 +156,9 @@ This information can lead our research and lead to identify 4 potentials problem
 	\item \textbf{\textit{Match statement with at least one conditional case}} \newline 
 	The case of listing \ref{lst:pattern-match-fp} seen previously, also appear in the list. 
 	The current situation is that the whole match statement is converted to a native tree if a least one conditional case is present. 
-	The granularity of this solution is not fine enough, we still want to be able to run the different checks related to match tree, even if one branch have an unknown structure!
+	The granularity of this solution is not fine enough, we still want to be able to run the different checks related to match tree, even if one branch has an unknown structure!
 	The solution chosen is to wrap the case tree inside a native node in the case where a guard is present.
-	This fine granularity is far better, we are know able to compare the body of the different cases and report duplicate ones, and also compare the pattern since we are still able to compare two natives nodes.
+	This fine granularity is far better, we are now able to compare the body of the different cases and report duplicate ones, and also compare the pattern since we are still able to compare two natives nodes.
 	
 	\item \textbf{\textit{Function parameters with default value}} \newline 
 	\lstinputlisting[label={lst:scala-default-modifier},
@@ -166,7 +166,7 @@ This information can lead our research and lead to identify 4 potentials problem
 	
 	In listing \ref{lst:scala-default-modifier}, we can see function parameters with default value. Once again, the first question is to know if it is worth it to add the support for such construct. 
 	This time, \emph{Ruby}, \emph{Scala} and \emph{Kotlin} have default value, it makes sense to add the support to \slang{}. 
-	This new structure adds new issues on bad naming convention, hard coded ip inside default value, unused parameters, and few others, comforting our choice that it was worth to support it.
+	This new structure adds new issues on bad naming convention, hard coded IP addresses inside default value, unused parameters, and few others, comforting our choice that it was worth to support it.
 
 	\item \textbf{\textit{Function parameters with modifier}} \newline 
 	\lstinputlisting[label={lst:scala-modifiers},

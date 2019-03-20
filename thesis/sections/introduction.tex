@@ -11,8 +11,8 @@ In 2018, SonarSource decided to respond to this demand and add the support for 5
 Supporting 5 new languages was a challenging objective since adding a new language to the list used to take month of work, the team had to question their whole process to tackle this challenge.
 Historically, the typical process to develop a new static analysis tool at SonarSource was to build a front-end, specifically a lexer and a parser.
 The next part of the work is to implement the different checks, the metrics, copy-paste detection and syntax highlighting. The main content of the work is done, but it still needs to be regularly maintained to stay up to date.
-Since each language produce a different tree, every check have to be implemented individually for every language, the complexity of the current situation is therefore a multiplication between the number of languages, and the number of rule. 
-As the objective is to increase the number of language, the current situation does not scale.
+Since each language produce a different tree, every check has to be implemented individually for every language, the complexity of the current situation is therefore a multiplication between the number of languages, and the number of checks.
+As the objective is to increase the number of languages, the current situation does not scale.
 The first observation that they made is that implementing the front-end for a language is a hard task, that typically takes most of the production time. This is more or less implementing the front end of a compiler, doing it right and following the evolution of the language is not a trivial task.
 Hopefully, open-source project that already provide complete and maintained parsing exists. 
 This is the first important choice: SonarSource is not going to develop their own front end anymore, but re-use existing one.
@@ -33,7 +33,7 @@ A second observation is that many rules are implemented the same way, and that s
 \end{table}
 
 Table \ref{table:common_rules} shows a sample of typical checks that can be considered as common rules \cite{JiraSonarSource:2019:Online}, that apply to any programming language.
-At this point, the high level idea is to use an existing front-end to perform the parsing, to translate it to an universal intermediate representation and to implements the checks and metrics on it.
+At this point, the high-level idea is to use an existing front-end to perform the parsing, to translate it to an universal intermediate representation and to implements the checks and metrics on it.
 This was the main motivation: avoid redoing the same work again and again, by implementing the checks on top of a common representation, reducing the complexity to a single implementation of each checks.
 This idea is promising, it would enable SonarSource to support new languages faster, avoiding duplication, and to reduce the maintainability cost, allowing them to reach their objective.
 After a few trial and error, the team came up with SonarLanguage, or \slang{}, an incomplete universal intermediate representation. 
@@ -46,7 +46,7 @@ In order to be able to implement the checks only once, SonarSource has introduce
 The goal is to have a unified representation of common programming language, for easy, scalable and maintainable code smell and bug detection. 
 The language is designed to implement the common rules introduced before, it is therefore not designed for mainstream programming, and in fact, the current goal is not even to be able to compile it.
 It contains all the metadata and abstract syntax tree nodes that we need to support these rules, and only the one needed.
-It is therefore a balance between complexity (number of different feature that we support) and accuracy to be able to still report interesting issues. 
+It is therefore a balance between complexity (number of different features that we support) and accuracy to be able to still report interesting issues. 
 
 The current grammar \cite{slangGrammar:2019:Online} and interface \cite{slangAPI:2019:Online} of \slang{} is not fixed, it is made to change and adapt to suits the needs that arise.
 We can see that it contains all the typical nodes of any programming language.
@@ -54,7 +54,7 @@ The different nodes approximate the different programming concepts, to be able t
 For example, the loops are all mapped to one single node, with one child that represents the condition, and another for the body. 
 Even if we keep the original type of the loop, this procedure can still mutilate the input, reducing the three part of a \emph{for} loop header into one condition.
 The transformation is therefore incomplete, we are going to make abstraction of some concepts, but it is not a problem as long as the result of the checks are not affected.
-One interesting note is that there is important nodes that are not present, for example, there is no function invocation. 
+One interesting note is that there are important nodes that are not present, for example, there is no function invocation. 
 The reason is that none of the rules use them, we eventually need to know the list of the arguments to report unused variable, but we do not need the concept of function invocation in itself.
 The specificity of this language are the \textbf{native nodes}. 
 During the translation, we are going to map all original nodes to their equivalent in \slang{}, if one has no equivalent, it is going to be mapped to a native node.
@@ -93,13 +93,13 @@ During the translation, we are going to map all original nodes to their equivale
 	\end{tabular}
 \end{figure}
 
-Figure \ref{figure:native_node_example} shows an example of native node present in a \slang{} tree. In the left tree, we understand that the equals is part of an assignment, but in the second case, we have an unknown expression, that we will still keep, but as a native node.
+Figure \ref{figure:native_node_example} shows an example of native node present in a \slang{} tree. In the left tree, we understand that the equal is part of an assignment, but in the second case, we have an unknown expression, that we will still keep, but as a native node.
 Native nodes therefore represent nodes that are unknown, but we will still be able to compare them because we will keep the original type, list of their children and tokens inside the native node. 
 Since we can compare two native nodes, we are still able to find that two branches of a switch is the same for example, without knowing exactly what is inside. 
 The other interesting point is that we now control the shape of the tree, we know what and where to expect a tree. 
 For example, if we want to detect that two functions body are similar, we can compare the child that correspond to the body, making abstraction of all its content.
 This is the key to ensure that the rule will work on any new language, for the function body comparison for example, we are going to add all elements that can differentiate two implementations inside the body, even if the node was not directly inside in the original language.
-The native nodes also enables to process to the implementation incrementally: we can implement the translation only for a few nodes, letting the others as native, and already be able to run some of the checks and see the first results.
+The native nodes also enable to process to the implementation incrementally: we can implement the translation only for a few nodes, letting the others as native, and already be able to run some of the checks and see the first results.
 
 
 If the \emph{Why?} is now clear, we will discuss the \emph{How?} in this work. 

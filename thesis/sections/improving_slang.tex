@@ -2,7 +2,7 @@
 \label{sec:improving_slang}
 
 \slang{} has already demonstrated his power to add 4 new languages, some of them in less than a month, and to implement more than 40 common checks. 
-However, the language is still young and the current checks involve mainly syntactic element. 
+However, the language is still young, and the current checks involve mainly syntactic element. 
 In this section, we are going to attend to push \slang{} further, to implement more complex checks.
 To estimate the quality of the results of a checker implemented on \slang{}, we will use a variation \emph{null} pointer consistency check. 
 We choose this check because this is a well-known bug and well-studied in static analysis, a lot of different implementations exist with different complexity.
@@ -17,10 +17,10 @@ We choose this check because this is a well-known bug and well-studied in static
 
 The goal is to build a checker that implements a variation of the current check \emph{null pointers should not be dereferenced} \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
 The current implementation uses a complex symbolic execution engine to report potential \emph{null} pointer exception.
-Symbolic execution try to estimate all possible execution paths, track the value of variables, and report when a pointer is dereferenced while it can be \emph{null} on one path.
+Symbolic execution tries to estimate all possible execution paths, track the value of variables, and report when a pointer is dereferenced while it can be \emph{null} on one path.
 One important limitation is that it uses a lot of assumptions to deal with the fact that the possible execution paths quickly explode. 
-If it is possible to come up with good assumptions to report interesting bug, the complexity of the implementation also increase, preventing improvement and therefore the ability to find more bugs. \cite{Brown:2016:BSC:2954679.2872364}. 
-Our initial goal is not to find all the issues that the implementation on SonarJava reports, but to see if it is possible to still find interesting issues with an implementation that is less complex, and based on a common intermediate representation.
+If it is possible to come up with good assumptions to report interesting bug, the complexity of the implementation also increases, preventing improvement and therefore the ability to find more bugs. \cite{Brown:2016:BSC:2954679.2872364}. 
+Our initial goal is not to find all the issues that the implementation on SonarJava reports, but to see if it is possible to still find interesting issues with an implementation that is less complex and based on a common intermediate representation.
 
 The idea of this first checker is to use facts implied by the code, that we will call \textbf{belief} \cite{Engler:2001:BDB:502059.502041}.
 It assumes that the programmer’s goal is not to make his code crash, if two contradicting believes are detected, we report an issue.
@@ -54,8 +54,8 @@ To do this, we are going to use a data-flow analysis using the control flow grap
 \subsubsection{Data-flow Analysis}
 \label{subsubsec:data_flow_analysis}
 
-The analysis tracks the pointer uses (set of pointer believed to be \emph{non-null}) and flag when the same pointer is checked afterwards.
-The control flow graph will only be built for the current function being analyzed (intraprocedural), and will not have any access to other functions or others files (interprocedural).
+The analysis tracks the pointer uses (set of pointers believed to be \emph{non-null}) and flag when the same pointer is checked afterwards.
+The control flow graph will only be built for the current function being analyzed (intraprocedural) and will not have any access to other functions or others files (interprocedural).
 
 Formally:
 
@@ -111,7 +111,7 @@ i_{n} = o_{p1}  \cup   o_{p2}  \cup  ... \cup   o_{pk}
 \end{equation}
 
 If a \emph{MUST} analysis takes the intersection of all incoming path, the \emph{MAY} analysis takes the union of the paths. 
-It means that a pointer will be removed from the set only if all path re-assign this variable.
+It means that a pointer will be removed from the set only if all path re-assigns this variable.
 The choice of \emph{MUST} over \emph{MAY} goes in the sense of the idea to have as little false positives as possible described \ref{subsubsec:precision_recall}.
 Table \ref{table:issue_per_analysis_type} shows the difference between a \emph{MAY} and a \emph{MUST} analysis of the checker ran on the same sets of sources.
 We can see that we have significantly more issues, but the rate of false positives is significantly higher, finding interesting issues is too hard with this noise. 
@@ -121,7 +121,7 @@ In practice, to help the user to better understand the issue, we could report mu
 Intuitively, it is not surprising that the \emph{MAY} analysis performs poorly if we do not take into account the paths that are unfeasible.
 
 \lstinputlisting[label={lst:may-analysis-issue},
-caption=False positive of MAY anaylsis]{code/may-analysis-fp.scala}
+caption=False positive of MAY analysis]{code/may-analysis-fp.scala}
 
 Listing \ref{lst:may-analysis-issue} shows an example of a false positive that is reported by the \emph{MAY} analysis. 
 This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not \emph{null}, the check for \emph{null} later at line $\#4$ does not mean that there is a potential exception.

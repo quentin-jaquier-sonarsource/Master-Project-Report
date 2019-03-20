@@ -11,8 +11,8 @@ If the basic idea is to generate rules specific to a project, it would make sens
 The typical example is to look at temporal properties. 
 There is multiples way to do it, looking at the sequence of method call during an execution \cite{Gabel:2010:OIE:1806799.1806806}, or to use an idea related to the belief style \cite{Engler:2001:BDB:502059.502041} that we used in this project. 
 The idea is to learn pattern of sequence of function call from the code, and report when this pattern is not respected.
-For example, if we see that the majority of the time, \emph{$<b>$} is used after \emph{$<a>$}, it might imply the belief that \emph{$<b>$} should be called after \emph{$<a>$}. If, in the minority of the cases, \emph{$<b>$} is not called after \emph{$<a>$}, it contradict the belief and may therefore implies an error. 
-Concretely, this idea should be able to detect that an unlock is called after a lock, or that a resources is closed. 
+For example, if we see that the majority of the time, \emph{$<b>$} is used after \emph{$<a>$}, it might imply the belief that \emph{$<b>$} should be called after \emph{$<a>$}. If, in the minority of the cases, \emph{$<b>$} is not called after \emph{$<a>$}, it contradicts the belief and may therefore implies an error. 
+Concretely, this idea should be able to detect that an unlock is called after a lock, or that a resource is closed. 
 In this example, the way a programmer typically deal with them is dependent of the language, and even dependent of the project! \newline
 This technique would enable us to find issues without knowing what is correct, everything in a language agnostic way!
 
