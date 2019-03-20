@@ -4,26 +4,26 @@
 \subsection{Rule inference}
 \label{subsec:rule_inference}
 
-This work shows the potential of \slang{} to support the implementation of more and more checks, however, the list is limited, finding interesting rules that makes sense in a language agnostic way is difficult. 
+This work shows the potential of \slang{} to support the implementation of more and more checks, however, the list is limited, finding interesting rules that make sense in a language agnostic way is difficult. 
 One promising continuation is to work on rule inference to detect object usage anomalies \cite{Wasylkowski:2007:DOU:1287624.1287632}. \newline
-Rules inference tries to solve the problem that programmers use a wide range of functions for the same goal, identifying which function does what is typically a cumbersome process that needs to be done by hand and even impossible for manual approach if the function is user defined. 
+Rules inference tries to solve the problem that programmers use a wide range of functions for the same goal, identifying which function does what is typically a cumbersome process that needs to be done by hand and even impossible for manual approach if the function is user-defined. 
 If the basic idea is to generate rules specific to a project, it would make sense to adapt it to generate rules specific to a language, everything in an agnostic way on top of \slang{}. 
 The typical example is to look at temporal properties. 
 There is multiples way to do it, looking at the sequence of method call during an execution \cite{Gabel:2010:OIE:1806799.1806806}, or to use an idea related to the belief style \cite{Engler:2001:BDB:502059.502041} that we used in this project. 
-The idea is to learn pattern of sequence of function call from the code, and report when this pattern is not respected.
-For example, if we see that the majority of the time, \emph{$<b>$} is used after \emph{$<a>$}, it might imply the belief that \emph{$<b>$} should be called after \emph{$<a>$}. If, in the minority of the cases, \emph{$<b>$} is not called after \emph{$<a>$}, it contradicts the belief and may therefore implies an error. 
+The idea is to learn pattern of sequence of function call from the code and report when this pattern is not respected.
+For example, if we see that the majority of the time, \emph{$<b>$} is used after \emph{$<a>$}, it might imply the belief that \emph{$<b>$} should be called after \emph{$<a>$}. If, in the minority of the cases, \emph{$<b>$} is not called after \emph{$<a>$}, it contradicts the belief and may therefore imply an error. 
 Concretely, this idea should be able to detect that an unlock is called after a lock, or that a resource is closed. 
-In this example, the way a programmer typically deal with them is dependent of the language, and even dependent of the project! \newline
+In this example, the way a programmer typically deals with them is dependent on the language and even dependent on the project! \newline
 This technique would enable us to find issues without knowing what is correct, everything in a language agnostic way!
 
 \subsection{Benchmarks}
 \label{subsec:benchmarks}
 
-In section \ref{sec:running_checker}, we have tested the tools on real-life project, it is a good step to understand the quality of the results on a set of real life situation, however, the list of potential issues present in the real life project is not necessary exhaustive. 
-To complement this work, it makes sense to test it against benchmarks, that aims to test as much situations as possible, to test with benchmark that uses languages specific features, like callback, high-order and all the features that we have discussed in section \ref{subsec:other_tools_technology}.
+In section \ref{sec:running_checker}, we have tested the tools on real-life projects, it is a good step to understand the quality of the results on a set of real-life situations, however, the list of potential issues present in the real-life project is not necessary exhaustive. 
+To complement this work, it makes sense to test it against benchmarks, that aim to test as many language specific features, like callback, high-order and all the features that we have discussed in section \ref{subsec:other_tools_technology}.
 
 \subsection{Improving the checker}
 \label{subsec:other_tools}
 
 The work presented under section \ref{subsec:other_tools_technology} is a good starting point to see what can be done in the future for this check. 
-For example, the comparison with SpotBugs in section \ref{subsec:spotbugs_specific} showed us that we can already greatly increase the number of true positive, without any complex feature and expected problem.
+For example, the comparison with SpotBugs in section \ref{subsec:spotbugs_specific} showed us that we can already greatly increase the number of true positive, without any complex features and expected problems.

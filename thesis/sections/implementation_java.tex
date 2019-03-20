@@ -1,9 +1,9 @@
 \section{Implementation on SonarJava}
 \label{sec:implementation_java}
 
-We are first going to implement this check on SonarJava ecosystem that already provide us all the tools that we need, specifically symbols resolutions, and a control flow graph.
+We are first going to implement this check on SonarJava ecosystem that already provides us all the tools that we need, specifically symbols resolutions, and a control flow graph.
 The implementation is a classical forward data-flow analysis: the first step is to generate for each basic block the gen and kill set as described before. 
-We are going to store the symbols of the variable in the two set. 
+We are going to store the symbols of the variable in the two sets. 
 We fill the set starting from the last element of the basic block to the first, when a pointer is killed, we also remove it if it is present in the \emph{gen} set.
 With this, a pointer that is used and assigned in the same basic block will be in the \emph{gen} set only if the use of the pointer follows the assignment, as expected.
 
@@ -11,7 +11,7 @@ With this, a pointer that is used and assigned in the same basic block will be i
 caption=Problematic situation with naive basic block creation]{code/native-block-creation.scala} 
 
 Listing \ref{lst:native-block-creation} shows a potential problem of this method, all the different parts of the code will be added to the same basic block, we will therefore have a situation that we would want to report, but is not detected since the pointer is not in the gen set of this block. 
-One naive solution would be to not aggregate statements in basic block, but we will have to compute the input and output set for every statement! 
+One naive solution would be to not aggregate statements in a basic block, but we will have to compute the input and output set for every statement! 
 \newline
 The alternative that we use in this work is done during the control flow graph creation: we break the basic block when we have a binary expression with an equal (or not equal). 
 In order to support the backward and forward analysis, we should break before and after the check for \emph{null}. 
@@ -31,9 +31,9 @@ Figure \ref{figure:new-way-to-split} shows the old and new control flow graph fo
 By doing this, we will be able to support the example shown in listing \ref{lst:native-block-creation}, the check for \emph{null} breaks the block in three, the use and check will therefore not be in the same basic block.
 
 Once the \emph{gen} (equation \ref{eqn:dataflow3}) and \emph{kill} (equation \ref{eqn:dataflow4}) set has been generated for every basic block, we can start to run the analysis with a work list approach.
-The idea is to add all basic block in a queue and compute the new \emph{out} set of the current head. 
+The idea is to add all basic blocks in a queue and compute the new \emph{out} set of the current head. 
 Since we are performing a forward analysis, if the new \emph{out} set have changed, this means that all the successors might potentially change as well. 
-We therefore add the current basic block and all of it successor at the end of the work list, if the processed block sets have changed. 
+We add the current basic block and all of its successor at the end of the work-list, if the processed block sets have changed. 
 We continue this process until the list is empty, meaning that we reached a fixed point.
 
 At the end of this process, we have a set of pointers that are believed to not be \emph{null} in each basic block.
@@ -42,15 +42,15 @@ We can therefore do a second pass through the elements of the basic blocks, if w
 \subsection{Other way to add belief}
 \label{subsec:other_way_to_add_belief}
 
-\emph{Null} pointer exception does not occurs only when a \emph{null} pointer is dereferenced, but can also appear in the following cases for Java, as defined in the documentation \cite{OracleDoc:2019:Online}:
+\emph{Null} pointer exception does not occur only when a \emph{null} pointer is dereferenced, but can also appear in the following cases for Java, as defined in the documentation \cite{OracleDoc:2019:Online}:
 
 \begin{enumerate}
 	\item Calling the instance method of a \emph{null} object. \newline 
 	\item Accessing or modifying the field of a \emph{null} object. \newline 
 	\item Taking the length of \emph{null} as if it were an array. \newline 
 	\item Accessing or modifying the slots of \emph{null} as if it were an array. \newline 
-	\item Throwing \emph{null} as if it were a throwable value. \newline 
+	\item Throwing \emph{null} as if it were a \emph{Throwable} value. \newline 
 \end{enumerate}
-Currently, our checker is only using the first case, but we can use this information to improve our implementation: when we see one of these construct, we will add the pointer to the set of believed to be \emph{non-null} (\emph{gen} set) the same way as we would for a pointer that is used.
+Currently, our checker is only using the first case, but we can use this information to improve our implementation: when we see one of these construction, we will add the pointer to the set of believed to be \emph{non-null} (\emph{gen} set) the same way as we would for a pointer that is used.
 
 

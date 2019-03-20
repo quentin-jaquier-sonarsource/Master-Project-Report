@@ -12,7 +12,7 @@ To test the checker, we are going to create a SonarQube instance \cite{SonarQube
 \subsection{Early results}
 \label{subsec:early_results}
 
-The checker has been run on more than one hundred projects of various size and various complexity. 
+The checker has been run on more than one hundred projects of various size and complexity. 
 The idea is to run the two implementations and compare the results.
 
 \begin{table}[h]
@@ -28,9 +28,9 @@ The idea is to run the two implementations and compare the results.
 
 
 Table \ref{table:early-sonarjava-vs-slang} shows the number of issues reported by the two implementations, with the sources and setup described in section \ref{subsec:experimental_setup}. 
-Despite all our effort to prevent problematic situations done in the previous sections, the implementation has more than 20\% of false negatives compared to the implementation on SonarJava. 
+Despite all our efforts to prevent problematic situations done in the previous sections, the implementation has more than 20\% of false negatives compared to the implementation on SonarJava. 
 This is already a good start, but it is not enough for our objective set in section \ref{subsubsec:precision_recall}.
-We will have a look at the issues that are reported by SonarJava but not by \slang{} in the following part, to see if this comes from a misbehavior of the implementation, or a real limitation.
+We will have a look at the issues that are reported by SonarJava but not by \slang{} in the following part, to see if this comes from misbehavior of the implementation or a real limitation.
 
 \subsubsection{Reducing the false negatives from SonarJava}
 \label{subsec:reducing_false_positive_sonarjava}
@@ -45,7 +45,7 @@ The difference between the two implementations is mainly due to the way ternary 
 	\lstinputlisting[label={lst:reduce-fp-ternary},
 	caption=Typical code structure with ternary expression]{code/reduce-fp-ternary.scala}
 	
-	The situation is not as obvious as the one presented before, listing \ref{lst:reduce-fp-ternary} shows a possible situation were no issue will be reported. 
+	The situation is not as obvious as the one presented before, listing \ref{lst:reduce-fp-ternary} shows a possible situation where no issue will be reported. 
 	To solve this problem, one solution is to map ternary expression to if/else tree.
 	This solution is already used for other checks and seems to solve our problem nicely.
 	
@@ -61,10 +61,10 @@ The difference between the two implementations is mainly due to the way ternary 
 	It is exactly the kind of situation that we would like to report. 
 	However, the different parts of the header are in a native node, as described before, it will therefore not be added to the set of pointers used.
 	This makes sense, from a language agnostic point of view, we cannot know anything from the execution order of the different blocks of the loop header, as it can depend on the original language.
-	This is in fact the kind of behavior that we want to achieve, the language specific features do not produce false positives, but we accept false negatives.
-	One way to solve this problem is to adapt the loop node in \slang{} that will better support this situation.
+	This is the kind of behavior that we want to achieve, the language specific features do not produce false positives, but we accept false negatives.
+	One way to solve this problem is to adapt the loop node in \slang{} that will better support this situations.
 	Adding a new node to \slang{} is a solution that we should not use in all situation, it is not well-suited when the feature is specific to a single language.
-	In this case, the correct handling of loop header can be useful in other checks, it makes sense to support it correctly.
+	In this case, the correct handling of loop's header can be useful in other checks, it makes sense to support it correctly.
 \end{enumerate}
 
 \subsection{Improved results}
@@ -105,13 +105,13 @@ With the two modification done on \slang{}, on the same source and setup that we
 \end{table}
 
 
-Table \ref{table:issues-per-project} shows the projects that contain one or more issue and number of true positives reported, for both forward and backward analysis. 
+Table \ref{table:issues-per-project} shows the projects that contain one or more issue and the number of true positives reported, for both forward and backward analysis. 
 
 \subsubsection{Other languages}
 \label{subsubsec:other_languages}
-The check is implemented on top of \slang{} we can therefore run the checker on other languages for free, if we make sure that all nodes described in subsection \ref{subsec:nodes} are present. 
+The check is implemented on top of \slang{} we can therefore run the checker on other languages for free if we make sure that all nodes described in subsection \ref{subsec:nodes} are present. 
 Currently, the mapping has been completed for Scala and Kotlin.
-Recently SonarSource have prepared a setup to run an analyzer on more than 170'000 projects, coming from open-source project on Github with more than 50 stars \cite{sourced:2019:Online}. 
+Recently SonarSource has prepared a setup to run an analyzer on more than 170'000 projects, coming from open-source project on Github with more than 50 stars \cite{sourced:2019:Online}. 
 This is a huge database, with billions of lines of code, containing many languages, and of overall good quality. 
 This is a nice setup to test our tool.
 
@@ -139,18 +139,18 @@ The first observation is that we have issues for all three languages!
 	If we cannot guarantee that the true positive rate is at 100\%, our goal to have less than 5\% of false positive set in subsection \ref{subsubsec:precision_recall} seems to be reached for Java!
     \newline
 	\item \textbf{\textit{Scala}} \newline
-	Finding issues on Scala is a good news to consolidate our confidence on the strength of the checker, it is confirmed to be working on at least two languages with two different paradigms!
+	Finding issues on Scala is good news to consolidate our confidence on the strength of the checker, it is confirmed to be working on at least two languages with two different paradigms!
 	The number of issues is lower than Java, it is partly due to the fact that there is way less Scala than Java projects.
-	A second reason is that Scala language provides the statement \emph{Option}, that can be used to avoid null pointer.
-	The experiment also show that this statement is not consistently used by the community though.
+	A second reason is that Scala language provides the statement \emph{Option}, which can be used to avoid \emph{null} pointer.
+	The experiment also shows that this statement is not consistently used by the community though.
 	
 	\lstinputlisting[label={lst:variable-shadow-in-pm},
 	caption=False positive due to high-order function]{code/variable-shadow-in-pm.scala}
 	
-	The true positives rate is slightly lower for Scala, this can be explained by situation similar to the one in listing \ref{lst:variable-shadow-in-pm}. 
-	In this case, our naive semantic described in \ref{subsubsec:identifying_local_variable} consider that both pointer \emph{p} refers to the same pointer, but it is not the case as the second one is the element of the list \emph{p}, and not the list itself.
+	The true positives rate is slightly lower for Scala, this can be explained by a situation similar to the one in listing \ref{lst:variable-shadow-in-pm}. 
+	In this case, our naive semantic described in \ref{subsubsec:identifying_local_variable} considers that both pointer \emph{p} refers to the same pointer, but it is not the case as the second one is the element of the list \emph{p}, and not the list itself.
 	The pointer will appear as used and then checked for \emph{null} in the control flow, we will therefore have a false positive.
-	This is an expected problem, the same can happen for variable that are shadowed in a pattern matching, but it is not a limitation, since the computation of proper pointer semantic would solve this problem.
+	This is an expected problem, the same can happen for variables that are shadowed in a pattern matching, but it is not a limitation since the computation of proper pointer semantic would solve this problem.
 	
 	\item \textbf{\textit{Kotlin}}
 	The checker only reports 10 issues on Kotlin, and all of them are false positives.
@@ -158,12 +158,12 @@ The first observation is that we have issues for all three languages!
 	\lstinputlisting[label={lst:false-positive-kotlin},
 	caption=False positive in Kotlin]{code/false-positive-kotlin.scala}
 	
-	Listing \ref{lst:false-positive-kotlin} shows Kotlin code with an interesting situation that reflect the reason of the false positives. 
+	Listing \ref{lst:false-positive-kotlin} shows Kotlin code with an interesting situation that reflects the reason for the false positives. 
 	At line $\#3$, we can see that the function \emph{isBooleanOrInt} from the pointer \emph{a} is called without a safe call with \emph{.?}, it is exactly what we want to detect and might look like a true positive at first glance. 
 	However, this code will not throw a \emph{null} pointer exception since the function \emph{isBooleanOrInt} is called, without dereferencing the pointer \emph{a}.
-	The is called an extension functions \cite{kotlinExtensionFun:2019:Online} in Kotlin, it will extend a class with a new functionality, and when used, it will not dereference the pointer.
+	The is called an extension functions \cite{kotlinExtensionFun:2019:Online} in Kotlin, it will extend a class with new functionality, and when used, it will not dereference the pointer.
 	Our checker is only looking at the content of one function, from his point of view this code can raise an exception.
-	In fact, in Kotlin, we do not expect to detect any situations where an exception is possible due to the fact that the type system is built to prevents this kind of issues.
+	In fact, in Kotlin, we do not expect to detect any situations where an exception is possible due to the fact that the type system is built to prevent this kind of issue.
 	As this check does not make a lot of sense for Kotlin, we might want to remove it from the list of checks that we are going to run on the language.
 \end{enumerate}
 
@@ -173,20 +173,20 @@ The first observation is that we have issues for all three languages!
 Table \ref{table:issues-per-project} shows the number of issues found per project. 
 This includes all the true positives of the forward and backward analysis. 
 A first observation is that the issues found are coming from various projects and in various situations, it is not one anti-pattern that is repeated multiple times in the same project. 
-Additionally, all the issues seem to be relevant from a high-level view and without any specific knowledge of the project, you cannot easily justify the correctness of any of the issue reported.
+Additionally, all the issues seem to be relevant from a high-level view and without any specific knowledge of the project, you cannot easily justify the correctness of any of the issues reported.
 To estimate more reliably this interest, we can also look at the fix-rate of the issues.
 
 \subsubsection{Fix-rate}
 \label{subsubsec:fix_rate}
 
-Fix-rate is the rate of issues that are reported by a tool, and really fixed by the user. 
+Fix-rate is the rate of issues that are reported by a tool and really fixed by the user. 
 As discussed in section \ref{subsubsec:precision_recall}, static analysis tools have to deal with the fact that if we report too many issues, we take the risk of reporting irrelevant ones and that the user will not pay attention to them. 
 This is where fix-rate may be useful, it shows that the user did really care about the issues and took some time to fix them. \newline
 The problem is that we cannot define at a given instant this rate, we can only retroactively look at this number, depending therefore on the time we give to the user to fix the issues.
 Our goal is not to reach a precise number, but to find examples of issues that are fixed, to improve our confidence in the quality of the results.\newline
-The first way we will use to estimate the fix rate is by using some of our test project that are not updated for every version.
-In practice, there is only a few in the infrastructure of SonarSource, the main one that we will use is the OpenJDK.
-The issues reported come from version 9, that we will compare with the version 11.
+The first way we will use to estimate the fix-rate is by using some of our test projects that are not updated for every version.
+In practice, there are only a few in the infrastructure of SonarSource, the main one that we will use is the OpenJDK.
+The issues reported come from version 9, which we will compare with version 11.
 
 \begin{table}[h]
 	\centering
@@ -199,13 +199,13 @@ The issues reported come from version 9, that we will compare with the version 1
 	\end{tabular}
 \end{table}
 
-Table \ref{table:openJDK_issues} shows that 25\% of the issues found on OpenJDK 9 have been fixed in the version 11. 
+Table \ref{table:openJDK_issues} shows that 25\% of the issues found on OpenJDK 9 have been fixed in version 11. 
 This may seem like a low number, but it seems to be the kind of results we can expect from this kind of estimation.
-For example, a research from Jetbrains \cite{Bryksin:2018:DAK:3236454.3236457} reports that 32\% of the issues reported by their tool were considered as useful (rated with high value) by the person that were confronted to the issue. 
-We can explain this by the fact that developer have priorities, especially in such big open-source project, fixing a bug that is already here and is apparently not causing any trouble for many years have low priority, even if this is a legitimate issue. 
+For example, research from Jetbrains \cite{Bryksin:2018:DAK:3236454.3236457} reports that 32\% of the issues reported by their tool were considered as useful (rated with a high value) by the person that was confronted to the issue. 
+We can explain this by the fact that developer has priorities, especially in such big open-source projects, fixing a bug that is already here and is apparently not causing any trouble for many years have low priority, even if this is a legitimate issue. 
 SonarSource often refers to this idea as the \textbf{Fix the leak} approach: it does not make sense to spend considerable effort to fix every bug already present in the code if you keep introducing new one in new code, the same way you would not start to mop the floor during a flooding without having fixed the origin of the leak.
 
-A nice story related to the fix-rate is that, during the run on thousands of project described in section \ref{subsubsec:other_languages}, the checker reported an issue on an old fork of the code of the Scala compiler! 
+A nice story related to the fix-rate is that during the run on thousands of projects described in section \ref{subsubsec:other_languages}, the checker reported an issue on an old fork of the code of the Scala compiler! 
 The issue has already been fixed, and the commit that fixes the issue state:
 
 \begin{displayquote}
@@ -215,8 +215,8 @@ The issue has already been fixed, and the commit that fixes the issue state:
 
 It is a nice result, this is exactly the kind of issue that we want to report, meaning that the issues that we are reporting really matters for the programmer and he is willing to fix it!
 
-One other way to estimate the fix-rate is to look into the issues reported by the tool, understand them, eventually write a unit test that raise an exception, and report this issue to let the owner of the project decide if this issue is worth the attention.
-One of the problem is that sometime, it is indeed possible to write a unit test that target a specific function and throw a \emph{null} pointer exception, but it will never happen in real execution, reducing his interest in fixing the code.
+One other way to estimate the fix-rate is to look into the issues reported by the tool, understand them, eventually write a unit test that raises an exception and report this issue to let the owner of the project decide if this issue is worth the attention.
+One of the problems is that sometimes, it is indeed possible to write a unit test that targets a specific function and throw a \emph{null} pointer exception, but it will never happen in real execution, reducing his interest in fixing the code.
 These kinds of issues should however not directly be classified as false positive, as it can also report dead code.
 
 \lstinputlisting[label={lst:contradiction-code},
@@ -225,18 +225,18 @@ caption=Contradicting code that lead to dead code]{code/contradiction-code.scala
 \paragraph{Potential Null Pointer Exception or Dead code ?}\mbox{}\\
 \label{subsubsec:dead_code}
 Despite the fact that we try to find \emph{null} pointer exception, some of the issues found can be considered as dead code, as they can never raise an exception in practice.
-It comes from the fact that we imply beliefs from the code that a programmer writes, if he writes himself contradicting statement, we will still report an issue.
+It comes from the fact that we imply beliefs from the code that a programmer writes, if he writes himself contradicting statements, we will still report an issue.
 Listing \ref{lst:contradiction-code} shows an example of such situation, the checker does not take in consideration the check for \emph{null} as a path-sensitive tool would do. \newline
-One similar situation is that sometimes, it is indeed possible to write a unit test that target a specific function and throw an exception, but it will never happen in real execution due to the fact that the programmer has an implicit knowledge about his code. 
+One similar situation is that sometimes, it is indeed possible to write a unit test that targets a specific function and throw an exception, but it will never happen in real execution due to the fact that the programmer has an implicit knowledge about his code. 
 For example, if a user only calls a function if he finds a specific element in a list, he will assume that the list will never be \emph{null} in this function, and therefore the check for \emph{null} is dead code. 
-This will however not degrade the quality of the results, this is still raising poor practice and poor code quality, since this will be dead code that can confuse the user.
+This will however not degrade the quality of the results, this is still raising poor practice and poor code quality since this will be dead code that can confuse the user.
 
 
 
 \subsection{In-depth comparison with SpotBugs}
 \label{subsec:indpeth_comparison_spotbugs}
 
-In addition to comparing the results between two implementations of the same check, we can also compare the issues with the one reported by others tools.
+In addition to comparing the results between two implementations of the same check, we can also compare the issues with the one reported by other tools.
 SpotBugs \cite{spotBugs:2019:Online} is the successor of Findbugs \cite{FindBugs:2019:Online}, an open-source static analysis tool, it implements multiple checks related to \emph{null} dereference, it is therefore a good candidate to have a comparison with, on the sources previously tested.
 
 \begin{table}[h]
@@ -273,11 +273,11 @@ Table \ref{table:spotbugs-rules} shows a subset of more than 30 checks related t
 For our purpose, we are only interested by the checks that are labeled as correctness, as they represent the bugs that we try to identify and not the code smells that are not directly of interest for us. 
 
 Note that the number is different from the previous experiments because SpotBugs was crashing during the analysis of some of the project (OpenJDK, elastic search). 
-This leads to our first observation: our tool can be ran with no configuration directly on any of more than 100 of projects, and during the experiment presented in section \ref{subsubsec:other_languages}, our plugin did not experience a single crash on a huge amount of file!
-This is particularly good: if we want to introduce our tool on top of huge project like OpenJDK, it is extremely complex to debug if it does not work out of the box.
-The second observation is that every issues reported by \slang{}, is also reported by SpotBugs. 
-This result may seem discouraging, we are not finding anything new, but it also shows that the issues reported by our check does matter for other tools as well. 
-These issues are reported by SpotBugs as “NullCheck of value previously dereferenced“, who is in fact corresponding to the issues that we report when we use the forward version of the analysis. 
+This leads to our first observation: our tool can be run with no configuration directly on any of more than 100 of projects, and during the experiment presented in section \ref{subsubsec:other_languages}, our plugin did not experience a single crash on a huge amount of file!
+This is particularly good: if we want to introduce our tool on top of a huge project like OpenJDK, it is extremely complex to debug if it does not work out of the box.
+The second observation is that every issue reported by \slang{}, is also reported by SpotBugs. 
+This result may seem discouraging, we are not finding anything new, but it also shows that the issues reported by our check do matter for other tools as well. 
+These issues are reported by SpotBugs as “NullCheck of value previously dereferenced“, who is corresponding to the issues that we report when we use the forward version of the analysis. 
 In addition, \slang{} implementation is reporting all issues that are reported under this category, showing that we are not missing any obvious issues.
 
 While we would want to compute the intersection automatically, this number has to be computed by hand, since fully automatically computing the intersection is not a trivial task \cite{Gabel:2010:OIE:1806799.1806806}. 
@@ -289,6 +289,6 @@ In addition, table \ref{table:slang_vs_spotbugs} raises one surprising observati
 We can split this number into two categories: the first one is the issues related to annotation. 
 It is interesting to do the differentiation to understand what we can gain from adding a given feature. 
 The second is the other issues related to \emph{null}, without the help of annotation. 
-It can be interesting for us since it does not require any language specific knowledge and can serve as a goal that can be reached by our tool.
+It can be interesting for us since it does not require any language-specific knowledge and can serve as a goal that can be reached by our tool.
 
 

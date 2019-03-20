@@ -1,7 +1,7 @@
 \section{Implementation on SLang}
 \label{sec:implementation_slang}
 
-In the implementation on SonarJava, we had access to the front end of the checker, with complete tree, a control flow graph and the symbol resolution available.
+In the implementation on SonarJava, we had access to the front end of the checker, with a complete tree, a control flow graph and the symbol resolution available.
 The first step to implement it on \slang{} is to identify what nodes and structures we need in order to implement everything that is required for this check.
 
 \subsection{Required Nodes}
@@ -28,11 +28,11 @@ We therefore have to make sure that we have all the nodes that we need in \slang
 Table \ref{table:nodes-needed} shows the nodes that we need in order to implement the different parts of the checker.
 The first column lists the nodes needed to recognize the different structures used in the checker. 
 We can see that the list is quite simple. 
-The interesting node is the member select, in fact, to identify when a pointer is used, we will only use this node: we do not need to know anything about the context in which the pointer is used, just that it is dereferenced at some point.
+The interesting node is the \emph{Member Select}, in fact, to identify when a pointer is used, we will only use this node: we do not need to know anything about the context in which the pointer is used, just that it is dereferenced at some point.
 When a function is called without a member selection, the tree will be an identifier (name of the function) and a list of argument, but in the case of a pointer use, the tree corresponding to the identifier will be a member selection, that we will use in the checker.
 By doing this, we can detect not only functions invocations, but also fields selections or anything that we consider as a member selection in the original language.
 
-The nodes needed for the control flow graph are the one that we can expect for identifying the control flow of a program, that are mostly common in all language and already implemented in \slang{}. 
+The nodes needed for the control flow graph are the ones that we can expect for identifying the control flow of a program, that are mostly common in all languages and already implemented in \slang{}. 
 The way we handle them will be described in subsection \ref{subsec:cfg_on_slang}.
 The last column describes other nodes that are needed indirectly by the checker:
 \begin{enumerate}
@@ -58,14 +58,14 @@ The last column describes other nodes that are needed indirectly by the checker:
 	As our checker is only ran inside functions, we need function declaration to have our starting point. 
 	We also use this to improve our semantics, using the fact that the variable that is used inside a nested function is not checked.
 	
-	Class declaration is used for the same idea as the function declaration, we use the assumption that variable declared in nested class are in another scope.
+	Class declaration is used for the same idea as the function declaration, we use the assumption that variables declared in a nested class are in another scope.
 \end{enumerate}
 
 \subsubsection{Other nodes not supported}
 \label{subsubsec:other_nodes_not_supported}
 
 In \ref{subsec:other_way_to_add_belief}, we saw multiple way to add the belief that a \emph{null} pointer can be raised. 
-Slang do not have arrays, so we could expect to not find all issues coming from them. 
+Slang does not have arrays, so we could expect to not find all issues coming from them. 
 The first is the length of the array, in Slang, this is represented as a member select, and can therefore be supported.
 Accessing or modifying the fields of \emph{null} as if it were an array is however not supported. 
 This will lead to false negatives in \slang{} that we will not have in the implementation of SonarJava, but the situation seems to be uncommon.
@@ -73,9 +73,9 @@ This will lead to false negatives in \slang{} that we will not have in the imple
 \subsection{Control Flow Graph on SLang}
 \label{subsec:cfg_on_slang}
 
-\slang{} already have every control flow statements represented in the language, we can already start to build it the same way we would do it for any other language. 
+\slang{} already has every control flow statement represented in the language, we can already start to build it the same way we would do it for any other language. 
 In fact, the current implementation is greatly inspired by the one of SonarPHP \cite{SonarPHP:2019:Online}, also developed at SonarSource.
-To build the control flow graph, we are going to use two main kind of basic blocks:
+To build the control flow graph, we are going to use two main kinds of basic blocks:
 
 \begin{enumerate}
 	\item \textbf{\textit{CFG Block}} \newline 
@@ -92,11 +92,11 @@ To build the control flow graph, we are going to use two main kind of basic bloc
 		This is not directly needed for our check, but it may be required for some check later in the future.\newline
 	\end{enumerate}
 	\item \textbf{\textit{CFG Branching Block}} \newline 
-	This interface represents blocks that include branching instruction, where the flow depend on the result of a Boolean expression. 
-	It inherits from CFG Block and have a true and false successor block reference in addition to the simple block.
+	This interface represents blocks that include branching instruction, where the flow depends on the result of a Boolean expression. 
+	It inherits from CFG Block and has a true and false successor block reference in addition to the simple block.
 	\newline 
 \end{enumerate}
-This is the only two interface that we need, we can now start to build the graph.
+This is the only two interfaces that we need, we can now start to build the graph.
 
 \subsubsection{Building the control flow graph}
 \label{subsubsec:building_the_graph}
@@ -111,7 +111,7 @@ We will then recursively build the graph by matching on the type of the tree.
 	\item \textbf{\textit{Block and other nodes}} \newline 
 	\label{subsubsec:block_and_others}
 	The simplest tree that we will face are the blocks, they represent a list of statements, we can therefore directly recursively build the graph for all children, that will add the content of the block inside the current basic block. 
-	This behavior can also be applied to other known trees that does not change the flow of execution, as a default case.
+	This behavior can also be applied to other known trees that do not change the flow of execution, as a default case.
 	The only difference is that we are also going to add the current tree to the elements after having built the graph for the children, in order to keep useful information. 
 	For example, having a list of identifiers is not useful if we do not know that they are linked together by a binary expression, we will therefore add both the binary expression and the children to the elements of the current block.
 	
@@ -127,14 +127,14 @@ We will then recursively build the graph by matching on the type of the tree.
 	However, in the case of loops, the flow is not going to continue at the successor, but return at the condition of the loop, a predecessor’s node that we have not built yet. 
 	To address this situation, we can introduce a \textbf{forwarding block}, a basic block that is used to store a reference and will not contain any element.
 	We can now start to build the loop flow by creating a forwarding block that will link to the condition and build the body with this new block as the successor. 
-	Finally, we can build the condition of the loop as a branching block, with the true successor as the body of the loop, and the false as the block that follow the loop.
-	There is one details that we have not address yet: break and continue.
+	Finally, we can build the condition of the loop as a branching block, with the true successor as the body of the loop, and the false as the block that follows the loop.
+	There is one detail that we have not addressed yet: break and continue.
 	To support these two statements, we are going to use a stack, that will contain \textbf{breakable} objects. 
 	These temporary objects are here to store the link to the condition for emph{continue}, and the end of the loop for \emph{break}.
 	Before starting to build the body of the loop, we will push a breakable object to the top of the stack, and pop it once we are done. 
-	We use a stack to support nested loop, a break and continue will refers to the first enclosing loop.
+	We use a stack to support nested loop, a break and continue will refer to the first enclosing loop.
 	
-	The current implementation of \emph{For} loops is the same as \emph{While} loops, as we do not need the exact behavior of loop for our check, we can accept this approximation.
+	The current implementation of \emph{For} loops is the same as \emph{While} loops, as we do not need the exact behavior of a loop for our check, we can accept this approximation.
 	For \emph{Do/While} loops, we are going to use the same idea but we are going to start to build the condition before the body.
 	
 	\item \textbf{\textit{Match Tree}} \newline 
@@ -146,7 +146,7 @@ We will then recursively build the graph by matching on the type of the tree.
 	Non-fallthrough match tree is an easy case, we can build all the cases separately, and create a block that will have multiples successors.
 	
 	Fallthrough switch is trickier, we first have to use the same idea as we used for loops: add an object (similar to breakable), to the stack, to store the reference to the block that is executed after the switch. 
-	We make the same assumption as we did with loop, that a \emph{break} statements refer only to the closest enclosing match tree. 
+	We make the same assumption as we did with loops, that a \emph{break} statements refer only to the closest enclosing match tree. 
 	
 	The next step is to create a forwarding block for the default case of the match tree, and build the different cases in the reverse order, one after the other. 
 	We create one branching block per match cases, with the body of the case as true successor and the next pattern as the false successor. 
@@ -161,7 +161,7 @@ We will then recursively build the graph by matching on the type of the tree.
 		\includegraphics[]{figure/pat-mat-cfg.pdf}
 	\end{figure}
 	
-	Figure \ref{figure:pat-mat-cfg} shows the resulting control flow graph of the code of listing \ref{lst:pattern-match}. We can see that the fallthrough behavior is represented as expected, for example \emph{a = 1} is executed both when \emph{pat1} and \emph{pat2} is true.
+	Figure \ref{figure:pat-mat-cfg} shows the resulting control flow graph of the code of listing \ref{lst:pattern-match}. We can see that the fallthrough behavior is represented as expected, for example \emph{a = 1} is executed both when \emph{pat1} and \emph{pat2} is \emph{True}.
 	
 	\item \textbf{\textit{Jump Tree: break and continue}} \newline 
 	\label{subsubsec:jump_tree_cfg}
@@ -172,15 +172,15 @@ We will then recursively build the graph by matching on the type of the tree.
 	
 	\item \textbf{\textit{Return}} \newline 
 	\label{subsubsec:return_cfg}
-	Once again, starting from the end greatly simplify the support of return statements: we can store a reference to the \emph{END} block that is created at the beginning, use it as successor to the block that will contain the return expression.
+	Once again, starting from the end greatly simplifies the support of return statements: we can store a reference to the \emph{END} block that is created at the beginning, use it as successor to the block that will contain the return expression.
 	
 	\item \textbf{\textit{Exception Handling Tree and Throw Tree}} \newline 
 	\label{subsubsec:exception_handling_cfg}
-	In our control flow graph, we are only going to consider exception that are explicitly thrown with a throw statements, and not add an edge to every statement where an exception can occur in reality. \newline
+	In our control flow graph, we are only going to consider exceptions that are explicitly thrown with a throw statement, and not add an edge to every statement where an exception can occur in reality. \newline
 	We are going to start at the end of the exception handling tree. 
 	When an exception handling tree is executed, it can result in two possible cases: the exception is caught and the flow can continue, or it is not and the flow goes to the end of the function. 
-	To support this behavior, we are going to create a block with two successor: the \emph{END} node and the successor previously created. \newline
-	We can then create the \emph{finally} block, if present, and the different catch case separately, and continue to build the body of the \emph{try} block. 
+	To support this behavior, we are going to create a block with two successors: the \emph{END} node and the successor previously created. \newline
+	We can then create the \emph{finally} block, if present, and the different catch cases separately, and continue to build the body of the \emph{try} block. 
 	At this point we must know where to jump in the case where an exception is thrown. 
 	To do this, we will use the same idea as we did with the jump trees: use a stack to push the target of the throw before building the body, and popping it after. 
 	If there is no catch block, the target will be the \emph{finally} block, if there is one or more catch block, we will use the first catch case as target. 
@@ -210,24 +210,24 @@ There is still part of it that can be imprecise due to the fact that the differe
 \subsection{Data flow analysis}
 \label{subsec:data_flow_analysis}
 
-We now have all nodes needed and a control flow graph, we can start the implementation of the checker, that is in fact really similar to the one described in \ref{sec:implementation_java}. 
-The main difference is the way we deal with nodes that have an unreliable execution order and the identification of local variable.
+We now have all nodes needed and a control flow graph, we can start the implementation of the checker, which is in fact really similar to the one described in \ref{sec:implementation_java}. 
+The main difference is the way we deal with nodes that have an unreliable execution order and the identification of local variables.
 The former will be described in \ref{subsec:how_to_deal_with_native} and the latter in the next section.
 
 \subsubsection{Identifying local variable}
 \label{subsubsec:identifying_local_variable}
 
-In SonarJava, we have access to symbol of identifier, data that we do not have in \slang{}. 
-The current computation of local variable is quite simple: all variable declaration inside the function and all arguments are considered as local variables.
+In SonarJava, we have access to symbols of identifiers, data that we do not have in \slang{}. 
+The current computation of local variables is quite simple: all variable declaration inside the function and all arguments are considered as local variables.
 This is a naive version that is not made to work well for all language but used to show that with a proper semantic computation (name definitions and scoping rules) we could expect results that are as good as the current naive version. \newline
 When we have this set of local variables, we can now check if the variable is in this set before reporting the issues. 
-In practice, we could still report the issues that are not coming from local variable, but this would add some false positive.
+In practice, we could still report the issues that are not coming from local variables, but this would add some false positives.
 
 \lstinputlisting[label={lst:field-change-value},
 caption=Field can change value during a function call]{code/field-change-value.scala}
 
-Listing \ref{lst:field-change-value} shows an example of a false positive due to a function with side-effect that change the value of a field. 
-Adding the issues that come from non-local variable double the number of issues found, but the most of them are false positives.
+Listing \ref{lst:field-change-value} shows an example of a false positive due to a function with side-effect that changes the value of a field. 
+Adding the issues that come from non-local variable double the number of issues found, but most of them are false positives.
 Since a variable can be reassigned between the use and the check of a pointer, these new issues do not exactly respect the original description, we are not going to report them.
 
 \subsection{How to deal with native nodes in a CFG based checker?}
@@ -258,7 +258,7 @@ In this example, we assume that we do not have ternary expression in \slang{}, a
 We will use ternary expression of Java to represent the problem, but the construction can be any native nodes coming from any original language. \newline
 The problem here is that we must represent the control flow of a node that we do not know anything about.
 We cannot trust the evaluation order of the children of the native nodes, as it can be arbitrary. 
-The first question that arise is why do we have to keep the content of a node that we do not know anything about? In fact, this is the root of the idea of the native nodes, we are not interested in the node itself, but only on the content.
+The first question that arises is why do we have to keep the content of a node that we do not know anything about? In fact, this is the root of the idea of the native nodes, we are not interested in the node itself, but only on the content.
 
 \begin{figure}[h]
 	\caption{CFG with an assignment in a native node}
@@ -266,14 +266,14 @@ The first question that arise is why do we have to keep the content of a node th
 	\includegraphics[]{figure/cfg-with-assignment-native.pdf}
 \end{figure}
 
-Figure \ref{figure:cfg-with-assignment-native} shows a typical example: in this case, we do not need to know what the native node (orange node) is exactly, but that the node assign \emph{p}. We do not care what exactly happens in this native node, we just need to know that, at one point, \emph{p} is assigned, even if it is possible that the assignment is never executed. If it is the case, this will add false negative, but intuitively, we can assume that dead code is not common, and this will not happen very often.
+Figure \ref{figure:cfg-with-assignment-native} shows a typical example: in this case, we do not need to know what the native node (orange node) is exactly, but that the node assigns \emph{p}. We do not care what exactly happens in this native node, we just need to know that, at one point, \emph{p} is assigned, even if it is possible that the assignment is never executed. If it is the case, this will add false negatives, but intuitively, we can assume that dead code is not common, and this will not happen very often.
 
 So, at this point, we know that we need to keep the content of the native nodes. 
 The next step is to define what to do with them. 
 A naive solution would be to add the content of the graph in the elements of the basic block, assuming that the evaluation order is not important. 
 This is in fact correct for a native node with only one child, where the evaluation order can obviously not change. 
-If there is multiple children, we have to add the assumption that all the statements that change the flow of a program are represented in \slang{}. 
-This is a reasonable assumption since programming language hardly ever provide exceptional statement that are break the control flow, and if it does, we can add it to \slang{} grammar.
+If there are multiple children, we have to add the assumption that all the statements that change the flow of a program are represented in \slang{}. 
+This is a reasonable assumption since programming language hardly ever provide an exceptional statement that break the control flow, and if it does, we can add it to \slang{} grammar.
 
 \lstinputlisting[label={lst:ternary-expression-example},
 caption=Pseudo code with a ternary expression]{code/ternary-expression-example.scala}
@@ -301,10 +301,10 @@ Since the ternary expression will be mapped to a native node in \slang{}, if we 
 
 We can therefore not ignore these nodes, and not naively add them to the blocks.
 The idea to solve the problem showed before is to put all elements that come from a native node in a separate basic block (figure \ref{figure:two-unreliable-cfg}, left), and mark the block as \textbf{unreliable} (figure \ref{figure:two-unreliable-cfg}, right), shown in orange.
-All control flow statement nested inside the native nodes will also lead to unreliable basic block.\newline
+All control flow statement nested inside the native nodes will also lead to an unreliable basic block.\newline
 Additionally, we will also mark the whole graph as unreliable. 
 
-This information can now be used by any checker that use a control flow graph, not only for the \emph{null} pointer dereference checker.
+This information can now be used by any checker that uses a control flow graph, not only for the \emph{null} pointer dereference checker.
 
 \subparagraph{How to use this information?}
 \label{subsubsec:use_unreliable_information}
@@ -333,8 +333,8 @@ This is the opposite of the previous point: in the case where the checker needs 
 	\end{tabular}
 \end{table}
 
-Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang{} after translating open-source projects \cite{SlangSources:2019:Online} to \slang{}. The percentage of completely native nodes refers to the nodes that have all their children as native. If more than $40\%$ of nodes are not translated, this does not mean that our language lack a lot of nodes, but that we do not mapped some kind of nodes on purpose.
-This table shows us that native nodes are not rare, using the above approach will greatly reduce our chance to find any relevant issue as we will, in the most of the case, be in the presence of native nodes in the body of a function.
+Table \ref{table:slang-native-percentage} show the percentage of native nodes in \slang{} after translating open-source projects \cite{SlangSources:2019:Online} to \slang{}. The percentage of completely native nodes refers to the nodes that have all their children as native. If more than $40\%$ of nodes are not translated, this does not mean that our language lacks a lot of nodes, but that we do not map some kind of nodes on purpose.
+This table shows us that native nodes are not rare, using the above approach will greatly reduce our chance to find any relevant issue as we will, in most of the case, be in the presence of native nodes in the body of a function.
 
 The two approaches described before seems not well-suited for our checker, we may want something between the two extremes.
 
@@ -352,7 +352,7 @@ caption=First example of finer grain behavior]{code/fine-grain-1.scala}
 \lstinputlisting[label={lst:fine-grain-2},
 caption=Second example of finer grain behavior]{code/fine-grain-2.scala}
 
-With this idea, we are now avoiding to report any issue for the two correct pseudo code from listing \ref{lst:fine-grain-1} and \ref{lst:fine-grain-2}. Since ternary expression are unreliable, we will not consider \emph{p} as used, even though it may look like in the control flow graph.
+With this idea, we are now avoiding to report any issue for the two correct pseudo code from listing \ref{lst:fine-grain-1} and \ref{lst:fine-grain-2}. Since ternary expressions are unreliable, we will not consider \emph{p} as used, even though it may look like in the control flow graph.
 
 \lstinputlisting[label={lst:fine-grain-3},
 caption=Third example of finer grain behavior]{code/fine-grain-3.scala}
@@ -364,14 +364,14 @@ This code is not reported by our tool despite the fact that it should be. This i
 caption=Fourth example of finer grain behavior]{code/fine-grain-4.scala}
 
 In addition, the implementation will still report issues inside native nodes.
-For example, in listing \ref{lst:fine-grain-4}, we can see that the pointer \emph{p} is used, and then checked for \emph{null} later in a un-trusted node. We do not know exactly what exactly happen in this node, but we can expect that a check for \emph{null} still mean that p can be \emph{null}. 
+For example, in listing \ref{lst:fine-grain-4}, we can see that the pointer \emph{p} is used, and then checked for \emph{null} later in a un-trusted node. We do not know exactly what exactly happens in this node, but we can expect that a check for \emph{null} still means that p can be \emph{null}. 
 In this example, we report an issue, that is a true positive.
 \end{enumerate}
 
 \subsection{Other problematic situations}
 \label{subsec:other_problematic_situation}
 	
-We have already presented the main problematic situations, coming from native nodes, but there are still a few cases that can raise false positive that we have to take care.
+We have already presented the main problematic situations, coming from native nodes, but there are still a few cases that can raise false positives that we have to take care of.
 
 \begin{enumerate}
 	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
@@ -394,12 +394,12 @@ We have already presented the main problematic situations, coming from native no
 	The same situation can in fact arise for any statement, hopefully, the solution is often to add the support for the new behavior in \slang{}.
 	This trick should be used with caution, the initial goal is to be language agnostic, we should ideally not have to modify \slang{} for every new language we add. 
 	The good news is that there is only a limited number of variations that are possible, since the number of known nodes is fixed (and only a fraction of it in practice). 
-	This kind of problem are difficulty that are hard to anticipate and will arise during the implementation of a new checker, but it is not in itself a strong limitation.
+	This kind of problems are a difficulty that is hard to anticipate and will arise during the implementation of a new checker, but it is not in itself a strong limitation.
 	
 	\item \textbf{\textit{Lost Jump Statements}} \newline 
 	\label{subsubsec:lost_jump_statement}
 	We have seen in section \ref{subsubsec:jump_tree_cfg} that we directly a jump statement to the basic block in the case where we do not expect it, without doing anything special.
 	In fact, we face similar uncertainties that happen with native nodes, we do not know exactly what is happening, but we can expect that something will go wrong.
-	The same happen with jump tree with label, as the way the different language deals with label can be arbitrary, we cannot assume anything.
+	The same happens with jump tree with labels, the way different language deals with label can be arbitrary, we cannot assume anything related to them.
 	We just know that the statement will change the execution flow in an unreliable way, we will therefore mark the flow generated by this statement as \emph{unreliable}.
 \end{enumerate}
