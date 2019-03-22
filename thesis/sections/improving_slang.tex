@@ -1,11 +1,11 @@
 \section{Improving SLang: Null pointer consistency}
 \label{sec:improving_slang}
 
-\slang{} has already demonstrated his power to add 4 new languages, some of them in less than a month, and to implement more than 40 common checks. 
+\slang{} has already demonstrated his power to support four new languages, some of them in less than a month, and to implement more than forty common checks. 
 However, the language is still young, and the current checks involve mainly syntactic elements. 
-In this section, we are going to attend to push \slang{} further, to implement more complex checks.
+In this section, we are going to attend to push \slang{} further, by implementing more complex checks.
 To estimate the quality of the results of a checker implemented on \slang{}, we will use a variation \emph{null} pointer consistency check. 
-We choose this check because this is a well-known bug and well-studied in static analysis, a lot of different implementations exist with different complexity.
+The check has been chosen because it is a well-known and well-studied bug in static analysis, a lot of different implementations exist with different complexity.
 
 \subsection{What is null pointer consistency}
 \label{subsec:null_pointer_consistency}
@@ -15,46 +15,49 @@ We choose this check because this is a well-known bug and well-studied in static
 \subsection{Belief style Null Pointer Checker}
 \label{subsec:belief_style}
 
-The goal is to build a checker that implements a variation of the current check \emph{null pointers should not be dereferenced} \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
+The goal is to build a checker implementing a variation of the current check \emph{null pointers should not be dereferenced} \cite{RSPEC-2259:2019:Online}, implemented on SonarJava \cite{SonarJava:2019:Online}, the tool developed at SonarSource to perform static analysis on Java code.
 The current implementation uses a complex symbolic execution engine to report potential \emph{null} pointer exception.
-Symbolic execution tries to estimate all possible execution paths, track the value of variables, and report when a pointer is dereferenced while it can be \emph{null} on one path.
+Symbolic execution tries to estimate all possible execution paths, to track the value of variables, and to report when a pointer is dereferenced while it can be \emph{null} on one path.
 One important limitation is that it uses a lot of assumptions to deal with the fact that the possible execution paths quickly explode. 
 If it is possible to come up with good assumptions to report interesting bugs, the complexity of the implementation also increases, preventing improvement and therefore the ability to find more bugs. \cite{Brown:2016:BSC:2954679.2872364}. 
-Our initial goal is not to find all the issues that the implementation on SonarJava reports, but to see if it is possible to still find interesting issues with an implementation that is less complex and based on a common intermediate representation.
+Our initial goal is not to find all the issues reported by the implementation on SonarJava, but to see if it is possible to still find interesting issues with a less complex implementation which is based on a common intermediate representation.
 
-The idea of this first checker is to use facts implied by the code, that we will call \textbf{belief} \cite{Engler:2001:BDB:502059.502041}.
+The idea of this first checker is to use facts implied by the code, called \textbf{beliefs} \cite{Engler:2001:BDB:502059.502041}.
 It assumes that the programmer’s goal is not to make his code crashes, if two contradicting believes are detected, we report an issue.
-Concretely, we are going to try to detect the use of a pointer \emph{P}, followed by a check for \emph{null}. The check for \emph{null} can be equal or not equal to \emph{null}, both statements implying that the programmer believes that the pointer \emph{P} can be \emph{null}.
+Concretely, we want to detect the use of a pointer \emph{P}, followed by a check for \emph{null}. 
+The check for \emph{null} can be equal or not equal to \emph{null}, both statements implying that the programmer believes that the pointer \emph{P} can be \emph{null}.
 
 \lstinputlisting[label={lst:typical-issue},
-caption=Typical example that the checker reports]{code/typical-issue.scala}
+caption=Typical example reported by the checker]{code/typical-issue.scala}
 
-Listing \ref{lst:typical-issue} demonstrates a typical example that the checker is able to report. 
-From line $\#1$, \emph{p} is dereferenced without having been checked for \emph{null}, we can imply that the programmer believes that, at this point, the pointer is not \emph{null}, otherwise the program will crash. 
-If later, at line $\#4$, \emph{p} is checked for \emph{null}, it implies that the programmer thinks that \emph{p} can in fact be \emph{null}, contradicting the previous belief: we report an issue from this contradiction.
-To implement this check, we need to have a representation of the control flow of the program, which is typically represented by a control flow graph.
+Listing \ref{lst:typical-issue} demonstrates a typical example reported by the checker. 
+From line $\#1$, \emph{p} is dereferenced without having been checked for \emph{null}.
+We can therefore assume that the programmer believes, at this point, that the pointer is not \emph{null}, otherwise the program will crash. 
+If later, at line $\#4$, \emph{p} is checked for \emph{null}, it implies that the programmer thinks that \emph{p} can be \emph{null}, contradicting the previous belief: we report an issue from this contradiction.
+To implement this check, we need to have a representation of the control flow of the program, which is represented by a control flow graph.
 
 \subsubsection{Control Flow Graph}
 \label{subsubsec:control_flow_graph}
 
-A control flow graph is a directed graph that represents the execution flow of a program, the nodes of the graph are individual instructions, and the edges represent the control flow. More precisely, there is an edge from a node \emph{N1} to a node \emph{N2}, if and only if the instruction of the node \emph{N2} can be directly executed after the node \emph{N1}.
+A control flow graph is a directed graph representing the execution flow of a program, the nodes of the graph are individual instructions, and the edges represent the control flow. More precisely, there is an edge from a node \emph{N1} to a node \emph{N2}, if and only if the instruction of the node \emph{N2} can be directly executed after the node \emph{N1}.
 
 
 \subparagraph{Basic Block}
-We initially described the nodes as individual instructions, however, we can easily see that many instructions are always executed unconditionally in the same sequence.
-We can regroup these instructions in the same node that we are going to call \textbf{basic block}, representing the maximum sequence of instructions that are executed unconditionally in sequence. 
+We initially described the nodes as individual instructions.
+However, we can see that many instructions are always executed unconditionally in the same sequence.
+These instructions are regrouped in the same node and called \textbf{basic block}, representing the maximum sequence of instructions which are executed unconditionally in sequence.
 This greatly reduces the number of nodes present in the graph, reducing therefore the complexity of future computation on top of the graph.
 
 \subsection{Formal definition of the checker}
 \label{subsec:checker_formal_definition}
-More formally, the idea is to check that the use of a pointer \emph{p} post dominates the check of \emph{p} for \emph{null}.
-Intuitively, we can say that all path arriving at the check of \emph{p} goes through the use of \emph{p}, without having been reassigned between the two. 
-To do this, we are going to use a data-flow analysis using the control flow graph previously described.
+More formally, the idea is to check if the use of a pointer \emph{p} post dominates the check of \emph{p} for \emph{null}.
+Intuitively, we report an issue if all path arriving at the check of \emph{p} go through the use of \emph{p}, without having been reassigned between the two. 
+To do this, a data-flow analysis using the control flow graph previously described will be used.
 
 \subsubsection{Data-flow Analysis}
 \label{subsubsec:data_flow_analysis}
 
-The analysis tracks the pointer uses (set of pointers believed to be \emph{non-null}) and flag when the same pointer is checked afterward.
+The analysis tracks the pointer use (set of pointers believed to be \emph{non-null}) and flag when the same pointer is checked afterward.
 The control flow graph will only be built for the current function being analyzed (intraprocedural) and will not have any access to other functions or other files (interprocedural).
 
 Formally:
@@ -72,7 +75,7 @@ o_{n} = gen(n)  \cup   (i_{n} \setminus kill(n))
 Where
 
 \begin{equation}\label{eqn:dataflow3}
-gen(n) =\text{pointer that is used in node \emph{n}}
+gen(n) =\text{pointer used in node \emph{n}}
 \end{equation}
 \begin{equation}\label{eqn:dataflow4}
 kill(n) = \text{assignment of pointer in node \emph{n}}
@@ -80,8 +83,8 @@ kill(n) = \text{assignment of pointer in node \emph{n}}
 
 Intuitively, we can see the analysis as follow:
 \begin{enumerate}
-	\item The set of believed to be \emph{non-null} pointer split at a fork. \newline 
-	\item On join, we take the intersection of incoming paths, this means that we will remove the ones killed on at least one path. Also called \emph{MUST} analysis. \newline 
+	\item The set of believed to be \emph{non-null} pointer split at branch. \newline 
+	\item On join, we take the intersection of incoming paths, we will remove the ones killed on at least one path. Also called \emph{MUST} analysis. \newline 
 \end{enumerate}
 
 \subsection{Variation of the check}
@@ -100,12 +103,12 @@ Intuitively, we can see the analysis as follow:
 	\end{tabular}
 \end{table}
 
-The version described before shows one way of doing the analysis, there is multiple small variations that we can do on the analysis that will greatly influence the results.
+The version described before shows one way of doing the analysis, there are small variations can be done on the analysis and will influence the results.
 
 \subsubsection{May vs Must analysis}
 \label{subsubsec:may_vs_must}
 
-With a MAY analysis, the computation of the input set from equation \ref{eqn:dataflow1} becomes:
+With a MAY analysis, the computation of the input set from equation \eqref{eqn:dataflow1} becomes:
 \begin{equation}\label{eqn:mayvsmust}
 i_{n} = o_{p1}  \cup   o_{p2}  \cup  ... \cup   o_{pk}
 \end{equation}
@@ -114,33 +117,35 @@ If a \emph{MUST} analysis takes the intersection of all incoming path, the \emph
 It means that a pointer will be removed from the set only if all path re-assigns this variable.
 The choice of \emph{MUST} over \emph{MAY} goes in the sense of the idea to have as little false positives as possible described \ref{subsubsec:precision_recall}.
 Table \ref{table:issue_per_analysis_type} shows the difference between a \emph{MAY} and a \emph{MUST} analysis of the checker ran on the same sets of sources.
-We can see that we have significantly more issues, but the rate of false positives is significantly higher, finding interesting issues is too hard with this noise. 
-In addition, another downside of \emph{MAY} analysis is that identifying true positive can be tricky, involving only a specific path executed that will raise an exception, while discovering false positive is straightforward.
+We can see that we have more issues, but the rate of false positives is significantly higher, finding interesting issues is too hard with this noise. 
+In addition, understanding which specific path of the execution will raise an exception is hard, making it hard to identify true positives.
 In practice, to help the user to better understand the issue, we could report multiple locations, the line where the pointer is used, and the one where it is dereferenced, for example.
 
-Intuitively, it is not surprising that the \emph{MAY} analysis performs poorly if we do not take into account the paths that are unfeasible.
+Intuitively, it is not surprising that the \emph{MAY} analysis performs poorly if we do not take into account the unfeasible paths.
 
 \lstinputlisting[label={lst:may-analysis-issue},
 caption=False positive of MAY analysis]{code/may-analysis-fp.scala}
 
-Listing \ref{lst:may-analysis-issue} shows an example of a false positive that is reported by the \emph{MAY} analysis. 
-This is obviously an unfeasible path, the pointer \emph{p} at line $\#2$ is only used if it is not \emph{null}, the check for \emph{null} later at line $\#4$ does not mean that there is a potential exception.
+Listing \ref{lst:may-analysis-issue} shows an example of a false positive reported by the \emph{MAY} analysis. 
+This is obviously an unfeasible path.
+The pointer \emph{p} at line $\#2$ is only used if it is not \emph{null}, the check for \emph{null} later at line $\#4$ does not mean that an exception is possible.
 We will discuss possible amelioration to this situation in subsection \ref{subsubsec:path_sensitivity}.
 
 \subsubsection{Used then check, check then used}
 \label{subsubsec:used_then_check_check_then_used}
 
 \lstinputlisting[label={lst:used-then-check},
-caption=Pointer that is used then checked]{code/used-then-check.scala}
+caption=Pointer used then checked]{code/used-then-check.scala}
 \lstinputlisting[label={lst:checked-then-used},
-caption=Pointer that is checked then used]{code/checked-then-used.scala}
+caption=Pointer checked then used]{code/checked-then-used.scala}
 
 Listing \ref{lst:used-then-check} and \ref{lst:checked-then-used} shows the difference between the two versions.
-The work presented before implements the former, however, the latter makes as much sense, if all paths that follow the check for \emph{null} uses the pointer \emph{p}, without re-assigning it, it probably means that an error is possible.
+The work presented before implements the former.
+However, the latter makes as much sense, if all paths following the check for \emph{null} uses the pointer \emph{p}, without re-assigning it, it probably means that an error is possible.
 In the implementation, this would be implemented using a backward analysis. 
 As the name suggests, a backward analysis means that we take the intersection of all successor’s input set to determine the output set of the current node. 
 
-For a backward analysis, equation \ref{eqn:dataflow1} becomes:
+For a backward analysis, equation \eqref{eqn:dataflow1} becomes:
 
 \begin{equation}\label{eqn:checkthenused1}
 o_{n} = i_{s1}  \cap   i_{s2}  \cap  ... \cap   i_{sk}
@@ -148,20 +153,21 @@ o_{n} = i_{s1}  \cap   i_{s2}  \cap  ... \cap   i_{sk}
 
 Where $s1, ..., sk$ are all the successors of n.
 
-And the computation \ref{eqn:dataflow2} from the forward analysis becomes:
+And the computation \eqref{eqn:dataflow2} from the forward analysis becomes:
 
 \begin{equation}\label{eqn:checkthenused2}
 i_{n} = gen(n)  \cup   (o_{n} \setminus kill(n))
 \end{equation}
 
-Surprisingly, the rate of FP is greatly increased, the number of false positive is greater than our goal of $<5\%$, but the issues are more interesting than the \emph{MAY} analysis, we can still find real issues, mainly due to the fact that identifying true positive is as easy as false positives.
+Surprisingly, the rate of FP is greatly increased, the number of false positives is greater than our goal of $<5\%$.
+However, the issues are more interesting than the \emph{MAY} analysis, real issues can still be found since identifying true positive is as easy as false positives.
 
 \lstinputlisting[label={lst:user-define-function},
-caption=User define function that changes the control flow]{code/user-define-function.scala} 
+caption=User define function changing the control flow]{code/user-define-function.scala} 
 
-Listing \ref{lst:user-define-function} shows the typical example that generates the false positives, we can see that a function is called when \emph{p} is \emph{null}, that will throw an exception, therefore changing the execution flow order.
+Listing \ref{lst:user-define-function} shows a typical example generating false positives, the function \emph{customThrow} is called when \emph{p} is \emph{null}, and will throw an exception and changing the execution order.
 
-Custom functions that change the control flow is a weak point for flow-based checker that does not perform interprocedural analysis, and we will probably face this problem both in an original language and in \slang{}. 
+Custom functions changing the control flow is a weak point for flow-based checker not performing interprocedural analysis, and we will probably face this problem both in an original language and in \slang{}. 
 From now, we are only going to work with the first version (used then checked).
 
 

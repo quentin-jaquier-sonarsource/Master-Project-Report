@@ -3,8 +3,8 @@
 SonarSource is a company that develops tools for continuous code quality for more than ten years, with the time, the team has developed good expertise in the domain.
 Static code analysis is the action of automatically analyzing the behavior of a program without actually executing it.
 This kind of analysis is particularly useful to identify potential issues as early as possible in the development cycle, reducing the effort needed to fix them.
-A year ago, SonarSource was supporting more than twenty languages, but realized that they were not targeting some that were the most used and asked by the community.
-In 2018, SonarSource decided to respond to this demand and add the support for five new languages that they were not supporting: \emph{Go}, \emph{Kotlin}, \emph{Ruby}, \emph{Scala} and \emph{Apex}.
+A year ago, SonarSource was supporting more than twenty languages, but realized that they were not targeting the most used and asked by the community.
+In 2018, SonarSource decided to respond to this demand and add the support for five new languages not supported: \emph{Go}, \emph{Kotlin}, \emph{Ruby}, \emph{Scala} and \emph{Apex}.
 
 \subsection{Supporting 5 new languages}
 \label{subsec:5_new_languages}
@@ -15,9 +15,9 @@ Since every language produces a different tree, every check has to be implemente
 The complexity of the current situation is, therefore, a multiplication between the number of languages and the number of checks.
 As the objective is to increase the number of languages, the current situation does not scale.
 The first observation they made is that implementing the front-end for a language is a hard task, which often takes most of the production time. 
-Hopefully, open-source's projects, that already provide complete and maintained parsing, exists. 
+Hopefully, open-source's projects already providing complete and maintained parsing, exists. 
 This is the first important choice: SonarSource is not going to develop its own front end anymore, but is going to re-use existing one.
-A second observation is that many rules are implemented in the same way and that some of them are common, they make sense for every programming language.
+A second observation is that many rules are implemented in the same way and some of them are common, they make sense for every programming language.
 
 
 \begin{table}[h]
@@ -33,7 +33,7 @@ A second observation is that many rules are implemented in the same way and that
 	\end{tabular}
 \end{table}
 
-Table \ref{table:common_rules} shows a sample of typical checks that can be considered as common rules \cite{JiraSonarSource:2019:Online}, that apply to any programming language.
+Table \ref{table:common_rules} shows a sample of typical checks considered as common \cite{JiraSonarSource:2019:Online}, applying to any programming language.
 At this point, the high-level idea is to use an existing front-end to perform the parsing, to translate it to a universal intermediate representation and to implement checks and metrics on it.
 This was the main motivation: avoid redoing the same work again and again, by implementing checks on top of common representation, reducing the complexity to a single implementation of each check.
 This idea is promising, it would enable SonarSource to support new languages faster, avoiding duplication, and to reduce the maintainability cost, allowing them to reach their objective.
@@ -46,17 +46,17 @@ After a few trial and error, the team came up with SonarLanguage, or \slang{}, a
 In order to implement checks only once, SonarSource introduced an incomplete universal intermediate representation, a domain specific language for static analysis: \textbf{\slang{}}.
 The goal was to have a unified representation of common programming language, for easy, scalable and maintainable code smell and bug detection. 
 The language is designed to implement the common rules introduced before, it is therefore not designed for mainstream programming, and in fact, the current goal is not even to be able to compile it.
-It contains all the metadata and abstract syntax tree nodes that we need to support these rules, and only the ones needed.
-It is therefore a balance between complexity (number of different features that we support) and accuracy to be able to report interesting issues. 
+It contains all the metadata and abstract syntax tree nodes needed to support these rules, and only the ones needed.
+It is therefore a balance between complexity (number of different features supported) and accuracy to be able to report interesting issues. 
 
-The current grammar \cite{slangGrammar:2019:Online} and interface \cite{slangAPI:2019:Online} of \slang{} is not fixed, it is meant to change and to adapt to suits needs that arise.
+The current grammar \cite{slangGrammar:2019:Online} and interface \cite{slangAPI:2019:Online} of \slang{} is not fixed, it is meant to change and to adapt to suit arising needs.
 We can see that it contains all the typical nodes of any programming language.
 The different nodes approximate the different programming concepts.
 To be able to support multiple input languages, but we do not need the translation to be faithful, as a transformation of source code requires\cite{Koppel:2018:OTM:3288538.3276492}.
-For example, the loops are all mapped to one single node, with one child that represents the condition, and another for the body. 
+For example, the loops are all mapped to one single node, with one child representing the condition, and another for the body. 
 Even if we keep the original type of the loop, this procedure can still mutilate the input, reducing the three part of a \emph{for} loop header into one condition.
 The transformation is therefore incomplete, we are going to make abstraction of some concepts, but it is not a problem as long as the results of the checks are not affected.
-One interesting note is that there are important nodes that are not present, for example, there is no function invocation. 
+One interesting note is that there are important nodes not present, for example, there is no function invocation. 
 The reason is that none of the rules use them, we eventually need to know the list of the arguments to report unused variable, but we do not need the concept of function invocation in itself.
 The specificity of this language is the \textbf{native nodes}. 
 During the translation, we are going to map all original nodes to their equivalent in \slang{}, if one has no equivalent, it is going to be mapped to a native node.
@@ -95,18 +95,20 @@ During the translation, we are going to map all original nodes to their equivale
 	\end{tabular}
 \end{figure}
 
-Figure \ref{figure:native_node_example} shows an example of native node in a \slang{} tree. In the left tree, we understand that the equal is part of an assignment, but in the second case, we have an unknown expression, that we will keep, but as a native node.
-Native nodes therefore represent nodes that are unknown, but we will still be able to compare them since we will keep the original type, list of their children and tokens inside the native node. 
-Since we can compare two native nodes, we are able to find that two branches of a switch are the same, for example, without knowing exactly what is inside.
+Figure \ref{figure:native_node_example} shows an example of native node in a \slang{} tree. 
+In the left tree, we understand that the equal is part of an assignment, but in the second case, we have an unknown expression. 
+We will keep, but as a native node.
+Native nodes therefore represent unknown nodes, but we will still be able to compare them since we will keep the original type, list of their children and tokens inside the native node. 
+Since we can compare two native nodes, we are able to find when two branches of a switch are the same, for example, without knowing exactly what is inside.
 The other interesting point is that we now control the shape of the tree, we know what and where to expect a tree. 
-For example, if we want to detect that two functions body are similar, we can compare the child that corresponds to the body, making abstraction of all its content.
+For example, if we want to detect when two functions body are similar, we can compare the child corresponding to the body, making abstraction of all its content.
 This is the key to ensure that the rule will work on any new language.
-For example, for the function body comparison, we are going to add all elements that can differentiate two implementations inside the body, even if the node was not directly inside in the original language.
+For example, for the function body comparison, we are going to add all elements who can differentiate two implementations inside the body, even if the node was not directly inside in the original language.
 The native nodes also enable to process to the implementation incrementally: we can implement the translation only for a few nodes, letting others as native, and already be able to run some of the checks and see the first results.
 
 
 If the \emph{Why?} is now clear, we will discuss the \emph{How?} in this work. 
-To better understand the challenge of implementing a new language, we will start by describing the process of adding a new language to the ecosystem (Section \ref{sec:new_language}), with the challenges and choices that need to be done (Subsection \ref{subsubsec:reducing_false_positives}). 
+To better understand the challenge of implementing a new language, we will start by describing the process of adding a new language to the ecosystem (Section \ref{sec:new_language}), with the challenges and choices needed to be done (Subsection \ref{subsubsec:reducing_false_positives}). 
 We will then try to push \slang{}, and verify whether the results of a control-flow base check on \slang{} are comparable in quality (based on number of true positives, false positives, etc.) with the same checker over the original tree (Section \ref{sec:improving_slang}, \ref{sec:implementation_java}, \ref{sec:implementation_slang} and \ref{sec:running_checker}).
 We will finish comparing our checker with other related work (Section \ref{sec:related_work}), to see what is the current state of the art, how we could improve our current version, and try to anticipate the potential problem that can arise in the future of \slang{}.
 

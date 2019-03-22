@@ -1,19 +1,22 @@
 \section{Implementation on SonarJava}
 \label{sec:implementation_java}
 
-We are first going to implement this check on SonarJava ecosystem that already provides us all the tools that we need, specifically symbols resolutions, and a control flow graph.
+We are first going to implement the check described in section \ref{sec:improving_slang} on SonarJava ecosystem.
+It already provides us symbols resolutions and a control flow graph.
 The implementation is a classical forward data-flow analysis: the first step is to generate for each basic block the gen and kill set as described before. 
 We are going to store the symbols of the variable in the two sets. 
-We fill the set starting from the last element of the basic block to the first, when a pointer is killed, we also remove it if it is present in the \emph{gen} set.
-With this, a pointer that is used and assigned in the same basic block will be in the \emph{gen} set only if the use of the pointer follows the assignment, as expected.
+We fill the set starting from the last element of the basic block to the first.
+When a pointer is killed, we also remove it if it was present in the \emph{gen} set.
+A pointer which is used and assigned in the same basic block will be in the \emph{gen} set only if the use of the pointer follows the assignment, as expected.
 
 \lstinputlisting[label={lst:native-block-creation},
 caption=Problematic situation with naive basic block creation]{code/native-block-creation.scala} 
 
-Listing \ref{lst:native-block-creation} shows a potential problem of this method, all the different parts of the code will be added to the same basic block, we will therefore have a situation that we would want to report, but is not detected since the pointer is not in the gen set of this block. 
-One naive solution would be to not aggregate statements in a basic block, but we will have to compute the input and output set for every statement! 
+Listing \ref{lst:native-block-creation} shows a potential problem of this method, all the different parts of the code will be added to the same basic block.
+We will therefore have a structure we would want to report, which is not detected since the pointer is not in the \emph{gen} set of this block. 
+One naive solution would be no to aggregate statements in a basic block, but we will have to compute the input and output set for every statement! 
 \newline
-The alternative that we use in this work is done during the control flow graph creation: we break the basic block when we have a binary expression with an equal (or not equal). 
+The alternative used in this work is done during the control flow graph creation: we break the basic block when we have a binary expression with an equal (or not equal). 
 In order to support the backward and forward analysis, we should break before and after the check for \emph{null}. 
 We can now safely consider that when a pointer checked, it will never be in the same basic block as where it is used or killed.
 \begin{figure}[h]
@@ -28,16 +31,16 @@ We can now safely consider that when a pointer checked, it will never be in the 
 \end{figure}
 
 Figure \ref{figure:new-way-to-split} shows the old and new control flow graph for the code of listing \ref{lst:native-block-creation}. 
-By doing this, we will be able to support the example shown in listing \ref{lst:native-block-creation}, the check for \emph{null} breaks the block in three, the use and check will therefore not be in the same basic block.
+By doing this, we will be able to support the example showed in listing \ref{lst:native-block-creation}, the check for \emph{null} breaks the block in three, the use and check will therefore not be in the same basic block.
 
 Once the \emph{gen} (equation \ref{eqn:dataflow3}) and \emph{kill} (equation \ref{eqn:dataflow4}) set has been generated for every basic block, we can start to run the analysis with a work list approach.
 The idea is to add all basic blocks in a queue and compute the new \emph{out} set of the current head. 
 Since we are performing a forward analysis, if the new \emph{out} set have changed, this means that all the successors might potentially change as well. 
 We add the current basic block and all of its successor at the end of the work-list, if the processed block sets have changed. 
-We continue this process until the list is empty, meaning that we reached a fixed point.
+We continue this process until the list is empty, meaning that we have reached a fixed point.
 
-At the end of this process, we have a set of pointers that are believed to not be \emph{null} in each basic block.
-We can therefore do a second pass through the elements of the basic blocks, if we see a check for \emph{null} (that implies that this pointer could be \emph{null}) in a block where the pointer is in the set of believed to not be \emph{null}, we have a contradiction and report an issue.
+At the end of this process, we have a set of pointers believed to be not \emph{null} in each basic block.
+We can therefore perform a second pass through the elements of the basic blocks, if we see a check for \emph{null} in a block where the pointer is in the set of believed to be not \emph{null}, we have a contradiction and we can report an issue.
 
 \subsection{Other way to add belief}
 \label{subsec:other_way_to_add_belief}
@@ -45,12 +48,12 @@ We can therefore do a second pass through the elements of the basic blocks, if w
 \emph{Null} pointer exception does not occur only when a \emph{null} pointer is dereferenced, but can also appear in the following cases for Java, as defined in the documentation \cite{OracleDoc:2019:Online}:
 
 \begin{enumerate}
-	\item Calling the instance method of a \emph{null} object. \newline 
-	\item Accessing or modifying the field of a \emph{null} object. \newline 
-	\item Taking the length of \emph{null} as if it were an array. \newline 
-	\item Accessing or modifying the slots of \emph{null} as if it were an array. \newline 
-	\item Throwing \emph{null} as if it were a \emph{Throwable} value. \newline 
+	\item Calling the instance method of a \emph{null} object;
+	\item Accessing or modifying the field of a \emph{null} object;
+	\item Taking the length of \emph{null} as if it were an array;
+	\item Accessing or modifying the slots of \emph{null} as if it were an array;
+	\item Throwing \emph{null} as if it were a \emph{Throwable} value.
 \end{enumerate}
-Currently, our checker is only using the first case, but we can use this information to improve our implementation: when we see one of these construction, we will add the pointer to the set of believed to be \emph{non-null} (\emph{gen} set) the same way as we would for a pointer that is used.
+Currently, our checker is only using the first case, but we can use this information to improve our implementation: when we see one of these construction, we will add the pointer to the set of believed to be \emph{non-null} (\emph{gen} set) the same way as we would for a pointer used.
 
 
