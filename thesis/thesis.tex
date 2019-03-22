@@ -13,7 +13,7 @@
 \usepackage{epstopdf}
 \usepackage{floatrow}
 \usepackage{float}
-\usepackage[colorlinks=true,breaklinks=false]{hyperref}
+\usepackage[colorlinks=true,breaklinks=false,urlcolor=black,citecolor=red]{hyperref}
 \usepackage{listings}
 \usepackage[norelsize,ruled,vlined]{algorithm2e}
 \usepackage{csquotes}
@@ -50,8 +50,8 @@
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
-\counterwithin*{equation}{section}
-\counterwithin*{equation}{subsection}
+%\counterwithin*{equation}{section}
+%\counterwithin*{equation}{subsection}
 
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
@@ -108,11 +108,15 @@
 \include{sections/settings}
 \include{sections/cover}
 \include{sections/abstract}
+{
+\hypersetup{linkcolor=black}
+
 \tableofcontents
 \lstlistoflistings
 %\listofalgorithms
 \listoffigures
 \listoftables
+}
 
 \setlength{\parskip}{1em}
 \include{sections/introduction}
@@ -127,7 +131,6 @@
 \begin{appendices}
 	\include{appendix}
 \end{appendices}
-
 
 \pagebreak
 \printbibliography{}

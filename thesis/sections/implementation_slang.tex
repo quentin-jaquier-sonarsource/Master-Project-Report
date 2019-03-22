@@ -344,7 +344,7 @@ The two approaches described before seems not well-suited for our checker, we ma
 
 \item \textbf{\textit{Fine grain}} \newline
 We can use the fact that we know if an element comes from a native node or not to define a finer grain implementation of our checker. 
-It consists mainly in one modification of the data flow analysis described previously: we do not add a pointer used in an unreliable block to the believed to be \emph{non-null} set.
+It consists mainly in one modification of the data flow analysis described in section \ref{subsubsec:data_flow_analysis}: we do not add a pointer used in an unreliable block to the believed to be \emph{non-null} set, the equation \eqref{eqn:dataflow3} therefore becomes:
 
 \begin{equation}\label{eqn:new_dataflow4}
 newGen(n) = \parbox{7cm}{pointer used in the node n\newline exept if marked as unreliable}
