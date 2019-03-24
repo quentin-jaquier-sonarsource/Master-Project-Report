@@ -81,6 +81,8 @@ gen(n) =\text{pointer used in node \emph{n}}
 kill(n) = \text{assignment of pointer in node \emph{n}}
 \end{equation}
 
+\pagebreak
+
 Intuitively, we can see the analysis as follow:
 \begin{enumerate}
 	\item The set of believed to be \emph{non-null} pointer split at branch. \newline 
@@ -144,6 +146,7 @@ The work presented before implements the former.
 However, the latter makes as much sense, if all paths following the check for \emph{null} uses the pointer \emph{p}, without re-assigning it, it probably means that an error is possible.
 In the implementation, this would be implemented using a backward analysis. 
 As the name suggests, a backward analysis means that we take the intersection of all successor’s input set to determine the output set of the current node. 
+\pagebreak
 
 For a backward analysis, equation \eqref{eqn:dataflow1} becomes:
 

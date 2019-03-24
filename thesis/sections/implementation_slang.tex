@@ -82,14 +82,14 @@ To build the control flow graph, we are going to use two main kinds of basic blo
 	This is the foundation of all basic block of the graph, it contains four fields:
 	\begin{enumerate}
 		\item \textbf{\textit{Predecessors}} \newline
-		List of nodes that may be executed \textbf{before} the current block.\newline
+		List of nodes that may be executed \textbf{before} the current block.
 		\item \textbf{\textit{Successors}} \newline
-		List of nodes that may be executed \textbf{after} the current block.\newline
+		List of nodes that may be executed \textbf{after} the current block.
 		\item \textbf{\textit{Elements}} \newline
-		List of instruction executed one after the other in this basic block. \newline
+		List of instruction executed one after the other in this basic block. 
 		\item \textbf{\textit{Syntactic Successor}} \newline
 		List of node following the current block if no jump is applied. 
-		This is not directly needed for our check, but it may be required in the future.\newline
+		This is not directly needed for our check, but it may be required in the future.
 	\end{enumerate}
 	\item \textbf{\textit{CFG Branching Block}} \newline 
 	This interface represents blocks including branching instruction, where the flow depends on the result of a Boolean expression. 
@@ -391,7 +391,7 @@ We have already presented the main problematic situations, coming from native no
 	caption=Problematic situations due to Boolean short circuit]{code/boolean-short-circuit.scala}
 	
 	With this addition, we are now able to avoid the false negative reported in the two examples of listing \ref{lst:boolean-short-circuit}.
-	
+	\pagebreak
 	\item \textbf{\textit{Order of evaluation of known nodes}} \newline 
 	\label{subsubsec:evaluation_known_nodes}
 	In section \ref{subsec:how_to_deal_with_native}, we saw that the order of evaluation of the nodes are critical for our checker.
