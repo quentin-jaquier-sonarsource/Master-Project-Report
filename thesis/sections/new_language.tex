@@ -60,7 +60,7 @@ Similarly, we can have false and true negatives, for real issue not reported and
 
 \emph{Precision} is the number of true positives, over the total number of issues reported by the tool ($ \emph{true positives} + \emph{false positives} $). \emph{Recall} is the number of true positive over the number of issues present in the code. 
 Finding a good balance is a challenging task, in the first case, the programmer does not want to be surrounded with issues considered as irrelevant, this would hide the real issues and discredit the tool.
-In the other extreme, a checker never reporting any issue will never report false positive, and will not be useful,because containing a lot of false negatives. 
+In the other extreme, a checker never reporting any issue will never report false positive, and will not be useful, because containing a lot of false negatives. 
 Since there is no concrete solution to this trade-off, we are going to target a rate of less than \textbf{5\%} of false positive for our work.
 This is an arbitrary choice, other tools like FindBugs \cite{Hovemeyer:2004:FBE:1052883.1052895} initially targeted a rate of less than 50\% of false positives for example. 
 It mainly depends on the context in which the tool is used, an analysis of the software of an aircraft might want to have a high recall while a user working on a small project would like a precise tool. 
@@ -141,18 +141,18 @@ This information can lead our research and lead to identify 4 potentials problem
 
 \begin{enumerate}
 	\captionsetup[lstlisting]{format=listingEnum, labelfont=white, textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
-	\item \textbf{\textit{Function with many parameter clauses}} \newline 
+	\item \textbf{\textit{Function with many parameter's clauses}} \newline 
 	\lstinputlisting[label={lst:many-parameters},
-	caption=Scala function with many parameters clauses]{code/many-parameters.scala}
+	caption=Scala function with many parameter's clauses]{code/many-parameters.scala}
 	
-	Listing \ref{lst:many-parameters} shows an example of a Scala function with multiple parameters, common in Scala, but not necessarily in other languages. 
+	Listing \ref{lst:many-parameters} shows an example of a Scala function with multiple parameter's clauses, common in Scala, but not necessarily in other languages. 
 	Mapping the whole function to a native node is a big loss, we are not going to be able to run all the checks we could run inside functions.
 	Adding the support for multiple lists to \slang{} is the first solution, but we have to make sure  that the benefit for this addition is worth the added complexity.
-	In our situation, multiple list support do not add any value to the checks.
+	In our situation, multiple lists support do not add any value to the checks.
 	Indeed, none of them would use this information, we should not add it to the language.
 	A second solution is to merge all the parameters into one single list.
 	This solution works fine, we recover the possibility to run all checks applying to functions.
-	However, the check limiting the number of parameters raise some unexpected issues.
+	However, the check limiting the number of parameters raises some unexpected issues.
 	If we limit the number to one single argument, the code from listing \ref{lst:many-parameters} will raise an issue.
 	The problem is the implicit keyword, it is here to avoid giving this argument when calling this function, one can argue that implicit parameters should not be accounted for.
 	Despite this concern, we chose this solution, a user can always configure the limit if he thinks that the checks raise unexpected issues.

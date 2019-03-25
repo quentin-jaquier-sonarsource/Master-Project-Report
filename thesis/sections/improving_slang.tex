@@ -51,7 +51,7 @@ This greatly reduces the number of nodes present in the graph, reducing therefor
 \subsection{Formal definition of the checker}
 \label{subsec:checker_formal_definition}
 More formally, the idea is to check if the use of a pointer \emph{p} post dominates the check of \emph{p} for \emph{null}.
-Intuitively, we report an issue if all path arriving at the check of \emph{p} go through the use of \emph{p}, without having been reassigned between the two. 
+Intuitively, we report an issue if all paths arriving at the check of \emph{p} go through the use of \emph{p}, without having been reassigned between the two. 
 To do this, a data-flow analysis using the control flow graph previously described will be used.
 
 \subsubsection{Data-flow Analysis}
@@ -116,7 +116,7 @@ i_{n} = o_{p1}  \cup   o_{p2}  \cup  ... \cup   o_{pk}
 \end{equation}
 
 If a \emph{MUST} analysis takes the intersection of all incoming path, the \emph{MAY} analysis takes the union of the paths. 
-It means that a pointer will be removed from the set only if all path re-assigns this variable.
+It means that a pointer will be removed from the set only if all paths re-assign this variable.
 The choice of \emph{MUST} over \emph{MAY} goes in the sense of the idea to have as little false positives as possible described \ref{subsubsec:precision_recall}.
 Table \ref{table:issue_per_analysis_type} shows the difference between a \emph{MAY} and a \emph{MUST} analysis of the checker ran on the same sets of sources.
 We can see that we have more issues, but the rate of false positives is significantly higher, finding interesting issues is too hard with this noise. 

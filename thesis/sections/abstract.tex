@@ -5,7 +5,7 @@ Therefore, static analysis companies typically minimize this effort by targeting
 However, the main technical problem is to support and approximate different language features and paradigms in the same representation.
 
 In this thesis, we study \slang{}, an intermediate representation defined by SonarSource, used as the input of a static analyzer for Kotlin, Scala, Ruby, and Apex.
-The key ideas are the representation of unknown expressions by natives elements in \slang{}, and the notion of unreliable basic block for dataflow analysis.
+The key ideas are the representation of unknown expressions by native elements in \slang{}, and the notion of unreliable basic block for dataflow analysis.
 Our experiments compare the results of an implementation of a \emph{null} pointer dereference checker over \slang{} and an implementation on the original language.
 The results show that we are able to find real issues with a very low false positive rate, and also reach the same precision as the implementation on the original language.
 \end{abstract}

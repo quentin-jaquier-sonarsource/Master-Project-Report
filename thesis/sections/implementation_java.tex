@@ -54,6 +54,6 @@ We can therefore perform a second pass through the elements of the basic blocks,
 	\item Accessing or modifying the slots of \emph{null} as if it were an array;
 	\item Throwing \emph{null} as if it were a \emph{Throwable} value.
 \end{enumerate}
-Currently, our checker is only using the first case, but we can use this information to improve our implementation: when we see one of these construction, we will add the pointer to the set of believed to be \emph{non-null} (\emph{gen} set) the same way as we would for a pointer used.
+Currently, our checker is only using the first case, but we can use this information to improve our implementation: when we see one of these constructions, we will add the pointer to the set of believed to be \emph{non-null} (\emph{gen} set) the same way as we would for a pointer used.
 
 

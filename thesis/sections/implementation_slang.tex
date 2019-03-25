@@ -147,7 +147,7 @@ We will then recursively build the graph by matching on the type of the tree.
 	Non-fallthrough match tree is an easy case, we can build all the cases separately, and create a block having multiples successors.
 	
 	Fallthrough switch is trickier, we first have to use the same idea as we used for loops: add an object (similar to breakable) to the stack, to store the reference to the block executed after the switch.
-	We make the same assumption as we did with loops, that a \emph{break} statements refer only to the closest enclosing match tree. 
+	We make the same assumption as we did with loops, that \emph{break} statements only refer to the closest enclosing match tree. 
 	
 	The next step is to create a forwarding block for the default case of the match tree, and build the different cases in the reverse order, one after the other. 
 	We create one branching block per match cases, with the body of the case as true successor and the next pattern as the false successor. 
